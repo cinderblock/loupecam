@@ -357,3 +357,57 @@ input.number {
 .update-banner a {
   color: var(--accent);
 }
+
+.calibration h4 {
+  margin: 10px 0 2px;
+  font-size: 12px;
+}
+.calibration code {
+  font-size: 11px;
+}
+.calibration input:not([type='checkbox']):not([type='radio']) {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+.calib-running progress {
+  width: 100%;
+}
+.calib-ok {
+  color: var(--ok);
+  margin: 4px 0;
+}
+.calib-err {
+  color: #f07070;
+  margin: 4px 0;
+}
+.calib-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.target-page {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  cursor: none;
+}
+.target-page canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+.target-info {
+  position: absolute;
+  top: 20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 520px;
+  text-align: center;
+  cursor: default;
+}

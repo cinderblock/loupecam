@@ -7,7 +7,8 @@ import { Section, Slider } from './components/widgets'
 import { formatExposure } from './format'
 import { Viewer, type Overlays, type Tool } from './components/Viewer'
 import { UpdateBanner, UpdatesPanel } from './components/Updates'
-import type { NormRect } from './types'
+import { CalibrationPanel } from './components/Calibration'
+import type { NormRect, ScalePreset } from './types'
 import { useCamera } from './useCamera'
 
 function useStored<T>(key: string, initial: T): [T, (v: T) => void] {
@@ -40,6 +41,14 @@ export default function App() {
     window.setTimeout(() => setToast((t) => (t === m ? null : t)), 4000)
   }, [])
   const cam = useCamera(flash)
+  // Calibrated scale presets (refreshed when a calibration step finishes).
+  const [scalePresets, setScalePresets] = useState<ScalePreset[]>([])
+  const calibAt = cam.calibration?.last?.at
+  const serial = cam.state?.device?.serial
+  useEffect(() => {
+    if (!serial) return
+    api.calibration().then((r) => setScalePresets(r.profile.scale), () => {})
+  }, [calibAt, serial])
 
   const capture = useCallback(async () => {
     if (busy) return
@@ -62,6 +71,8 @@ export default function App() {
         flash(`White balance set: ${gains.map((g) => g.toFixed(2)).join(' / ')}`)
       } else if (t === 'roi') {
         await api.roi(r)
+      } else if (t === 'chart') {
+        await api.runCalibration({ step: 'color', region: r })
       }
       setTool('pan')
     } catch (e) {
@@ -115,7 +126,10 @@ export default function App() {
     const sizeW = dev.resolutions[s.sizeIndex]?.[0] ?? fullW
     const rotated = s.orientation.rotation === 90 || s.orientation.rotation === 270
     const frameAcross = rotated ? cam.stats.height : cam.stats.width
-    umPerPixel = (dev.pixelSizeUm * (fullW / sizeW) * (frameAcross / cam.frame.width)) / (objective * adapter)
+    // A calibrated scale preset, or the nominal pixel size through objective × adapter.
+    const preset = scalePresets.find((p) => p.name === s.calibration.scalePreset)
+    const umPerSensorPixel = preset ? preset.umPerSensorPixel : dev.pixelSizeUm / (objective * adapter)
+    umPerPixel = umPerSensorPixel * (fullW / sizeW) * (frameAcross / cam.frame.width)
   }
 
   return (
@@ -171,10 +185,31 @@ export default function App() {
             </Section>
           )}
           <Section title="Scale" defaultOpen={false}>
-            <Slider label="Objective" value={objective} min={1} max={100} log format={(v) => `${v.toFixed(v < 10 ? 1 : 0)}×`} onChange={setObjective} />
-            <Slider label="Camera adapter" value={adapter} min={0.3} max={2} format={(v) => `${v.toFixed(2)}×`} onChange={setAdapter} />
-            <p className="hint">Sets the scale bar: µm per pixel = pixel size × binning ÷ (objective × adapter).</p>
+            {s?.calibration.scalePreset ? (
+              <p className="hint">Using the calibrated preset “{s.calibration.scalePreset}” (change it under Calibration).</p>
+            ) : (
+              <>
+                <Slider label="Objective" value={objective} min={0.1} max={100} log format={(v) => `${v.toFixed(v < 10 ? 2 : 0)}×`} onChange={setObjective} />
+                <Slider label="Camera adapter" value={adapter} min={0.3} max={2} format={(v) => `${v.toFixed(2)}×`} onChange={setAdapter} />
+                <p className="hint">Nominal scale: pixel size ÷ (objective × adapter). For an exact scale, use Calibration → Scale.</p>
+              </>
+            )}
           </Section>
+          {s && (
+            <Section title="Calibration" defaultOpen={false}>
+              <CalibrationPanel
+                s={s}
+                device={dev}
+                status={cam.calibration}
+                patch={cam.patch}
+                flash={flash}
+                startChartBox={() => {
+                  setTool('chart')
+                  flash('Drag a box tightly around the colour chart patches')
+                }}
+              />
+            </Section>
+          )}
           <Section title="Captures">
             <Gallery version={galleryVersion} />
           </Section>

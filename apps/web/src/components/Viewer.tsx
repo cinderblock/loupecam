@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { NormRect } from '../types'
 
-export type Tool = 'pan' | 'roi' | 'wb'
+export type Tool = 'pan' | 'roi' | 'wb' | 'chart'
 
 export interface Overlays {
   crosshair: boolean
@@ -120,7 +120,7 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
       const a = { x: Math.min(sel.x0, sel.x1), y: Math.min(sel.y0, sel.y1) }
       const w = Math.abs(sel.x1 - sel.x0)
       const h = Math.abs(sel.y1 - sel.y0)
-      g.strokeStyle = tool === 'wb' ? '#ffd23f' : '#3fa9ff'
+      g.strokeStyle = tool === 'wb' ? '#ffd23f' : tool === 'chart' ? '#ff6bd5' : '#3fa9ff'
       g.setLineDash([6 * dpr, 4 * dpr])
       g.strokeRect(ox + a.x * zoom, oy + a.y * zoom, w * zoom, h * zoom)
       g.setLineDash([])
@@ -137,7 +137,7 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
     <div className="viewer">
       <canvas
         ref={canvas}
-        className={`tool-${tool}`}
+        className={`tool-${tool === 'chart' ? 'roi' : tool}`}
         onWheel={(e) => {
           if (!frame) return
           const p = dev(e)

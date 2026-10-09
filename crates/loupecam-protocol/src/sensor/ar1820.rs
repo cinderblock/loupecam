@@ -164,11 +164,13 @@ pub fn line_time_us(line_length_pck: u16) -> f64 {
     line_length_pck as f64 / PIXEL_RATE_HZ * 1e6
 }
 
-/// Analog gain stages seen in use, as (`global_gain` bits 6:0, approximate multiplier).
+/// Analog gain stages the vendor SDK uses, as (`global_gain` bits 6:0, multiplier).
 ///
-/// Ratios come from where the vendor SDK switches stages (digital gain falls from 127/64
-/// to 64/64 at each step). They have not yet been measured optically.
-pub const ANALOG_STAGES: &[(u8, f32)] = &[(0x09, 1.0), (0x0a, 2.0), (0x0e, 3.0), (0x7a, 4.0)];
+/// Measured optically on an MU1803-HS with the calibration wizard's gain step
+/// (flicker-safe 50 ms exposures, interleaved references; three runs agreed within
+/// ±0.3 %). The vendor SDK's switch points had suggested 1/2/3/4×; the top stage is in
+/// fact ~3.64×. A camera's own calibration overrides these.
+pub const ANALOG_STAGES: &[(u8, f32)] = &[(0x09, 1.0), (0x0a, 1.99), (0x0e, 2.97), (0x7a, 3.64)];
 
 /// Maximum digital gain field value we allow (bits 15:7 of `global_gain`, unit 1/64).
 pub const DIGITAL_MAX: u16 = 255;

@@ -40,7 +40,53 @@ export interface Settings {
     saveRaw: boolean
   }
   updates: { autoInstall: boolean; checkIntervalHours: number }
+  calibration: CalibrationSettings
 }
+
+export interface CalibrationSettings {
+  blackLevel: boolean
+  defects: boolean
+  gainStages: boolean
+  flatField: boolean
+  color: boolean
+  scalePreset: string | null
+}
+
+export interface ScalePreset {
+  name: string
+  umPerSensorPixel: number
+  measuredAt: string
+  method: string
+}
+
+export interface CalibrationProfile {
+  serial: string
+  dark: { measuredAt: string; blackLevel: [number, number, number]; defects: Record<string, [number, number][]> } | null
+  gain: { measuredAt: string; stages: [number, number][]; linearityError: number } | null
+  flatField: Record<string, { measuredAt: string; width: number; height: number }>
+  scale: ScalePreset[]
+  color: { measuredAt: string; error: number } | null
+}
+
+export interface CalibrationStatus {
+  running: string | null
+  progress: number
+  message: string
+  last: { step: string; ok: boolean; summary: string; at: string } | null
+}
+
+export type Light = 'physical' | 'screen'
+
+export type ScaleSource = { source: 'lines'; spacingUm: number } | { source: 'screen'; pixelPitchUm: number; periodPx: number }
+
+export type StepRequest =
+  | { step: 'dark' }
+  | { step: 'gain'; light: Light }
+  | { step: 'flatField'; light: Light; sizeIndex?: number }
+  | ({ step: 'scale'; name: string } & ScaleSource)
+  | { step: 'color'; region: NormRect }
+
+export type TargetPattern = { kind: 'idle' } | { kind: 'solid'; level: number } | { kind: 'grid'; period: number; line: number }
 
 export interface Release {
   version: string

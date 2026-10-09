@@ -1,4 +1,4 @@
-import type { CaptureEntry, CaptureInfo, NormRect, Patch, Settings, UpdateStatus } from './types'
+import type { CalibrationProfile, CalibrationStatus, CaptureEntry, CaptureInfo, NormRect, Patch, Settings, StepRequest, UpdateStatus } from './types'
 
 // The server may require a token (when exposed on a network). It is kept in
 // localStorage and sent as a Bearer header, or as ?token= where headers are
@@ -50,6 +50,10 @@ export const api = {
   roi: (region: NormRect | null) => request<Settings>('POST', '/api/roi', { region }),
   checkUpdate: () => request<UpdateStatus>('POST', '/api/update/check'),
   installUpdate: () => request<{ installed: string; restarting: boolean }>('POST', '/api/update/install'),
+  calibration: () => request<{ profile: CalibrationProfile; status: CalibrationStatus; targetConnected: boolean }>('GET', '/api/calibration'),
+  runCalibration: (req: StepRequest) => request<void>('POST', '/api/calibration/run', req),
+  cancelCalibration: () => request<void>('POST', '/api/calibration/cancel'),
+  deleteCalibration: (section: string) => request<void>('DELETE', `/api/calibration/${encodeURIComponent(section)}`),
 }
 
 export function wsUrl(): string {

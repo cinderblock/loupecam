@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, AuthError, getToken, wsUrl } from './api'
-import type { LiveStats, Patch, Settings, State, UpdateStatus } from './types'
+import type { CalibrationStatus, LiveStats, Patch, Settings, State, UpdateStatus } from './types'
 
 export interface Camera {
   state: State | null
   stats: LiveStats | null
   update: UpdateStatus | null
+  calibration: CalibrationStatus | null
   /** Latest preview frame, decoded. */
   frame: ImageBitmap | null
   connected: boolean
@@ -35,6 +36,7 @@ export function useCamera(onError: (message: string) => void): Camera {
   const [state, setState] = useState<State | null>(null)
   const [stats, setStats] = useState<LiveStats | null>(null)
   const [update, setUpdate] = useState<UpdateStatus | null>(null)
+  const [calibration, setCalibration] = useState<CalibrationStatus | null>(null)
   const [frame, setFrame] = useState<ImageBitmap | null>(null)
   const [connected, setConnected] = useState(false)
   const [authNeeded, setAuthNeeded] = useState(false)
@@ -70,6 +72,7 @@ export function useCamera(onError: (message: string) => void): Camera {
           if (msg.type === 'state') setState(msg as State)
           else if (msg.type === 'stats') setStats(msg as LiveStats)
           else if (msg.type === 'update') setUpdate(msg as UpdateStatus)
+          else if (msg.type === 'calibration') setCalibration(msg as CalibrationStatus)
           return
         }
         // Skip frames while the previous one is still decoding.
@@ -131,5 +134,5 @@ export function useCamera(onError: (message: string) => void): Camera {
     [flush],
   )
 
-  return { state, stats, update, frame, connected, authNeeded, patch }
+  return { state, stats, update, calibration, frame, connected, authNeeded, patch }
 }

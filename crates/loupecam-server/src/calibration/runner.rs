@@ -24,7 +24,7 @@ pub enum Light {
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase", tag = "source")]
+#[serde(rename_all = "camelCase", rename_all_fields = "camelCase", tag = "source")]
 pub enum ScaleSource {
     /// Evenly spaced lines (ruler, stage micrometer) `spacing_um` apart.
     Lines { spacing_um: f64 },
@@ -32,13 +32,19 @@ pub enum ScaleSource {
     Screen { pixel_pitch_um: f64, period_px: u32 },
 }
 
+/// A step to run. JSON: `{"step": "scale", "name": "2×", "source": "lines", "spacingUm": 1000}`
+/// (the scale source's fields sit alongside the step's).
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase", tag = "step")]
+#[serde(rename_all = "camelCase", rename_all_fields = "camelCase", tag = "step")]
 pub enum StepRequest {
     Dark,
     Gain { light: Light },
     FlatField { light: Light, size_index: Option<usize> },
-    Scale { name: String, source: ScaleSource },
+    Scale {
+        name: String,
+        #[serde(flatten)]
+        source: ScaleSource,
+    },
     Color { region: NormRect },
 }
 
@@ -240,19 +246,36 @@ impl Runner {
         let size = self.sizes().saturating_sub(1); // the smallest size: fastest
         let black = self.black();
         self.progress(0.05, "finding exposure")?;
-        let (exp, base) = self.find_exposure(size, 0.08).await?;
+        let (mut exp, base) = self.find_exposure(size, 0.08).await?;
         let base_level = analysis::level(&base, black);
-        let mut stages = Vec::new();
-        for (i, &(code, _)) in ANALOG_STAGES.iter().enumerate() {
-            self.progress(0.2 + 0.4 * i as f32 / ANALOG_STAGES.len() as f32, format!("measuring analog stage {code:#04x}"))?;
-            let m = self.measure(size, exp, Gain { analog_code: code, digital: 64 }, 4).await?;
+        // Mains-powered lights flicker at 100 or 120 Hz; 50 ms spans whole cycles of
+        // both, so every frame integrates the same light. Use a multiple of it when the
+        // highest stage (~4×) still stays well clear of clipping.
+        const FLICKER_SAFE_US: u32 = 50_000;
+        let flicker_exp = exp.div_ceil(FLICKER_SAFE_US) * FLICKER_SAFE_US;
+        let projected = base_level * flicker_exp as f32 / exp.max(1) as f32;
+        if flicker_exp != exp && projected * 4.5 < 0.85 * FULL_SCALE {
+            exp = flicker_exp;
+        }
+        let flicker_safe = exp % FLICKER_SAFE_US == 0;
+        let frames = if flicker_safe { 4 } else { 8 };
+        // Interleave unity-gain reference measurements between the stages, so slow
+        // drift in the light cancels: ratio = stage / mean(reference before, after).
+        let unity = |m: &Measurement| analysis::level(m, black);
+        let mut reference = unity(&self.measure(size, exp, Gain::UNITY, frames).await?);
+        let mut stages = vec![(ANALOG_STAGES[0].0, 1.0f32)];
+        let mut drift = 0f32;
+        for (i, &(code, _)) in ANALOG_STAGES.iter().enumerate().skip(1) {
+            self.progress(0.15 + 0.5 * i as f32 / ANALOG_STAGES.len() as f32, format!("measuring analog stage {code:#04x}"))?;
+            let m = self.measure(size, exp, Gain { analog_code: code, digital: 64 }, frames).await?;
             if m.clipped() > 0.01 {
                 return Err(format!("stage {code:#04x} clipped; reduce the light"));
             }
-            stages.push((code, analysis::level(&m, black)));
+            let after = unity(&self.measure(size, exp, Gain::UNITY, frames).await?);
+            drift = drift.max((after / reference.max(1.0) - 1.0).abs());
+            stages.push((code, analysis::level(&m, black) / ((reference + after) / 2.0).max(1.0)));
+            reference = after;
         }
-        let ref_level = stages[0].1.max(1.0);
-        let stages: Vec<(u8, f32)> = stages.into_iter().map(|(c, l)| (c, l / ref_level)).collect();
         // Linearity: levels across an exposure sweep at unity gain.
         let mut points = Vec::new();
         for (i, f) in [0.5f32, 1.0, 2.0, 4.0].into_iter().enumerate() {
@@ -264,12 +287,14 @@ impl Runner {
         }
         let k = points.iter().map(|(t, l)| t * l).sum::<f64>() / points.iter().map(|(t, _)| t * t).sum::<f64>().max(1e-9);
         let linearity = points.iter().map(|(t, l)| ((l - k * t) / (k * t)).abs()).fold(0.0, f64::max) as f32;
-        let stability = (analysis::level(&base, black) / base_level - 1.0).abs();
         self.update_profile(|p| p.gain = Some(GainStages { measured_at: now(), stages: stages.clone(), linearity_error: linearity }))?;
         let list: Vec<String> = stages.iter().map(|(c, m)| format!("{c:#04x}: {m:.2}×")).collect();
         let mut s = format!("analog stages {}; linearity within {:.1} %", list.join(", "), linearity * 100.0);
-        if stability > 0.03 {
-            s.push_str(" (light level varied during the measurement; flicker? results may be less accurate)");
+        if !flicker_safe {
+            s.push_str(&format!(" (exposure {:.1} ms is too short to average out light flicker; frames were averaged instead)", exp as f32 / 1000.0));
+        }
+        if drift > 0.03 {
+            s.push_str(&format!(" (the light drifted {:.0} % between measurements; results may be less accurate)", drift * 100.0));
         }
         Ok(s)
     }
@@ -466,6 +491,16 @@ fn mean_rgb(m: &Measurement, (x0, y0, x1, y1): (u32, u32, u32, u32), black: [f32
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn step_requests_parse_like_the_ui_sends_them() {
+        let r: StepRequest = serde_json::from_str(r#"{"step":"scale","name":"2x","source":"screen","pixelPitchUm":276.9,"periodPx":16}"#).unwrap();
+        assert_eq!(r, StepRequest::Scale { name: "2x".into(), source: ScaleSource::Screen { pixel_pitch_um: 276.9, period_px: 16 } });
+        let r: StepRequest = serde_json::from_str(r#"{"step":"flatField","light":"screen","sizeIndex":1}"#).unwrap();
+        assert_eq!(r, StepRequest::FlatField { light: Light::Screen, size_index: Some(1) });
+        let r: StepRequest = serde_json::from_str(r#"{"step":"color","region":{"x":0.1,"y":0.1,"width":0.5,"height":0.4}}"#).unwrap();
+        assert!(matches!(r, StepRequest::Color { .. }));
+    }
 
     /// Render a chart through a known "camera" matrix and check the fit inverts it.
     #[test]
