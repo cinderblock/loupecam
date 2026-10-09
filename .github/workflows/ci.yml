@@ -12,13 +12,13 @@ jobs:
   web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
         working-directory: apps/web
       - run: bunx tsc -b && bun run lint && bun run build
         working-directory: apps/web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: web-dist
           path: apps/web/dist
@@ -31,20 +31,20 @@ jobs:
         os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: web-dist
           path: apps/web/dist
       # The desktop crate needs WebKitGTK on Linux; it has its own job.
       - run: cargo clippy --workspace --exclude loupecam-desktop --all-targets -- -D warnings
       - run: cargo test --workspace --exclude loupecam-desktop
-      - run: cargo build --release -p loupecam-cli --features embed-ui
-      - uses: actions/upload-artifact@v4
+      - run: cargo build --release --locked -p loupecam-cli --features embed-ui
+      - uses: actions/upload-artifact@v5
         with:
           name: loupecam-${{ matrix.os }}
           path: |
@@ -59,10 +59,10 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: web-dist
           path: apps/web/dist
