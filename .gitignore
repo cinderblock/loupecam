@@ -1,0 +1,7 @@
+# Raw USB captures: large, and they contain the device serial. Curate fixtures deliberately.
+/captures/
+# RE tooling virtualenv
+/re/.venv/
+__pycache__/
+/target/
+node_modules/
