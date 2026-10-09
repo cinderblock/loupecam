@@ -21,7 +21,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "embed-ui")]
 #[derive(rust_embed::Embed)]
-#[folder = "$CARGO_MANIFEST_DIR/../../apps/web/dist"]
+#[folder = "../../apps/web/dist"]
 struct Assets;
 
 /// Where the web UI comes from.
