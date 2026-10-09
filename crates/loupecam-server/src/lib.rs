@@ -6,6 +6,7 @@
 //!
 //! See [`http`] for the API surface.
 
+pub mod calibration;
 pub mod captures;
 pub mod geometry;
 pub mod http;

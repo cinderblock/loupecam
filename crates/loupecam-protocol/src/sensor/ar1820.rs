@@ -192,35 +192,80 @@ impl Gain {
         Gain { analog_code: (v & 0x7f) as u8, digital: v >> 7 }
     }
 
-    /// Approximate total multiplier relative to [`Gain::UNITY`].
+    /// Approximate total multiplier relative to [`Gain::UNITY`], using the built-in
+    /// stage estimates. See [`GainTable`] for measured stages.
     pub fn multiplier(self) -> f32 {
-        let a = ANALOG_STAGES
-            .iter()
-            .find(|(c, _)| *c == self.analog_code)
-            .map(|(_, m)| *m)
-            .unwrap_or(1.0);
-        a * self.digital as f32 / 64.0
+        GainTable::default().multiplier(self)
+    }
+
+    /// Choose a setting for a total multiplier with the built-in stage estimates.
+    pub fn for_multiplier(m: f32) -> Result<Self> {
+        GainTable::default().for_multiplier(m)
+    }
+
+    pub fn max_multiplier() -> f32 {
+        GainTable::default().max_multiplier()
+    }
+}
+
+/// Analog gain stages and their multipliers (relative to stage `0x09`), sorted by
+/// multiplier. The default is the estimate in [`ANALOG_STAGES`]; calibration can
+/// replace it with measured ratios.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GainTable(Vec<(u8, f32)>);
+
+impl Default for GainTable {
+    fn default() -> Self {
+        GainTable(ANALOG_STAGES.to_vec())
+    }
+}
+
+impl GainTable {
+    /// A table from measured `(analog_code, multiplier)` pairs. Stages are sorted, and
+    /// ones that do not increase the multiplier are dropped. Falls back to the default
+    /// if nothing usable remains.
+    pub fn new(mut stages: Vec<(u8, f32)>) -> Self {
+        stages.retain(|(_, m)| m.is_finite() && *m > 0.0);
+        stages.sort_by(|a, b| a.1.total_cmp(&b.1));
+        let mut out: Vec<(u8, f32)> = Vec::new();
+        for s in stages {
+            if out.last().is_none_or(|l| s.1 > l.1 * 1.01) {
+                out.push(s);
+            }
+        }
+        if out.is_empty() { Self::default() } else { GainTable(out) }
+    }
+
+    pub fn stages(&self) -> &[(u8, f32)] {
+        &self.0
+    }
+
+    /// The multiplier of the lowest stage at unity digital gain (the minimum gain).
+    fn base(&self) -> f32 {
+        self.0[0].1
+    }
+
+    /// Total multiplier of `g`, normalised so the lowest stage at unity digital gain is
+    /// 1.0.
+    pub fn multiplier(&self, g: Gain) -> f32 {
+        let a = self.0.iter().find(|(c, _)| *c == g.analog_code).map_or(self.base(), |(_, m)| *m);
+        a / self.base() * g.digital as f32 / 64.0
     }
 
     /// Choose a setting for a total multiplier: the highest analog stage that does not
     /// exceed it (best SNR), with digital gain making up the rest.
-    pub fn for_multiplier(m: f32) -> Result<Self> {
-        let max = Self::max_multiplier();
-        if !(1.0..=max).contains(&m) {
+    pub fn for_multiplier(&self, m: f32) -> Result<Gain> {
+        let max = self.max_multiplier();
+        if !(1.0..=max * 1.0001).contains(&m) {
             return Err(Error::OutOfRange(format!("gain {m} not in 1.0..={max}")));
         }
-        let (code, a) = ANALOG_STAGES
-            .iter()
-            .rev()
-            .find(|(_, a)| *a <= m)
-            .copied()
-            .unwrap_or(ANALOG_STAGES[0]);
+        let (code, a) = self.0.iter().rev().map(|(c, a)| (*c, a / self.base())).find(|(_, a)| *a <= m).unwrap_or((self.0[0].0, 1.0));
         let digital = ((m / a) * 64.0).round().clamp(64.0, DIGITAL_MAX as f32) as u16;
         Ok(Gain { analog_code: code, digital })
     }
 
-    pub fn max_multiplier() -> f32 {
-        ANALOG_STAGES.last().unwrap().1 * DIGITAL_MAX as f32 / 64.0
+    pub fn max_multiplier(&self) -> f32 {
+        self.0.last().unwrap().1 / self.base() * DIGITAL_MAX as f32 / 64.0
     }
 }
 
@@ -294,6 +339,17 @@ mod tests {
         ] {
             assert_eq!(exposure_lines(us, ll), lines, "{us} µs @ {ll}");
         }
+    }
+
+    #[test]
+    fn measured_gain_table() {
+        // Measured stages (unsorted, one useless) replace the estimates.
+        let t = GainTable::new(vec![(0x0a, 1.9), (0x09, 1.0), (0x7a, 4.4), (0x0e, 1.9), (0x0e, 2.9)]);
+        assert_eq!(t.stages().iter().map(|s| s.0).collect::<Vec<_>>(), [0x09, 0x0a, 0x0e, 0x7a]);
+        let g = t.for_multiplier(3.8).unwrap();
+        assert_eq!(g.analog_code, 0x0e);
+        assert!((t.multiplier(g) - 3.8).abs() < 0.03);
+        assert_eq!(GainTable::default().for_multiplier(2.5).unwrap(), Gain::for_multiplier(2.5).unwrap());
     }
 
     #[test]

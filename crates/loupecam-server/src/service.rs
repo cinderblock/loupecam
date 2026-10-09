@@ -5,6 +5,8 @@
 //! and state comes out through `tokio::sync::watch` channels, which any number of
 //! HTTP/WebSocket clients can observe.
 
+use crate::calibration::Calibration;
+use crate::calibration::analysis::Measurement;
 use crate::settings::{Settings, WbMode};
 use loupecam::{Camera, FrameReceiver, Gain, Model, RawFrame, RecvError};
 use loupecam_isp::auto::{AutoExposure, Exposure, grey_world};
@@ -77,11 +79,16 @@ pub struct LiveStats {
 pub struct FrameEnvelope {
     pub raw: Arc<RawFrame>,
     pub model: &'static Model,
+    /// Size index the frame was streamed at.
+    pub size_index: usize,
+    /// Top-left of the frame within the full frame of that size (ROI offset).
+    pub origin: (u32, u32),
 }
 
 /// A frame captured for saving.
 pub struct Captured {
     pub frame: FrameEnvelope,
+    pub calibration: Arc<Calibration>,
     pub settings: Settings,
     pub exposure_us: f64,
     pub gain: f32,
@@ -93,7 +100,19 @@ enum Command {
     Patch(serde_json::Value, Reply<Settings>),
     Capture { full_resolution: bool, reply: Reply<Captured> },
     WhiteBalance { region: Option<Rect>, reply: Reply<[f32; 3]> },
+    Measure { spec: MeasureSpec, reply: Reply<Measurement> },
+    ReloadCalibration,
     Shutdown,
+}
+
+/// What to measure with [`Service::measure`]: averaged raw 12-bit frames at fixed
+/// settings, with auto exposure, white balance and ROI out of the way.
+#[derive(Debug, Clone, Copy)]
+pub struct MeasureSpec {
+    pub size_index: usize,
+    pub exposure_us: u32,
+    pub gain: Gain,
+    pub frames: u32,
 }
 
 /// Channels shared between the actor and its observers.
@@ -101,6 +120,8 @@ pub struct Shared {
     pub state: watch::Sender<State>,
     pub stats: watch::Sender<LiveStats>,
     pub frame: watch::Sender<Option<FrameEnvelope>>,
+    /// The connected camera's calibration (empty when none / no camera).
+    pub calibration: watch::Sender<Arc<Calibration>>,
 }
 
 /// Handle to the camera actor.
@@ -117,6 +138,7 @@ impl Service {
             state: watch::Sender::new(State { status: Status::Searching(None), device: None, settings: settings.clone() }),
             stats: watch::Sender::new(LiveStats::default()),
             frame: watch::Sender::new(None),
+            calibration: watch::Sender::new(Arc::new(Calibration::default())),
         });
         let actor = Actor::new(shared.clone(), rx, settings);
         let thread = std::thread::Builder::new()
@@ -140,6 +162,17 @@ impl Service {
     /// Grab a frame for saving, switching to full resolution if asked.
     pub async fn capture(&self, full_resolution: bool) -> Result<Captured, String> {
         self.call(|reply| Command::Capture { full_resolution, reply }).await
+    }
+
+    /// Average raw frames at fixed settings (for calibration). The stream is restored
+    /// afterwards.
+    pub async fn measure(&self, spec: MeasureSpec) -> Result<Measurement, String> {
+        self.call(|reply| Command::Measure { spec, reply }).await
+    }
+
+    /// Re-read the calibration profile from disk (after the wizard saved it).
+    pub fn reload_calibration(&self) {
+        let _ = self.tx.lock().unwrap().send(Command::ReloadCalibration);
     }
 
     /// One-shot white balance over a region (frame pixels) assumed neutral, or the whole
@@ -245,7 +278,10 @@ impl Actor {
 
     fn connect(&mut self) -> Result<(), String> {
         let mut cam = Camera::open_first().map_err(|e| e.to_string())?;
-        let frames = cam.start(&self.settings.stream_config()).map_err(|e| e.to_string())?;
+        // Load this camera's calibration first: it can change gain register choices.
+        let profile = crate::calibration::load(&cam.info().serial);
+        self.shared.calibration.send_replace(Arc::new(Calibration::new(profile)));
+        let frames = cam.start(&self.settings.stream_config(&self.gains())).map_err(|e| e.to_string())?;
         let i = cam.info();
         self.device = Some(DeviceSummary {
             model: i.model.name.into(),
@@ -299,7 +335,8 @@ impl Actor {
     fn on_frame(&mut self, f: RawFrame) {
         let Some(live) = self.live.as_ref() else { return };
         let model = live.cam.model();
-        let env = FrameEnvelope { raw: Arc::new(f), model };
+        let (size_index, origin) = self.frame_place();
+        let env = FrameEnvelope { raw: Arc::new(f), model, size_index, origin };
         let pattern = match model.color {
             loupecam::ColorFilter::Bayer(p) => p,
             loupecam::ColorFilter::Mono => loupecam::BayerPattern::Rggb,
@@ -352,7 +389,7 @@ impl Actor {
         let Some(live) = self.live.as_ref() else { return };
         let s = live.frames.stats();
         let geom = live.cam.geometry();
-        let tone = self.settings.develop_params(env.model, self.settings.preview.demosaic).tone;
+        let tone = self.settings.develop_params_uncalibrated(env.model, self.settings.preview.demosaic).tone;
         let mut hist = vec![0u32; 64];
         for (i, &n) in st.histogram.iter().enumerate() {
             let v = tone.eval((i as f32 + 0.5) / 256.0);
@@ -397,22 +434,28 @@ impl Actor {
                 self.publish_state(true);
                 let _ = reply.send(r);
             }
+            Command::Measure { spec, reply } => {
+                let r = self.measure(spec);
+                let _ = reply.send(r);
+            }
+            Command::ReloadCalibration => self.reload_calibration(),
             Command::Shutdown => unreachable!("handled by the run loop"),
         }
     }
 
     /// Make `next` the active settings, reprogramming the camera as needed.
     fn apply(&mut self, next: Settings) -> Result<(), String> {
+        let gains = self.gains();
         let prev = std::mem::replace(&mut self.settings, next.clone());
         self.state_dirty = true;
         let Some(live) = self.live.as_mut() else { return Ok(()) };
         let r = (|| -> Result<(), loupecam::Error> {
             if prev.needs_restart(&next) {
-                live.frames = live.cam.start(&next.stream_config())?;
+                live.frames = live.cam.start(&next.stream_config(&gains))?;
                 self.ae_cooldown = SETTLE_FRAMES;
                 return Ok(());
             }
-            let (pc, nc) = (prev.stream_config(), next.stream_config());
+            let (pc, nc) = (prev.stream_config(&gains), next.stream_config(&gains));
             if pc.speed != nc.speed {
                 live.cam.set_speed(nc.speed)?;
             }
@@ -439,6 +482,7 @@ impl Actor {
     }
 
     fn capture(&mut self, full_resolution: bool) -> Result<Captured, String> {
+        let gains = self.gains();
         let live = self.live.as_mut().ok_or("no camera connected")?;
         let model = live.cam.model();
         let grab = |frames: &FrameReceiver, skip: u32| -> Result<RawFrame, String> {
@@ -452,7 +496,7 @@ impl Actor {
             self.status = Status::Busy("capturing at full resolution".into());
             self.shared.state.send_modify(|s| s.status = self.status.clone());
             // Stills always use 12-bit samples.
-            let mut cfg = self.settings.stream_config();
+            let mut cfg = self.settings.stream_config(&gains);
             cfg.size_index = 0;
             cfg.roi = None;
             cfg.pixel_mode = loupecam::PixelMode::Raw12;
@@ -461,7 +505,7 @@ impl Actor {
                 .start(&cfg)
                 .map_err(|e| e.to_string())
                 .and_then(|frames| grab(&frames, SETTLE_FRAMES));
-            let restore = live.cam.start(&self.settings.stream_config()).map_err(|e| e.to_string());
+            let restore = live.cam.start(&self.settings.stream_config(&gains)).map_err(|e| e.to_string());
             match restore {
                 Ok(frames) => {
                     live.frames = frames;
@@ -477,8 +521,10 @@ impl Actor {
             grab(&live.frames, 0)?
         };
         let geom = self.live.as_ref().and_then(|l| l.cam.geometry());
+        let (size_index, origin) = if switch { (0, (0, 0)) } else { self.frame_place() };
         Ok(Captured {
-            frame: FrameEnvelope { raw: Arc::new(raw), model },
+            frame: FrameEnvelope { raw: Arc::new(raw), model, size_index, origin },
+            calibration: self.shared.calibration.borrow().clone(),
             settings: self.settings.clone(),
             exposure_us: geom.map_or(self.settings.exposure_us as f64, |g| g.exposure_us),
             gain: self.settings.gain,
@@ -500,5 +546,83 @@ impl Actor {
         self.settings.white_balance.mode = WbMode::Manual;
         self.state_dirty = true;
         Ok(g)
+    }
+
+    /// Analog gain stages to use (measured ones when calibrated and enabled).
+    fn gains(&self) -> loupecam::protocol::sensor::ar1820::GainTable {
+        self.shared.calibration.borrow().gain_table(&self.settings.calibration)
+    }
+
+    /// Size index and ROI origin of frames from the current stream (ROI aligned the way
+    /// the sensor programming aligns it).
+    fn frame_place(&self) -> (usize, (u32, u32)) {
+        let origin = self.settings.roi.map_or((0, 0), |r| ((r.x & !3) as u32, (r.y & !1) as u32));
+        (self.settings.size_index, origin)
+    }
+
+    fn reload_calibration(&mut self) {
+        let Some(d) = &self.device else { return };
+        let profile = crate::calibration::load(&d.serial);
+        self.shared.calibration.send_replace(Arc::new(Calibration::new(profile)));
+        // Gain registers may map differently with measured stages.
+        let gain = self.settings.stream_config(&self.gains()).gain;
+        if let Some(live) = self.live.as_mut()
+            && let Err(e) = live.cam.set_gain(gain)
+        {
+            tracing::warn!("applying calibrated gain: {e}");
+        }
+    }
+
+    fn measure(&mut self, spec: MeasureSpec) -> Result<Measurement, String> {
+        let gains = self.gains();
+        let live = self.live.as_mut().ok_or("no camera connected")?;
+        let pattern = match live.cam.model().color {
+            loupecam::ColorFilter::Bayer(p) => p,
+            loupecam::ColorFilter::Mono => loupecam::BayerPattern::Rggb,
+        };
+        self.status = Status::Busy("measuring for calibration".into());
+        self.shared.state.send_modify(|s| s.status = self.status.clone());
+        let mut cfg = self.settings.stream_config(&gains);
+        cfg.size_index = spec.size_index;
+        cfg.roi = None;
+        cfg.binning = false;
+        cfg.pixel_mode = loupecam::PixelMode::Raw12;
+        cfg.exposure_us = spec.exposure_us;
+        cfg.gain = spec.gain;
+        // Long exposures need a longer wait per frame.
+        let timeout = Duration::from_secs(5).max(Duration::from_micros(spec.exposure_us as u64 * 3));
+        let r = (|| -> Result<Measurement, String> {
+            let frames = live.cam.start(&cfg).map_err(|e| e.to_string())?;
+            let geom = live.cam.geometry().ok_or("no stream geometry")?;
+            for _ in 0..SETTLE_FRAMES {
+                frames.recv_timeout(timeout).map_err(|e| e.to_string())?;
+            }
+            let n = spec.frames.max(1);
+            let mut sum: Vec<f32> = Vec::new();
+            let (mut w, mut h) = (0, 0);
+            for _ in 0..n {
+                let f = frames.recv_timeout(timeout).map_err(|e| e.to_string())?;
+                if sum.is_empty() {
+                    (w, h) = (f.width, f.height);
+                    sum = vec![0.0; (w * h) as usize];
+                }
+                for (acc, px) in sum.iter_mut().zip(f.data.as_chunks::<2>().0) {
+                    *acc += u16::from_le_bytes(*px) as f32;
+                }
+            }
+            sum.iter_mut().for_each(|v| *v /= n as f32);
+            Ok(Measurement { width: w, height: h, pattern, mean: sum, exposure_us: geom.exposure_us, frames: n })
+        })();
+        // Restore the normal stream whatever happened.
+        match live.cam.start(&self.settings.stream_config(&gains)) {
+            Ok(frames) => {
+                live.frames = frames;
+                live.last_frame = Instant::now();
+                self.ae_cooldown = SETTLE_FRAMES;
+                self.set_status(Status::Streaming);
+            }
+            Err(e) => self.disconnect(e.to_string()),
+        }
+        r
     }
 }

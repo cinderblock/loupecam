@@ -39,6 +39,33 @@ pub struct Settings {
     pub preview: PreviewSettings,
     pub capture: CaptureSettings,
     pub updates: UpdateSettings,
+    pub calibration: CalibrationSettings,
+}
+
+/// Which calibration results to apply. Each only has an effect once measured (see the
+/// calibration wizard); with no calibration the defaults are used.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CalibrationSettings {
+    /// Subtract the measured black level.
+    pub black_level: bool,
+    /// Replace measured defective pixels.
+    pub defects: bool,
+    /// Use the measured analog gain stages.
+    pub gain_stages: bool,
+    /// Apply the flat field. Off by default: it is tied to the lighting it was measured
+    /// with (a moved ring light changes it).
+    pub flat_field: bool,
+    /// Use the measured colour matrix instead of the camera's default.
+    pub color: bool,
+    /// Scale preset (by name) for the scale bar and measurements.
+    pub scale_preset: Option<String>,
+}
+
+impl Default for CalibrationSettings {
+    fn default() -> Self {
+        CalibrationSettings { black_level: true, defects: true, gain_stages: true, flat_field: false, color: false, scale_preset: None }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -222,6 +249,7 @@ impl Default for Settings {
                 save_raw: false,
             },
             updates: UpdateSettings { auto_install: false, check_interval_hours: 6.0 },
+            calibration: CalibrationSettings::default(),
         }
     }
 }
@@ -280,11 +308,14 @@ impl Settings {
         if us < period { us } else { us / period * period }
     }
 
-    pub fn stream_config(&self) -> StreamConfig {
+    /// Stream configuration, choosing gain registers from `gains` (the measured stages
+    /// when calibrated, else the built-in estimates).
+    pub fn stream_config(&self, gains: &loupecam::protocol::sensor::ar1820::GainTable) -> StreamConfig {
         let mode = if self.bit_depth == 12 { PixelMode::Raw12 } else { PixelMode::Raw8 };
         let mut c = StreamConfig::new(self.size_index, mode);
         c.exposure_us = self.effective_exposure_us(self.exposure_us);
-        c.gain = Gain::for_multiplier(self.gain).unwrap_or(Gain::UNITY);
+        let gain = self.gain.min(gains.max_multiplier());
+        c.gain = gains.for_multiplier(gain).unwrap_or(Gain::UNITY);
         c.speed = self.speed;
         c.binning = self.binning;
         c.roi = self.roi.map(|r| Roi { x: r.x, y: r.y, width: r.width, height: r.height });
@@ -292,7 +323,25 @@ impl Settings {
     }
 
     /// Host-side develop parameters for the current settings.
-    pub fn develop_params(&self, model: &loupecam::Model, demosaic: DemosaicSetting) -> DevelopParams {
+    /// Host-side develop parameters for a frame, including any enabled calibration.
+    pub fn develop_params(&self, env: &crate::service::FrameEnvelope, demosaic: DemosaicSetting, cal: &crate::calibration::Calibration) -> DevelopParams {
+        let mut p = self.develop_params_uncalibrated(env.model, demosaic);
+        let c = &self.calibration;
+        p.black_level = ((cal.black_level(c) + self.tone.black_level as f32) * 16.0).round().clamp(0.0, 65535.0) as u16;
+        if let Some(col) = cal.color(c)
+            && self.color.correction
+        {
+            let m = loupecam::ColorMatrix::hue(self.color.hue)
+                .mul(&loupecam::ColorMatrix::saturation(self.color.saturation))
+                .mul(&loupecam::ColorMatrix(col.ccm));
+            p.ccm = m.0;
+        }
+        p.corrections = cal.corrections(c, env.size_index, env.origin, (env.raw.width, env.raw.height));
+        p
+    }
+
+    /// Develop parameters without calibration (also used for orientation/tone only).
+    pub fn develop_params_uncalibrated(&self, model: &loupecam::Model, demosaic: DemosaicSetting) -> DevelopParams {
         let pattern = match model.color {
             loupecam::ColorFilter::Bayer(p) => p,
             loupecam::ColorFilter::Mono => loupecam::BayerPattern::Rggb,

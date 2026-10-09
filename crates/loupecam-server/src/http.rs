@@ -151,7 +151,7 @@ struct RegionBody {
 fn display_mapping(s: &AppState) -> Option<(loupecam_isp::Orientation, u32, u32)> {
     let env = s.service.shared.frame.borrow().clone()?;
     let settings = s.service.shared.state.borrow().settings.clone();
-    let o = settings.develop_params(env.model, settings.preview.demosaic).orientation;
+    let o = settings.develop_params_uncalibrated(env.model, settings.preview.demosaic).orientation;
     Some((o, env.raw.width, env.raw.height))
 }
 

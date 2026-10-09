@@ -75,7 +75,8 @@ pub fn spawn(shared: Arc<Shared>) -> Arc<Preview> {
             }
             let Some(env) = frames.borrow_and_update().clone() else { continue };
             last = Instant::now();
-            match tokio::task::spawn_blocking(move || render(&env, &settings)).await {
+            let cal = shared.calibration.borrow().clone();
+            match tokio::task::spawn_blocking(move || render(&env, &settings, &cal)).await {
                 Ok(Ok(frame)) => {
                     p.frames.send_replace(Some(Arc::new(frame)));
                 }
@@ -89,12 +90,12 @@ pub fn spawn(shared: Arc<Shared>) -> Arc<Preview> {
 
 /// Develop a frame for display: superpixel demosaic when we'd downscale anyway (it is
 /// both faster and alias-free), then box-downscale to the preview width.
-pub fn render(env: &FrameEnvelope, s: &Settings) -> Result<PreviewFrame, encode::EncodeError> {
+pub fn render(env: &FrameEnvelope, s: &Settings, cal: &crate::calibration::Calibration) -> Result<PreviewFrame, encode::EncodeError> {
     let f = &env.raw;
     let max_w = s.preview.max_width.max(160);
     let factor = f.width.div_ceil(max_w).max(1);
     let demosaic = if factor >= 2 { DemosaicSetting::Superpixel } else { s.preview.demosaic };
-    let p = s.develop_params(env.model, demosaic);
+    let p = s.develop_params(env, demosaic, cal);
     let img = develop(f, &p);
     let rest = if p.demosaic == Demosaic::Superpixel { factor.div_ceil(2) } else { factor };
     let img = downscale(&img, rest);

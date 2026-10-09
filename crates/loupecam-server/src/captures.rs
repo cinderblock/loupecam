@@ -25,7 +25,7 @@ pub struct CaptureInfo {
 pub fn save(c: &Captured, dir: &Path) -> anyhow::Result<CaptureInfo> {
     std::fs::create_dir_all(dir)?;
     let s = &c.settings.capture;
-    let p = c.settings.develop_params(c.frame.model, s.demosaic);
+    let p = c.settings.develop_params(&c.frame, s.demosaic, &c.calibration);
     let format = match s.format {
         CaptureFormat::Png => Format::Png,
         CaptureFormat::Tiff => Format::Tiff,
