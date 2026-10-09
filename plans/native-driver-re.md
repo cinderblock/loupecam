@@ -64,6 +64,34 @@ the camera a network appliance, maybe with a local screen and shutter buttons.
    `amscope-server` (headless), `apps/web` (UI), `apps/desktop` (Tauri).
 4. Desktop + headless features, packaging, CI (Windows/Linux x64/arm64, macOS).
 
+## Architecture (decided, implementing)
+
+```
+crates/amscope-protocol  pure protocol: Session<T: Transport>, frames, ISP regs   [done]
+crates/amscope           nusb transport, Camera, bulk reader thread           [done]
+crates/amscope-isp       demosaic/colour/tone/stats/AE/AWB/encoders           [done]
+crates/amscope-server    camera actor + preview pipeline + axum HTTP/WS API   [current]
+crates/amscope-cli       `amscope` binary: list/info/stream/snap/serve
+apps/web                 React + Vite + TS (Bun) UI, served by the server
+apps/desktop             Tauri v2 shell: embeds the server on 127.0.0.1, same UI
+```
+
+- **One API path.** The desktop app embeds the same server and the webview talks
+  HTTP/WS to it, so headless mode and desktop exercise identical code. "Share on network"
+  in the desktop app just rebinds the listener.
+- **Camera actor**: a std thread owns `Camera` (blocking USB). Commands arrive over a
+  channel with oneshot replies. A frame thread runs AE/AWB and publishes the latest raw
+  frame plus a preview JPEG (encoded only while someone is watching, to save CPU on ARM).
+- **HTTP API**: `GET /api/info`, `GET /api/state`, `PATCH /api/settings`,
+  `POST /api/capture`, `GET /api/captures[/name]`, `POST /api/awb`, `WS /api/ws`
+  (state + stats + histogram pushes), `GET /stream.mjpg` (MJPEG multipart: works in
+  `<img>`, VLC, Home Assistant, OctoPrint), `GET /snapshot.jpg`. The web UI is served at
+  `/` only when enabled.
+- **Security**: bind 127.0.0.1 by default. Network exposure is opt-in (`--listen`), with
+  an optional bearer token / password.
+- **Full-res stills while previewing small**: reconfigure to full size, skip settle
+  frames, capture, restore the preview (same approach as the vendor SDK's `Snap`).
+
 ## Findings / gotchas
 
 ### Control-transfer protocol (open sequence, `captures/01_open_close.*`)
@@ -225,8 +253,26 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
   still in the pipeline). `snap` skips 6 by default.
 - FPGA test pattern (reg `0x1c`) has **no visible effect** in RAW or processed mode.
   The sensor's CCS test pattern (`0x0600`) works.
+- **The lens is covered with blue tape** (per the user), which explains the dim, blurry,
+  blue scenes. The user's reference image from the vendor app:
+  `~/Downloads/0001.bmp` (4912×3684, shop lights on).
+- **Orientation**: our frames are bottom-up relative to the vendor image (vertical-flip
+  correlation 0.999 vs 0.25 unflipped) → `Model::rows_bottom_up`, applied when
+  developing.
+- **White balance**: the vendor uses a fixed daylight preset (R 1.53, G 1.0, B 1.71).
+  Grey-world AWB turned the blue tape grey, so it's opt-in. With the preset, our colours
+  match the vendor image closely (they add a little extra saturation/contrast).
+- **Corrupt last row** in the 1228×922 mode (in the vendor SDK's frames too) →
+  `Model::bad_last_row`, patched in the driver from the row two above.
 - Gotcha: a stray `/tmp/enum.py` from the first session shadowed Python's `enum` module.
   Keep RE scripts in `re/`.
+
+- **Restart needs re-seed + sensor power-up wait**: after a stop, sensor I²C (`0x0c`,
+  `0x0d`) answers `09` until re-seeded *and* ~140 ms has passed since the `0x01` enable
+  (the SDK waits ~138 ms). The first open only worked because the flash read took
+  ~200 ms. Fixed with `Session::reseed` and a 150 ms `SENSOR_POWER_UP` delay.
+- Server measurements: AE converges on the blue tape at ~120 ms; a full-res 12-bit still
+  while previewing at 1228×922 takes 1.9 s end to end (including the 26 MB PNG).
 
 ### Gotchas
 
@@ -256,14 +302,32 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - [ ] Dense gain sweep (100..500) → gain encoding
 - [ ] Meaning of `0xda` payload, `0x0c` reads, FPGA `0xa6/0xa8/0xf4-0xfc`, trailer stats
 - [ ] Bayer order + color verification (needs a lit, focused, colorful target)
-- [ ] Ghidra on amcam.dll
-- [ ] Python PoC without SDK
-- [ ] Rust workspace
+- [ ] Ghidra on amcam.dll (not needed so far)
+- [x] Python PoC without SDK (`re/native_probe.py`)
+- [x] Rust workspace: protocol + driver + CLI, verified on hardware
+- [x] amscope-isp: demosaic (superpixel/bilinear/MHC), colour, tone, stats, AE/AWB,
+      PNG/TIFF/JPEG. Full-res MHC 66 ms
+- [x] amscope-server (actor, preview, REST/WS/MJPEG, captures, ROI/WB from display regions,
+      token auth, settings persistence) + `amscope serve`. Verified on hardware
+- [ ] apps/web UI
+- [ ] apps/desktop (Tauri)
+- [ ] README, docs/protocol.md, udev rule, CI (Win/Linux x64+arm64/macOS), license files
+- [ ] Hotplug / reconnect
+- [ ] Video recording (format TBD, see open questions)
+- [ ] Microscope extras: scale bar/calibration per objective, crosshair/grid overlays
+- [ ] mDNS advertisement for the headless appliance
+- [ ] Optical calibration of analog gain stages; black level; decode defect map
 
 ## Open questions for the user
 
 1. License: MIT/Apache-2.0 dual (Rust convention)? *Recommendation: yes.*
 2. Repo name on GitHub (e.g. `cinderblock/amscope-reader`)?
+3. Video recording: (a) MJPEG-in-AVI/MKV (pure Rust, big files, every frame
+   lossless-ish), (b) H.264 via openh264 (a native build, small files), or (c) a
+   browser-side MediaRecorder for desktop use only. *Recommendation: (a) first, (b)
+   later as an option.*
+4. Need a lit, focused, colourful target under the microscope for colour/sharpness
+   validation and gain calibration.
 
 ## Things not to do
 
