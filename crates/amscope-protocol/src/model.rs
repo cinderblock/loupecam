@@ -67,8 +67,8 @@ pub const MU1803_HS: Model = Model {
         Resolution::new(1228, 922),
     ],
     pixel_size_um: 1.25,
-    // Inferred from channel statistics of a dim, bluish scene compared with the vendor
-    // SDK's RGB output. Not yet verified against a colour target.
+    // Verified with the sensor's colour-bar test pattern (register 0x0600 = 2) at
+    // full resolution: the red bar lights only (0,0), the blue bar only (1,1).
     color: ColorFilter::Bayer(BayerPattern::Rggb),
     max_bit_depth: 12,
 };

@@ -36,7 +36,7 @@ enum Cmd {
         #[arg(long, default_value_t = 1)]
         count: u32,
         /// Frames to discard first (lets exposure settle).
-        #[arg(long, default_value_t = 3)]
+        #[arg(long, default_value_t = 6)]
         skip: u32,
     },
 }
@@ -65,6 +65,39 @@ struct StreamOpts {
     /// FPGA test pattern (3, 5, 7, 9).
     #[arg(long, default_value_t = 0)]
     test_pattern: u8,
+    /// Write a sensor register after starting, `ADDR=VALUE` (hex with 0x or decimal).
+    /// Repeatable. For experimentation.
+    #[arg(long = "sensor-reg", value_parser = parse_reg)]
+    sensor_regs: Vec<(u16, u16)>,
+    /// Write an FPGA register after starting, `ADDR=VALUE`. Repeatable.
+    #[arg(long = "fpga-reg", value_parser = parse_reg)]
+    fpga_regs: Vec<(u16, u16)>,
+}
+
+fn parse_num(s: &str) -> Result<u16, String> {
+    let s = s.trim();
+    match s.strip_prefix("0x") {
+        Some(h) => u16::from_str_radix(h, 16),
+        None => s.parse(),
+    }
+    .map_err(|e| format!("{s}: {e}"))
+}
+
+fn parse_reg(s: &str) -> Result<(u16, u16), String> {
+    let (a, v) = s.split_once('=').ok_or("expected ADDR=VALUE")?;
+    Ok((parse_num(a)?, parse_num(v)?))
+}
+
+/// Start streaming with `opts`, then apply any raw register writes.
+fn start(cam: &mut Camera, opts: &StreamOpts) -> Result<amscope::FrameReceiver> {
+    let rx = cam.start(&opts.config()?)?;
+    for &(a, v) in &opts.sensor_regs {
+        cam.write_sensor(a, v)?;
+    }
+    for &(a, v) in &opts.fpga_regs {
+        cam.write_fpga(u8::try_from(a).context("FPGA register must be < 0x100")?, v)?;
+    }
+    Ok(rx)
 }
 
 #[derive(Copy, Clone, ValueEnum)]
@@ -135,7 +168,7 @@ fn main() -> Result<()> {
         }
         Cmd::Stream { opts, seconds } => {
             let mut cam = Camera::open_first()?;
-            let rx = cam.start(&opts.config()?)?;
+            let rx = start(&mut cam, &opts)?;
             let geom = cam.geometry().unwrap();
             eprintln!(
                 "streaming {} {:?}, exposure {:.1} µs, sensor max {:.1} fps",
@@ -178,7 +211,7 @@ fn main() -> Result<()> {
         }
         Cmd::Snap { opts, out, count, skip } => {
             let mut cam = Camera::open_first()?;
-            let rx = cam.start(&opts.config()?)?;
+            let rx = start(&mut cam, &opts)?;
             for _ in 0..skip {
                 rx.recv_timeout(Duration::from_secs(5))?;
             }

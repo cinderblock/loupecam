@@ -210,6 +210,24 @@ challenge/response request numbers are random per session in ranges ~`0x43-0x5e`
 decompresses to 6599 bytes of records `[u16 row?][u16 count][count sorted bytes][packed
 high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet.
 
+### Native driver results (Rust, `target/debug/amscope.exe`)
+
+- Every mode streams at the sensor-limited rate: full RAW8 13.1 fps, full RAW12 10.1 fps
+  (386 MB/s), 2456×1842 34 fps, 1228×922 50 fps (capped by the 20 ms exposure).
+  ROI, binning and speed all work.
+- Generated control sequences match the SDK's transfer for transfer
+  (`crates/amscope-protocol/tests/sequences.rs`).
+- **Bayer = RGGB**, verified with the sensor colour bars (`--sensor-reg 0x0600=2`) at
+  full res. The bars come out mirrored left-to-right (the readout is mirrored).
+- RAW12 is LSB-aligned 12-bit in u16 LE. Beware: PIL rescales 16-bit PGMs on read, so
+  use `re/pgm_peek.py`.
+- The first ~3 frames after start are dark (the SDK-style 1 ms startup exposure is
+  still in the pipeline). `snap` skips 6 by default.
+- FPGA test pattern (reg `0x1c`) has **no visible effect** in RAW or processed mode.
+  The sensor's CCS test pattern (`0x0600`) works.
+- Gotcha: a stray `/tmp/enum.py` from the first session shadowed Python's `enum` module.
+  Keep RE scripts in `re/`.
+
 ### Gotchas
 
 - USBPcapCMD **silently fails to overwrite** an existing output file; the old pcap
