@@ -4,13 +4,23 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod updater;
+
 use loupecam_server::{Config, Server, WebUi};
 use std::sync::Mutex;
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
-use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
+use std::sync::atomic::Ordering;
+use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_opener::OpenerExt;
 
 struct Running(Mutex<Option<Server>>);
+
+/// Stop the embedded server (releasing the camera). Idempotent.
+pub fn stop_server(app: &AppHandle) {
+    if let Some(server) = app.state::<Running>().0.lock().unwrap().take() {
+        let _ = tauri::async_runtime::block_on(server.stop());
+    }
+}
 
 fn web_ui() -> WebUi {
     // Debug builds read the built UI from disk so it can be rebuilt without recompiling.
@@ -35,22 +45,38 @@ fn main() {
         web: web_ui(),
         captures_dir: captures_dir.clone(),
         settings_file: Config::default_settings_file(),
+        // The Tauri updater owns updates for the desktop app.
+        self_update: false,
     };
 
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_dialog::init())
         .setup(move |app| {
+            let prefs = updater::load_prefs();
+            app.manage(updater::State::new(prefs.auto_install));
             let server = tauri::async_runtime::block_on(Server::start(cfg))?;
             let url = format!("http://{}/", server.addr);
             app.manage(Running(Mutex::new(Some(server))));
 
             let open_captures = MenuItem::with_id(app, "open-captures", "Open Captures Folder", true, Some("CmdOrCtrl+O"))?;
             let open_browser = MenuItem::with_id(app, "open-browser", "Open in Browser", true, None::<&str>)?;
+            let check_updates = MenuItem::with_id(app, "check-updates", "Check for Updates…", true, None::<&str>)?;
+            let auto_update = CheckMenuItem::with_id(app, "auto-update", "Automatically Install Updates", true, prefs.auto_install, None::<&str>)?;
             let file = Submenu::with_items(
                 app,
                 "File",
                 true,
-                &[&open_captures, &open_browser, &PredefinedMenuItem::separator(app)?, &PredefinedMenuItem::quit(app, None)?],
+                &[
+                    &open_captures,
+                    &open_browser,
+                    &PredefinedMenuItem::separator(app)?,
+                    &check_updates,
+                    &auto_update,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::quit(app, None)?,
+                ],
             )?;
             let menu = Menu::with_items(app, &[&file])?;
 
@@ -69,6 +95,15 @@ fn main() {
                         tracing::warn!("opening captures folder: {e}");
                     }
                 }
+                "check-updates" => {
+                    let app = app.clone();
+                    tauri::async_runtime::spawn(async move { updater::check(&app, true).await });
+                }
+                "auto-update" => {
+                    let on = auto_update.is_checked().unwrap_or(false);
+                    app.state::<updater::State>().auto_install.store(on, Ordering::Release);
+                    updater::save_prefs(&updater::Prefs { auto_install: on });
+                }
                 "open-browser" => {
                     if let Err(e) = app.opener().open_url(&url, None::<&str>) {
                         tracing::warn!("opening browser: {e}");
@@ -76,6 +111,7 @@ fn main() {
                 }
                 _ => {}
             });
+            updater::spawn(app.handle().clone());
             Ok(())
         })
         .build(tauri::generate_context!())
@@ -84,9 +120,7 @@ fn main() {
     app.run(|app, event| {
         if let RunEvent::Exit = event {
             // Release the camera cleanly.
-            if let Some(server) = app.state::<Running>().0.lock().unwrap().take() {
-                let _ = tauri::async_runtime::block_on(server.stop());
-            }
+            stop_server(app);
         }
     });
 }
