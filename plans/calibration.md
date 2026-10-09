@@ -71,17 +71,38 @@ step list with instructions, live preview, progress, and per-step results/accept
 
 ## Plan / steps
 
-1. [ ] Actor command: capture N frames (averaged mosaic + stats) with temporary settings.
-2. [ ] Calibration store + API (`GET/DELETE /api/calibration[/section]`, `POST
-   /api/calibration/run/{step}`), settings toggles.
-3. [ ] Steps 1–2 (dark, gain) + gain stage override in the protocol crate.
-4. [ ] Step 3 flat field + ISP support.
-5. [ ] Step 4 scale + zoom presets in the UI (replacing the objective/adapter sliders).
-6. [ ] Screen target page + pairing.
-7. [ ] Step 5 colour chart.
-8. [ ] Test on the hardware once the tape is off; docs.
+1. [x] Actor `measure` command (averaged raw 12-bit frames at fixed settings, stream restored).
+2. [x] Calibration store (per serial) + API + settings toggles.
+3. [x] Dark + gain steps; `GainTable` in the protocol crate.
+4. [x] Flat field + ISP support (and defect replacement).
+5. [x] Scale presets (lines or screen grid) used by the scale bar.
+6. [x] Screen target page + WebSocket pairing.
+7. [x] Colour chart step (24-patch, orientation-tolerant fit).
+8. [ ] **current** Merge into master (branch `calibration`, worktree
+   `../loupecam-calibration`). The other thread had uncommitted changes in the same
+   files (`server/src/lib.rs`, Cargo files), so the branch is pushed and a PR opened
+   instead of merging over them.
+9. [ ] Real-scene validation once the tape is off: dark (lens covered), flat field on
+   white paper, scale on a ruler, colour chart if available; check the `/target` page
+   in a real browser on a real screen.
 
 ## Findings / gotchas
+
+- **Measured analog gain stages: 1.00 / 1.99 / 2.97 / 3.64×** (three runs within
+  ±0.3 %). The top stage was assumed 4×. These are now the built-in defaults.
+- Shop-light (LED) flicker made short-exposure gain runs disagree by ~7 %. Fixed with
+  50 ms exposures (whole cycles at 100 and 120 Hz) when headroom allows, plus interleaved
+  unity references.
+- Black level of this sensor ≈ 5 (12-bit) with the vendor's pedestal setting.
+- The dark step correctly refuses the taped lens ("not dark: median 1541 vs black 5").
+- Flat field on the taped, cloudy scene: block std 10.1 → 2.0 when applied (it was
+  measured on that scene, so this proves the path, not the optics).
+- The screen-target protocol was verified with a stand-in WebSocket client (grid for
+  scale, solid white for gain, idle after). The real page could not be exercised in a
+  browser here: the preview tool stopped responding and headless Edge produces no output.
+- `~/.cargo/config.toml` shares one `build-dir` across all projects. Two worktrees of
+  this repo then link each other's crates. Build here with
+  `CARGO_BUILD_BUILD_DIR="$PWD/target/build-dir"` (logged in ISSUES.md on master).
 
 ## Open questions for the user
 

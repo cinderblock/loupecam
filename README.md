@@ -133,6 +133,25 @@ Settings persist across restarts (in the OS config directory, e.g.
 `%APPDATA%\loupecam\settings.json`). Captures go to `Pictures/LoupeCam` unless
 `--captures` says otherwise.
 
+## Calibration (optional)
+
+LoupeCam works out of the box. The **Calibration** section of the web UI can measure
+your particular camera and optics to improve on the defaults. Each step is
+independent, takes under a minute, and can be switched off or forgotten:
+
+| Step | What you do | What improves |
+| --- | --- | --- |
+| Black level & defective pixels | Cover the lens | Deeper blacks; hot pixels removed |
+| Gain | Point at anything plain and evenly lit | Accurate gain steps |
+| Flat field | Defocus on white paper, lit as you work | Even brightness and colour across the field (vignetting, dust) |
+| Scale | Focus on a ruler/micrometer, or a screen grid | An exact scale bar, per zoom setting |
+| Colour | A 24-patch colour chart | Accurate colour under your lighting |
+
+Where a screen can be placed under the optics (low-power scopes), open
+`http://<server>/target` on it, full screen. The wizard then uses it as an even light
+source, and as a grid of known pitch for the scale step. Results are stored per camera
+serial in the OS config directory (`loupecam/calibration/`).
+
 ## Desktop app
 
 ```sh
@@ -155,7 +174,7 @@ Windows/macOS code signing once certificates are configured) is described in
 crates/loupecam-protocol  wire protocol, no I/O (session, registers, frame decoding)
 crates/loupecam           USB driver over nusb (pure Rust)
 crates/loupecam-isp       image pipeline and encoders
-crates/loupecam-server    headless service: camera actor, preview, HTTP/WS API
+crates/loupecam-server    headless service: camera actor, preview, HTTP/WS API, calibration
 crates/loupecam-cli       the `loupecam` binary
 crates/loupecam-update    signed self-update from GitHub Releases
 apps/web                 web UI (React, Vite, Bun)
