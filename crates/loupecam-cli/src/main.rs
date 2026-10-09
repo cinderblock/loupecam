@@ -48,6 +48,19 @@ enum Cmd {
         /// `updates.autoInstall` setting, off by default).
         #[arg(long)]
         no_update_check: bool,
+        /// Don't announce the server on the local network (mDNS / DNS-SD). Announcing
+        /// only happens when listening beyond loopback.
+        #[arg(long)]
+        no_mdns: bool,
+        /// Name to announce on the network [default: "LoupeCam on <hostname>"].
+        #[arg(long)]
+        mdns_name: Option<String>,
+    },
+    /// Find LoupeCam servers on the local network (mDNS / DNS-SD).
+    Discover {
+        /// Seconds to listen for answers.
+        #[arg(long, default_value_t = 3.0)]
+        seconds: f64,
     },
     /// Check for a new release and install it (verified against the release signing key).
     Update {
@@ -279,9 +292,11 @@ fn main() -> Result<()> {
                 st.bytes as f64 / seconds / 1e6
             );
         }
-        Cmd::Serve { listen, token, web_ui, captures, no_persist, no_update_check } => {
-            serve(listen, token, web_ui, captures, no_persist, !no_update_check)?
+        Cmd::Serve { listen, token, web_ui, captures, no_persist, no_update_check, no_mdns, mdns_name } => {
+            let announce = (!no_mdns).then_some(loupecam_server::mdns::Announce { name: mdns_name });
+            serve(listen, token, web_ui, captures, no_persist, !no_update_check, announce)?
         }
+        Cmd::Discover { seconds } => discover(Duration::from_secs_f64(seconds))?,
         Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
             let mut cam = Camera::open_first()?;
@@ -341,6 +356,27 @@ fn update(check_only: bool, yes: bool) -> Result<()> {
     Ok(())
 }
 
+fn discover(timeout: Duration) -> Result<()> {
+    let found = loupecam_server::mdns::discover(timeout)?;
+    if found.is_empty() {
+        println!("no LoupeCam servers found");
+    }
+    for f in found {
+        let txt = |k: &str| f.txt.get(k).map(String::as_str);
+        let camera = match (txt("model"), txt("serial")) {
+            (Some(m), Some(s)) => format!("{m} (serial {s})"),
+            (Some(m), None) => m.to_string(),
+            _ => "no camera connected".into(),
+        };
+        println!("{}: {camera}", f.name);
+        println!("  version {}, {}", txt("version").unwrap_or("?"), if txt("auth") == Some("token") { "token required" } else { "no token" });
+        for url in f.urls() {
+            println!("  {url}");
+        }
+    }
+    Ok(())
+}
+
 fn serve(
     listen: std::net::SocketAddr,
     token: Option<String>,
@@ -348,6 +384,7 @@ fn serve(
     captures: Option<PathBuf>,
     no_persist: bool,
     self_update: bool,
+    announce: Option<loupecam_server::mdns::Announce>,
 ) -> Result<()> {
     use loupecam_server::{Config, Server, WebUi};
     let web = match web_ui.as_deref() {
@@ -368,6 +405,7 @@ fn serve(
         captures_dir: captures.unwrap_or_else(Config::default_captures_dir),
         settings_file: if no_persist { None } else { Config::default_settings_file() },
         self_update,
+        announce,
     };
     let rt = tokio::runtime::Runtime::new()?;
     let restart = rt.block_on(async move {

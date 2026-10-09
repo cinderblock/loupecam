@@ -289,6 +289,21 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
   before capturing (`capture.ps1` checks).
 - Most SDK getters (serial, versions, ranges) are served from cached open-time data and
   generate no USB traffic.
+- mDNS on this machine (a dozen Hyper-V VLAN vNICs, and a network that reflects mDNS
+  between VLANs): with `mdns-sd`'s default conflict probing, the server heard its own
+  records reflected back on `vEthernet (VLAN-3)` with other interfaces' addresses, took
+  them for a conflict, and announced a second `LoupeCam on Noook (2)` /
+  `noook-2.local.` alongside the original. Probing is off (`set_requires_probe(false)`),
+  and the host name is `loupecam-<hostname>.local.`, not the OS's own `<hostname>.local.`.
+- Firewall prompts are per executable path. Today's two prompts came from the dev CLI
+  and the mDNS test binary; the installed desktop app (localhost only) never prompted.
+  The test binary's name hash changes with dependencies, so it can prompt again.
+- Tauri's MSI bundler loads any WiX extension a fragment's xmlns names
+  (`http://schemas.microsoft.com/wix/FirewallExtension`), and the main executable's
+  File Id in its template is `Path`. The NSIS `-setup.exe` is per user and can't add
+  firewall rules.
+- `mdns-sd`: browsing a second service type on the same `ServiceDaemon` didn't resolve
+  our `_http._tcp` instance; a separate daemon did (the network test uses two).
 
 ## Progress log
 
@@ -325,7 +340,15 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - [x] Reconnect: the actor polls for the camera and reopens after loss/stall
 - [ ] Video recording (format TBD, see open questions)
 - [x] Microscope extras: calibrated scale bar (objective × adapter), crosshair, grid
-- [ ] mDNS advertisement for the headless appliance
+- [x] mDNS advertisement for the headless appliance (`crates/loupecam-server/src/mdns.rs`:
+      `_loupecam._tcp` + `_http._tcp`, live model/serial TXT, goodbye on stop;
+      `loupecam discover`). Verified on this machine's VLANs
+- [x] Windows Firewall: the server warns at startup when a rule blocks it (dismissed
+      prompt), with fix commands (`crates/loupecam-server/src/firewall.rs`, COM
+      `INetFwPolicy2`); the MSI adds domain/private allow rules
+      (`apps/desktop/src-tauri/wix/firewall.wxs`). Verified: rules read from the live
+      policy; firewall tables and actions present in a built MSI. Not yet: an actual
+      MSI install/uninstall
 - [ ] Desktop: "share on network" toggle (today: `loupecam serve --listen 0.0.0.0:… --token`)
 - [ ] Gallery thumbnails (the list currently links full-size files)
 - [ ] Create the GitHub repo and push (outward-facing: needs your go-ahead)
@@ -350,3 +373,4 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - Don't commit raw pcaps wholesale (they're large and contain the device serial).
   Curate small fixtures deliberately.
 - Don't leave the AmScope app running during captures.
+- Don't re-enable mDNS conflict probing or announce as `<hostname>.local.` (see Gotchas).
