@@ -73,6 +73,19 @@ impl std::fmt::Debug for RawFrame {
     }
 }
 
+impl RawFrame {
+    /// Overwrite row `y` with row `y - 2` (same Bayer phase). Used to hide rows the
+    /// camera is known to corrupt.
+    pub fn patch_row_from_two_above(&mut self, y: u32) {
+        if y < 2 || y >= self.height {
+            return;
+        }
+        let rl = self.width as usize * self.format.bytes_per_sample();
+        let (src, dst) = ((y as usize - 2) * rl, y as usize * rl);
+        self.data.copy_within(src..src + rl, dst);
+    }
+}
+
 /// What happened to a transfer fed to the assembler.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Feed {

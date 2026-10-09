@@ -44,7 +44,7 @@ pub enum RecvError {
 
 struct Shared {
     stop: AtomicBool,
-    geometry: Mutex<Option<(Resolution, SampleFormat)>>,
+    geometry: Mutex<Option<(Resolution, SampleFormat, bool)>>,
     stats: Mutex<StreamStats>,
     queue: Mutex<(VecDeque<RawFrame>, bool)>,
     ready: Condvar,
@@ -142,7 +142,7 @@ impl Reader {
         }
         let shared = Arc::new(Shared {
             stop: AtomicBool::new(false),
-            geometry: Mutex::new(Some((res, format))),
+            geometry: Mutex::new(Some((res, format, false))),
             stats: Mutex::new(StreamStats::default()),
             queue: Mutex::new((VecDeque::new(), false)),
             ready: Condvar::new(),
@@ -155,9 +155,10 @@ impl Reader {
         Ok((Reader { shared: shared.clone(), thread: Some(thread) }, FrameReceiver { shared }))
     }
 
-    /// Tell the reader the frame size changed (resolution, ROI or format).
-    pub fn set_geometry(&self, res: Resolution, format: SampleFormat) {
-        *self.shared.geometry.lock().unwrap() = Some((res, format));
+    /// Tell the reader the frame size changed (resolution, ROI or format), and whether
+    /// the last row must be patched.
+    pub fn set_geometry(&self, res: Resolution, format: SampleFormat, patch_last_row: bool) {
+        *self.shared.geometry.lock().unwrap() = Some((res, format, patch_last_row));
     }
 
     pub fn stats(&self) -> StreamStats {
@@ -185,10 +186,12 @@ impl Drop for Reader {
 
 fn run(mut ep: nusb::Endpoint<Bulk, In>, shared: Arc<Shared>) {
     let mut asm: Option<FrameAssembler> = None;
+    let mut patch_last_row = false;
     let mut window = (Instant::now(), 0u32);
     while !shared.stop.load(Ordering::Acquire) {
-        if let Some((res, fmt)) = shared.geometry.lock().unwrap().take() {
+        if let Some((res, fmt, patch)) = shared.geometry.lock().unwrap().take() {
             asm = Some(FrameAssembler::new(res.width, res.height, fmt));
+            patch_last_row = patch;
         }
         let Some(c) = ep.wait_next_complete(Duration::from_millis(100)) else {
             continue;
@@ -201,7 +204,10 @@ fn run(mut ep: nusb::Endpoint<Bulk, In>, shared: Arc<Shared>) {
                 st.bytes += c.actual_len as u64;
                 match feed {
                     Some(Feed::Frame) => {
-                        let frame = asm.as_mut().unwrap().take().unwrap();
+                        let mut frame = asm.as_mut().unwrap().take().unwrap();
+                        if patch_last_row {
+                            frame.patch_row_from_two_above(frame.height - 1);
+                        }
                         st.frames += 1;
                         let seq = frame.trailer.sequence;
                         if let Some(prev) = st.last_sequence {

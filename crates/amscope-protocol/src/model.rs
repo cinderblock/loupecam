@@ -53,6 +53,12 @@ pub struct Model {
     pub color: ColorFilter,
     /// Bits per sample delivered in 16-bit transport mode.
     pub max_bit_depth: u8,
+    /// Frames arrive bottom-up relative to the vendor software's (upright) image. Raw
+    /// frames are delivered as the sensor sends them; developers should flip rows.
+    pub rows_bottom_up: bool,
+    /// Size indices whose last row is corrupt (the vendor SDK's frames show it too).
+    /// The driver replaces it with the same-colour row two above.
+    pub bad_last_row: &'static [usize],
 }
 
 /// AmScope MU1803-HS: 18 MP, onsemi AR1820HS, USB 3.0.
@@ -71,6 +77,10 @@ pub const MU1803_HS: Model = Model {
     // full resolution: the red bar lights only (0,0), the blue bar only (1,1).
     color: ColorFilter::Bayer(BayerPattern::Rggb),
     max_bit_depth: 12,
+    // Verified against an image saved by the vendor app: ours matches it vertically
+    // flipped (correlation 0.999).
+    rows_bottom_up: true,
+    bad_last_row: &[2],
 };
 
 /// All models this crate knows how to drive.

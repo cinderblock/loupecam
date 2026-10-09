@@ -169,6 +169,36 @@ fn fixed_ccm(m: &[[f32; 3]; 3], mono: bool) -> [[i32; 3]; 3] {
     m.map(|row| row.map(|v| (v * 4096.0).round() as i32))
 }
 
+/// Shrink by an integer factor, averaging `factor × factor` blocks. Edge remainders
+/// are dropped.
+pub fn downscale(src: &Image8, factor: u32) -> Image8 {
+    if factor <= 1 {
+        return src.clone();
+    }
+    let f = factor as usize;
+    let (w, h, c) = (src.width as usize / f, src.height as usize / f, src.channels as usize);
+    let srl = src.row_len();
+    let mut dst = Image8::new(w as u32, h as u32, src.channels);
+    let n = (f * f) as u32;
+    dst.data.par_chunks_mut(w * c).enumerate().for_each(|(y, row)| {
+        let mut acc = vec![0u32; w * c];
+        for sy in y * f..(y + 1) * f {
+            let s = &src.data[sy * srl..sy * srl + w * f * c];
+            for x in 0..w {
+                for dx in 0..f {
+                    for k in 0..c {
+                        acc[x * c + k] += s[(x * f + dx) * c + k] as u32;
+                    }
+                }
+            }
+        }
+        for (d, a) in row.iter_mut().zip(&acc) {
+            *d = ((a + n / 2) / n) as u8;
+        }
+    });
+    dst
+}
+
 /// Apply flips and rotation.
 pub fn orient<T: Copy + Default + Send + Sync>(img: Image<T>, o: Orientation) -> Image<T> {
     let img = if o.flip_h || o.flip_v { flip(img, o.flip_h, o.flip_v) } else { img };

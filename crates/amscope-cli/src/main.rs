@@ -48,9 +48,12 @@ enum Cmd {
 struct DevelopOpts {
     #[arg(long, value_enum, default_value_t = DemosaicArg::Mhc)]
     demosaic: DemosaicArg,
-    /// White balance gains r,g,b. Default: grey-world auto white balance.
-    #[arg(long, value_parser = parse_f32x3)]
+    /// White balance gains r,g,b. Default: the vendor's daylight preset.
+    #[arg(long, value_parser = parse_f32x3, conflicts_with = "awb")]
     wb: Option<[f32; 3]>,
+    /// Grey-world auto white balance (neutralises the scene's average colour).
+    #[arg(long)]
+    awb: bool,
     /// Skip colour correction (identity matrix).
     #[arg(long)]
     no_ccm: bool,
@@ -276,6 +279,9 @@ fn mean(f: &RawFrame) -> f64 {
     }
 }
 
+/// The vendor software's default white balance (colour temperature 6503 K, tint 1000).
+const DAYLIGHT_WB: [f32; 3] = [1.53, 1.0, 1.71];
+
 fn save(path: &std::path::Path, f: &RawFrame, model: &amscope::Model, d: &DevelopOpts) -> Result<()> {
     use amscope_isp::encode::{self, Format};
     let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
@@ -299,7 +305,12 @@ fn save(path: &std::path::Path, f: &RawFrame, model: &amscope::Model, d: &Develo
         DemosaicArg::Bilinear => amscope_isp::Demosaic::Bilinear,
         DemosaicArg::Mhc => amscope_isp::Demosaic::Mhc,
     };
-    p.wb = d.wb.unwrap_or_else(|| amscope_isp::auto::grey_world(&amscope_isp::stats::compute(f, pattern, None, 4, [1.0; 3])));
+    p.wb = if d.awb {
+        amscope_isp::auto::grey_world(&amscope_isp::stats::compute(f, pattern, None, 4, [1.0; 3]))
+    } else {
+        d.wb.unwrap_or(DAYLIGHT_WB)
+    };
+    p.orientation.flip_v = model.rows_bottom_up;
     if !d.no_ccm {
         p.ccm = amscope::ColorMatrix::mu1803_default().0;
     }

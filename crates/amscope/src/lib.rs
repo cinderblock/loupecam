@@ -134,7 +134,7 @@ impl Camera {
         let (reader, rx) = stream::Reader::spawn(&self.interface, res, cfg.pixel_mode.sample_format())?;
         match self.session.start(cfg) {
             Ok(geom) => {
-                reader.set_geometry(geom.resolution, geom.format);
+                reader.set_geometry(geom.resolution, geom.format, self.patch_last_row(cfg));
                 self.stream = Some(reader);
                 Ok(rx)
             }
@@ -174,7 +174,8 @@ impl Camera {
     pub fn set_roi(&mut self, roi: Option<Roi>) -> Result<StreamGeometry> {
         let geom = self.session.set_roi(roi)?;
         if let Some(r) = &self.stream {
-            r.set_geometry(geom.resolution, geom.format);
+            let patch = self.session.config().is_some_and(|c| self.patch_last_row(c));
+            r.set_geometry(geom.resolution, geom.format, patch);
         }
         Ok(geom)
     }
@@ -197,6 +198,11 @@ impl Camera {
 
     pub fn stats(&self) -> Option<StreamStats> {
         self.stream.as_ref().map(|s| s.stats())
+    }
+
+    /// The corrupt last row only appears with the full-height window.
+    fn patch_last_row(&self, cfg: &StreamConfig) -> bool {
+        cfg.roi.is_none() && self.model().bad_last_row.contains(&cfg.size_index)
     }
 
     /// Low-level access for experimentation.

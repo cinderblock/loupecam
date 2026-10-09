@@ -1,0 +1,19702 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.0
+ },
+ {
+  "mark": "gain 100"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 101"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   101
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 102"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   102
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 103"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   103
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 104"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   104
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 105"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   105
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 106"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   106
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 107"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   107
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 108"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   108
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 109"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   109
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 110"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   110
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 111"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   111
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 112"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   112
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 113"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   113
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 114"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   114
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 115"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   115
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 116"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   116
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 117"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   117
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 118"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   118
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 119"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   119
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 120"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   120
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 121"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   121
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 122"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   122
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 123"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   123
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 124"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   124
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 125"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   125
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 126"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   126
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 127"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   127
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 128"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   128
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 129"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   129
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 130"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   130
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 131"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   131
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 132"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   132
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 133"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   133
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 134"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   134
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 135"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   135
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 136"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   136
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 137"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   137
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 138"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   138
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 139"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   139
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 140"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   140
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 141"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   141
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 142"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   142
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 143"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   143
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 144"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   144
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 145"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   145
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 146"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   146
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 147"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   147
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 148"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   148
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 149"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   149
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 150"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   150
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 151"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   151
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 152"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   152
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 153"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   153
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 154"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   154
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 155"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   155
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 156"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   156
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 157"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   157
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 158"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   158
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 159"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   159
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 160"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   160
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 161"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   161
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 162"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   162
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 163"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   163
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 164"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   164
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 165"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   165
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 166"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   166
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 167"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   167
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 168"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   168
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 169"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   169
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 170"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   170
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 171"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   171
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 172"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   172
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 173"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   173
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 174"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   174
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 175"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   175
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 176"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   176
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 177"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   177
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 178"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   178
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 179"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   179
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 180"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   180
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 181"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   181
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 182"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   182
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 183"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   183
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 184"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   184
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 185"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   185
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 186"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   186
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 187"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   187
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 188"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   188
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 189"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   189
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 190"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   190
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 191"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   191
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 192"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   192
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 193"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   193
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 194"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   194
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 195"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   195
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 196"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   196
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 197"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   197
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 198"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   198
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 199"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   199
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 200"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   200
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 201"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   201
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 202"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   202
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 203"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   203
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 204"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   204
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 205"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   205
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 206"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   206
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 207"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   207
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 208"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   208
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 209"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   209
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 210"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   210
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 211"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   211
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 212"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   212
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 213"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   213
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 214"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   214
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 215"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   215
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 216"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   216
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 217"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   217
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 218"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   218
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 219"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   219
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 220"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   220
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 221"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   221
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 222"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   222
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 223"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   223
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 224"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   224
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 225"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   225
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 226"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   226
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 227"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   227
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 228"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   228
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 229"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   229
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 230"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   230
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 231"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   231
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 232"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   232
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 233"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   233
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 234"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   234
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 235"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   235
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 236"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   236
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 237"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   237
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 238"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   238
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 239"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   239
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 240"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   240
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 241"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   241
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 242"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   242
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 243"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   243
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 244"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   244
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 245"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   245
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 246"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   246
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 247"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   247
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 248"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   248
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 249"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   249
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 250"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   250
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 251"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   251
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 252"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   252
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 253"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   253
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 254"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   254
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 255"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 256"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   256
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 257"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   257
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 258"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   258
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 259"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   259
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 260"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   260
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 261"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   261
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 262"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   262
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 263"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   263
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 264"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   264
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 265"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   265
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 266"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   266
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 267"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   267
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 268"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   268
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 269"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   269
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 270"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   270
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 271"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   271
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 272"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   272
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 273"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   273
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 274"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   274
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 275"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   275
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 276"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   276
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 277"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   277
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 278"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   278
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 279"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   279
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 280"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   280
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 281"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   281
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 282"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   282
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 283"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   283
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 284"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   284
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 285"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   285
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 286"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   286
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 287"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   287
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 288"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   288
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 289"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   289
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 290"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   290
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 291"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   291
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 292"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   292
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 293"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   293
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 294"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   294
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 295"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   295
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 296"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   296
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 297"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   297
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 298"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   298
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 299"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   299
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 300"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   300
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 301"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   301
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 302"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   302
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 303"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   303
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 304"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   304
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 305"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   305
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 306"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   306
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 307"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   307
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 308"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   308
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 309"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   309
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 310"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   310
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 311"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   311
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 312"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   312
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 313"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   313
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 314"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   314
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 315"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   315
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 316"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   316
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 317"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   317
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 318"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   318
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 319"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   319
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 320"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   320
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 321"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   321
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 322"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   322
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 323"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   323
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 324"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   324
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 325"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   325
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 326"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   326
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 327"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   327
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 328"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   328
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 329"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   329
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 330"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   330
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 331"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   331
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 332"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   332
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 333"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   333
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 334"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   334
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 335"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   335
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 336"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   336
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 337"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   337
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 338"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   338
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 339"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   339
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 340"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   340
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 341"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   341
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 342"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   342
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 343"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   343
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 344"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   344
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 345"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   345
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 346"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   346
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 347"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   347
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 348"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   348
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 349"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   349
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 350"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   350
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 351"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   351
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 352"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   352
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 353"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   353
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 354"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   354
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 355"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   355
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 356"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   356
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 357"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   357
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 358"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   358
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 359"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   359
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 360"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   360
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 361"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   361
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 362"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   362
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 363"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   363
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 364"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   364
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 365"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   365
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 366"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   366
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 367"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   367
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 368"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   368
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 369"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   369
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 370"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   370
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 371"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   371
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 372"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   372
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 373"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   373
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 374"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   374
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 375"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   375
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 376"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   376
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 377"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   377
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 378"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   378
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 379"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   379
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 380"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   380
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 381"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   381
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 382"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   382
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 383"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   383
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 384"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   384
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 385"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   385
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 386"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   386
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 387"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   387
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 388"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   388
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 389"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   389
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 390"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   390
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 391"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   391
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 392"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   392
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 393"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   393
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 394"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   394
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 395"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   395
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 396"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   396
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 397"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   397
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 398"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   398
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 399"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   399
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 400"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   400
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 401"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   401
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 402"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   402
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 403"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   403
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 404"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   404
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 405"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   405
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 406"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   406
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 407"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   407
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 408"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   408
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 409"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   409
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 410"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   410
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 411"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   411
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 412"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   412
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 413"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   413
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 414"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   414
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 415"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   415
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 416"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   416
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 417"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   417
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 418"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   418
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 419"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   419
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 420"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   420
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 421"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   421
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 422"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   422
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 423"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   423
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 424"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   424
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 425"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   425
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 426"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   426
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 427"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   427
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 428"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   428
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 429"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   429
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 430"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   430
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 431"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   431
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 432"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   432
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 433"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   433
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 434"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   434
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 435"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   435
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 436"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   436
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 437"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   437
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 438"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   438
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 439"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   439
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 440"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   440
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 441"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   441
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 442"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   442
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 443"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   443
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 444"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   444
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 445"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   445
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 446"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   446
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 447"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   447
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 448"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   448
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 449"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   449
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 450"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   450
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 451"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   451
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 452"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   452
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 453"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   453
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 454"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   454
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 455"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   455
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 456"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   456
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 457"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   457
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 458"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   458
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 459"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   459
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 460"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   460
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 461"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   461
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 462"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   462
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 463"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   463
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 464"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   464
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 465"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   465
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 466"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   466
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 467"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   467
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 468"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   468
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 469"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   469
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 470"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   470
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 471"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   471
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 472"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   472
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 473"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   473
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 474"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   474
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 475"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   475
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 476"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   476
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 477"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   477
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 478"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   478
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 479"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   479
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 480"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   480
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 481"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   481
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 482"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   482
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 483"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   483
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 484"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   484
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 485"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   485
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 486"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   486
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 487"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   487
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 488"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   488
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 489"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   489
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 490"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   490
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 491"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   491
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 492"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   492
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 493"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   493
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 494"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   494
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 495"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   495
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 496"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   496
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 497"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   497
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 498"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   498
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 499"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   499
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 500"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   500
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.2
+ },
+ {
+  "mark": "speed 0"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 1"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 2"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 3"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size1"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.0
+ },
+ {
+  "mark": "gain 100"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 101"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   101
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 102"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   102
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 103"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   103
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 104"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   104
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 105"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   105
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 106"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   106
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 107"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   107
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 108"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   108
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 109"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   109
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 110"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   110
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 111"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   111
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 112"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   112
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 113"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   113
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 114"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   114
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 115"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   115
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 116"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   116
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 117"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   117
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 118"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   118
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 119"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   119
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 120"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   120
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 121"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   121
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 122"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   122
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 123"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   123
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 124"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   124
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 125"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   125
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 126"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   126
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 127"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   127
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 128"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   128
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 129"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   129
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 130"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   130
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 131"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   131
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 132"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   132
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 133"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   133
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 134"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   134
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 135"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   135
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 136"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   136
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 137"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   137
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 138"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   138
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 139"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   139
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 140"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   140
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 141"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   141
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 142"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   142
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 143"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   143
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 144"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   144
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 145"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   145
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 146"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   146
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 147"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   147
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 148"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   148
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 149"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   149
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 150"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   150
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 151"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   151
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 152"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   152
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 153"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   153
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 154"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   154
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 155"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   155
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 156"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   156
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 157"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   157
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 158"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   158
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 159"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   159
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 160"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   160
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 161"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   161
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 162"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   162
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 163"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   163
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 164"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   164
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 165"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   165
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 166"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   166
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 167"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   167
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 168"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   168
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 169"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   169
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 170"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   170
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 171"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   171
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 172"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   172
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 173"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   173
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 174"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   174
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 175"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   175
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 176"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   176
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 177"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   177
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 178"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   178
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 179"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   179
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 180"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   180
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 181"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   181
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 182"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   182
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 183"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   183
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 184"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   184
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 185"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   185
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 186"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   186
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 187"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   187
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 188"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   188
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 189"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   189
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 190"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   190
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 191"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   191
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 192"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   192
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 193"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   193
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 194"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   194
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 195"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   195
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 196"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   196
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 197"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   197
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 198"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   198
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 199"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   199
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 200"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   200
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 201"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   201
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 202"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   202
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 203"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   203
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 204"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   204
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 205"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   205
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 206"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   206
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 207"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   207
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 208"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   208
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 209"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   209
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 210"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   210
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 211"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   211
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 212"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   212
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 213"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   213
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 214"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   214
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 215"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   215
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 216"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   216
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 217"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   217
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 218"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   218
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 219"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   219
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 220"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   220
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 221"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   221
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 222"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   222
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 223"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   223
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 224"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   224
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 225"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   225
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 226"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   226
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 227"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   227
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 228"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   228
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 229"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   229
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 230"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   230
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 231"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   231
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 232"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   232
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 233"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   233
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 234"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   234
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 235"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   235
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 236"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   236
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 237"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   237
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 238"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   238
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 239"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   239
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 240"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   240
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 241"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   241
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 242"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   242
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 243"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   243
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 244"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   244
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 245"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   245
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 246"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   246
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 247"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   247
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 248"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   248
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 249"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   249
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 250"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   250
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 251"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   251
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 252"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   252
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 253"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   253
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 254"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   254
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 255"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 256"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   256
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 257"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   257
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 258"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   258
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 259"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   259
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 260"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   260
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 261"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   261
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 262"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   262
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 263"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   263
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 264"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   264
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 265"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   265
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 266"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   266
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 267"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   267
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 268"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   268
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 269"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   269
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 270"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   270
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 271"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   271
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 272"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   272
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 273"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   273
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 274"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   274
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 275"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   275
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 276"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   276
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 277"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   277
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 278"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   278
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 279"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   279
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 280"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   280
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 281"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   281
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 282"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   282
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 283"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   283
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 284"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   284
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 285"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   285
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 286"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   286
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 287"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   287
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 288"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   288
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 289"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   289
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 290"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   290
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 291"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   291
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 292"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   292
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 293"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   293
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 294"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   294
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 295"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   295
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 296"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   296
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 297"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   297
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 298"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   298
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 299"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   299
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 300"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   300
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 301"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   301
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 302"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   302
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 303"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   303
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 304"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   304
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 305"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   305
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 306"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   306
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 307"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   307
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 308"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   308
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 309"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   309
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 310"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   310
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 311"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   311
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 312"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   312
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 313"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   313
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 314"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   314
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 315"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   315
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 316"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   316
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 317"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   317
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 318"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   318
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 319"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   319
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 320"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   320
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 321"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   321
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 322"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   322
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 323"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   323
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 324"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   324
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 325"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   325
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 326"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   326
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 327"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   327
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 328"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   328
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 329"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   329
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 330"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   330
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 331"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   331
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 332"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   332
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 333"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   333
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 334"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   334
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 335"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   335
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 336"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   336
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 337"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   337
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 338"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   338
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 339"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   339
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 340"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   340
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 341"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   341
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 342"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   342
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 343"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   343
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 344"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   344
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 345"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   345
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 346"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   346
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 347"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   347
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 348"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   348
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 349"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   349
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 350"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   350
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 351"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   351
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 352"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   352
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 353"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   353
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 354"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   354
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 355"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   355
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 356"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   356
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 357"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   357
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 358"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   358
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 359"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   359
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 360"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   360
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 361"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   361
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 362"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   362
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 363"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   363
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 364"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   364
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 365"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   365
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 366"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   366
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 367"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   367
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 368"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   368
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 369"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   369
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 370"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   370
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 371"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   371
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 372"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   372
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 373"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   373
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 374"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   374
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 375"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   375
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 376"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   376
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 377"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   377
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 378"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   378
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 379"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   379
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 380"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   380
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 381"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   381
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 382"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   382
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 383"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   383
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 384"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   384
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 385"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   385
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 386"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   386
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 387"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   387
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 388"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   388
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 389"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   389
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 390"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   390
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 391"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   391
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 392"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   392
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 393"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   393
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 394"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   394
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 395"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   395
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 396"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   396
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 397"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   397
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 398"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   398
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 399"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   399
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 400"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   400
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 401"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   401
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 402"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   402
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 403"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   403
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 404"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   404
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 405"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   405
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 406"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   406
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 407"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   407
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 408"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   408
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 409"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   409
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 410"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   410
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 411"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   411
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 412"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   412
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 413"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   413
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 414"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   414
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 415"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   415
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 416"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   416
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 417"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   417
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 418"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   418
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 419"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   419
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 420"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   420
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 421"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   421
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 422"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   422
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 423"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   423
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 424"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   424
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 425"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   425
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 426"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   426
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 427"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   427
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 428"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   428
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 429"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   429
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 430"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   430
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 431"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   431
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 432"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   432
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 433"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   433
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 434"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   434
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 435"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   435
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 436"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   436
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 437"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   437
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 438"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   438
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 439"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   439
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 440"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   440
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 441"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   441
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 442"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   442
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 443"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   443
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 444"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   444
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 445"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   445
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 446"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   446
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 447"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   447
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 448"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   448
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 449"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   449
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 450"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   450
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 451"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   451
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 452"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   452
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 453"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   453
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 454"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   454
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 455"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   455
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 456"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   456
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 457"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   457
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 458"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   458
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 459"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   459
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 460"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   460
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 461"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   461
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 462"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   462
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 463"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   463
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 464"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   464
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 465"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   465
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 466"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   466
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 467"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   467
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 468"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   468
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 469"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   469
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 470"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   470
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 471"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   471
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 472"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   472
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 473"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   473
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 474"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   474
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 475"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   475
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 476"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   476
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 477"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   477
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 478"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   478
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 479"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   479
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 480"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   480
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 481"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   481
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 482"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   482
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 483"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   483
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 484"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   484
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 485"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   485
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 486"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   486
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 487"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   487
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 488"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   488
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 489"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   489
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 490"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   490
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 491"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   491
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 492"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   492
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 493"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   493
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 494"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   494
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 495"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   495
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 496"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   496
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 497"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   497
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 498"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   498
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 499"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   499
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 500"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   500
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.2
+ },
+ {
+  "mark": "speed 0"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 1"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 2"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 3"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size0"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.0
+ },
+ {
+  "mark": "gain 100"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 101"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   101
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 102"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   102
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 103"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   103
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 104"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   104
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 105"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   105
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 106"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   106
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 107"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   107
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 108"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   108
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 109"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   109
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 110"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   110
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 111"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   111
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 112"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   112
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 113"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   113
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 114"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   114
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 115"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   115
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 116"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   116
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 117"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   117
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 118"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   118
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 119"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   119
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 120"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   120
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 121"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   121
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 122"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   122
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 123"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   123
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 124"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   124
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 125"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   125
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 126"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   126
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 127"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   127
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 128"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   128
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 129"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   129
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 130"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   130
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 131"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   131
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 132"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   132
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 133"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   133
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 134"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   134
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 135"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   135
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 136"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   136
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 137"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   137
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 138"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   138
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 139"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   139
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 140"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   140
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 141"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   141
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 142"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   142
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 143"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   143
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 144"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   144
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 145"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   145
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 146"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   146
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 147"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   147
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 148"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   148
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 149"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   149
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 150"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   150
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 151"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   151
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 152"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   152
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 153"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   153
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 154"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   154
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 155"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   155
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 156"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   156
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 157"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   157
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 158"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   158
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 159"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   159
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 160"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   160
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 161"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   161
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 162"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   162
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 163"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   163
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 164"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   164
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 165"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   165
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 166"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   166
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 167"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   167
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 168"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   168
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 169"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   169
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 170"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   170
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 171"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   171
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 172"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   172
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 173"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   173
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 174"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   174
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 175"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   175
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 176"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   176
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 177"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   177
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 178"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   178
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 179"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   179
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 180"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   180
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 181"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   181
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 182"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   182
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 183"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   183
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 184"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   184
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 185"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   185
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 186"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   186
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 187"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   187
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 188"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   188
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 189"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   189
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 190"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   190
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 191"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   191
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 192"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   192
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 193"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   193
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 194"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   194
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 195"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   195
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 196"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   196
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 197"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   197
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 198"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   198
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 199"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   199
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 200"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   200
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 201"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   201
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 202"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   202
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 203"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   203
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 204"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   204
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 205"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   205
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 206"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   206
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 207"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   207
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 208"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   208
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 209"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   209
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 210"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   210
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 211"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   211
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 212"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   212
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 213"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   213
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 214"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   214
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 215"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   215
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 216"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   216
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 217"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   217
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 218"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   218
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 219"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   219
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 220"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   220
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 221"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   221
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 222"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   222
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 223"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   223
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 224"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   224
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 225"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   225
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 226"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   226
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 227"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   227
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 228"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   228
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 229"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   229
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 230"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   230
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 231"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   231
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 232"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   232
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 233"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   233
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 234"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   234
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 235"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   235
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 236"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   236
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 237"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   237
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 238"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   238
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 239"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   239
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 240"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   240
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 241"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   241
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 242"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   242
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 243"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   243
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 244"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   244
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 245"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   245
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 246"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   246
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 247"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   247
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 248"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   248
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 249"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   249
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 250"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   250
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 251"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   251
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 252"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   252
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 253"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   253
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 254"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   254
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 255"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 256"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   256
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 257"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   257
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 258"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   258
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 259"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   259
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 260"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   260
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 261"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   261
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 262"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   262
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 263"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   263
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 264"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   264
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 265"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   265
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 266"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   266
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 267"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   267
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 268"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   268
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 269"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   269
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 270"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   270
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 271"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   271
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 272"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   272
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 273"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   273
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 274"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   274
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 275"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   275
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 276"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   276
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 277"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   277
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 278"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   278
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 279"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   279
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 280"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   280
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 281"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   281
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 282"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   282
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 283"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   283
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 284"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   284
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 285"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   285
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 286"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   286
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 287"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   287
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 288"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   288
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 289"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   289
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 290"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   290
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 291"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   291
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 292"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   292
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 293"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   293
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 294"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   294
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 295"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   295
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 296"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   296
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 297"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   297
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 298"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   298
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 299"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   299
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 300"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   300
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 301"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   301
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 302"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   302
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 303"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   303
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 304"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   304
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 305"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   305
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 306"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   306
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 307"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   307
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 308"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   308
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 309"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   309
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 310"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   310
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 311"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   311
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 312"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   312
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 313"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   313
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 314"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   314
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 315"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   315
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 316"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   316
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 317"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   317
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 318"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   318
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 319"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   319
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 320"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   320
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 321"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   321
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 322"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   322
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 323"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   323
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 324"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   324
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 325"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   325
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 326"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   326
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 327"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   327
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 328"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   328
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 329"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   329
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 330"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   330
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 331"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   331
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 332"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   332
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 333"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   333
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 334"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   334
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 335"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   335
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 336"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   336
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 337"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   337
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 338"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   338
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 339"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   339
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 340"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   340
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 341"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   341
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 342"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   342
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 343"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   343
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 344"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   344
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 345"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   345
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 346"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   346
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 347"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   347
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 348"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   348
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 349"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   349
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 350"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   350
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 351"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   351
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 352"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   352
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 353"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   353
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 354"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   354
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 355"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   355
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 356"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   356
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 357"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   357
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 358"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   358
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 359"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   359
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 360"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   360
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 361"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   361
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 362"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   362
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 363"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   363
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 364"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   364
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 365"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   365
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 366"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   366
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 367"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   367
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 368"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   368
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 369"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   369
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 370"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   370
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 371"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   371
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 372"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   372
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 373"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   373
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 374"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   374
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 375"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   375
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 376"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   376
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 377"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   377
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 378"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   378
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 379"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   379
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 380"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   380
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 381"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   381
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 382"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   382
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 383"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   383
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 384"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   384
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 385"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   385
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 386"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   386
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 387"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   387
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 388"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   388
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 389"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   389
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 390"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   390
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 391"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   391
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 392"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   392
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 393"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   393
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 394"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   394
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 395"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   395
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 396"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   396
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 397"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   397
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 398"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   398
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 399"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   399
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 400"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   400
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 401"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   401
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 402"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   402
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 403"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   403
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 404"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   404
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 405"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   405
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 406"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   406
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 407"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   407
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 408"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   408
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 409"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   409
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 410"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   410
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 411"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   411
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 412"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   412
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 413"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   413
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 414"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   414
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 415"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   415
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 416"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   416
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 417"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   417
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 418"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   418
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 419"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   419
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 420"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   420
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 421"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   421
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 422"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   422
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 423"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   423
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 424"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   424
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 425"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   425
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 426"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   426
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 427"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   427
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 428"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   428
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 429"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   429
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 430"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   430
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 431"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   431
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 432"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   432
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 433"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   433
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 434"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   434
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 435"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   435
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 436"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   436
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 437"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   437
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 438"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   438
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 439"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   439
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 440"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   440
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 441"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   441
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 442"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   442
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 443"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   443
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 444"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   444
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 445"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   445
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 446"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   446
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 447"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   447
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 448"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   448
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 449"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   449
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 450"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   450
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 451"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   451
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 452"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   452
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 453"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   453
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 454"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   454
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 455"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   455
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 456"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   456
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 457"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   457
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 458"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   458
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 459"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   459
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 460"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   460
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 461"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   461
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 462"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   462
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 463"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   463
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 464"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   464
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 465"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   465
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 466"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   466
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 467"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   467
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 468"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   468
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 469"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   469
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 470"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   470
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 471"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   471
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 472"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   472
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 473"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   473
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 474"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   474
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 475"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   475
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 476"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   476
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 477"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   477
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 478"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   478
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 479"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   479
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 480"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   480
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 481"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   481
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 482"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   482
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 483"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   483
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 484"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   484
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 485"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   485
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 486"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   486
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 487"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   487
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 488"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   488
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 489"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   489
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 490"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   490
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 491"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   491
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 492"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   492
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 493"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   493
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 494"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   494
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 495"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   495
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 496"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   496
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 497"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   497
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 498"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   498
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 499"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   499
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 500"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   500
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.2
+ },
+ {
+  "mark": "speed 0"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 1"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 2"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 3"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 1
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pullbits": 16
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw16 size0"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.0
+ },
+ {
+  "mark": "gain 100"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 101"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   101
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 102"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   102
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 103"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   103
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 104"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   104
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 105"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   105
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 106"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   106
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 107"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   107
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 108"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   108
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 109"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   109
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 110"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   110
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 111"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   111
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 112"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   112
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 113"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   113
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 114"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   114
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 115"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   115
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 116"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   116
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 117"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   117
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 118"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   118
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 119"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   119
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 120"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   120
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 121"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   121
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 122"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   122
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 123"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   123
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 124"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   124
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 125"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   125
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 126"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   126
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 127"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   127
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 128"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   128
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 129"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   129
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 130"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   130
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 131"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   131
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 132"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   132
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 133"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   133
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 134"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   134
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 135"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   135
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 136"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   136
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 137"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   137
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 138"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   138
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 139"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   139
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 140"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   140
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 141"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   141
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 142"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   142
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 143"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   143
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 144"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   144
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 145"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   145
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 146"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   146
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 147"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   147
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 148"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   148
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 149"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   149
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 150"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   150
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 151"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   151
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 152"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   152
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 153"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   153
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 154"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   154
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 155"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   155
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 156"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   156
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 157"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   157
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 158"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   158
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 159"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   159
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 160"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   160
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 161"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   161
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 162"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   162
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 163"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   163
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 164"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   164
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 165"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   165
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 166"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   166
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 167"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   167
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 168"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   168
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 169"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   169
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 170"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   170
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 171"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   171
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 172"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   172
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 173"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   173
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 174"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   174
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 175"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   175
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 176"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   176
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 177"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   177
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 178"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   178
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 179"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   179
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 180"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   180
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 181"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   181
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 182"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   182
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 183"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   183
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 184"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   184
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 185"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   185
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 186"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   186
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 187"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   187
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 188"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   188
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 189"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   189
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 190"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   190
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 191"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   191
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 192"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   192
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 193"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   193
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 194"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   194
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 195"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   195
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 196"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   196
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 197"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   197
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 198"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   198
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 199"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   199
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 200"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   200
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 201"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   201
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 202"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   202
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 203"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   203
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 204"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   204
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 205"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   205
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 206"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   206
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 207"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   207
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 208"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   208
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 209"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   209
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 210"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   210
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 211"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   211
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 212"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   212
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 213"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   213
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 214"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   214
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 215"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   215
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 216"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   216
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 217"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   217
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 218"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   218
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 219"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   219
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 220"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   220
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 221"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   221
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 222"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   222
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 223"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   223
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 224"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   224
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 225"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   225
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 226"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   226
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 227"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   227
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 228"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   228
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 229"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   229
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 230"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   230
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 231"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   231
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 232"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   232
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 233"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   233
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 234"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   234
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 235"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   235
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 236"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   236
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 237"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   237
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 238"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   238
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 239"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   239
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 240"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   240
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 241"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   241
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 242"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   242
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 243"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   243
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 244"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   244
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 245"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   245
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 246"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   246
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 247"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   247
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 248"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   248
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 249"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   249
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 250"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   250
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 251"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   251
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 252"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   252
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 253"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   253
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 254"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   254
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 255"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 256"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   256
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 257"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   257
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 258"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   258
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 259"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   259
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 260"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   260
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 261"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   261
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 262"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   262
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 263"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   263
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 264"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   264
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 265"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   265
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 266"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   266
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 267"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   267
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 268"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   268
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 269"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   269
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 270"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   270
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 271"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   271
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 272"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   272
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 273"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   273
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 274"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   274
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 275"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   275
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 276"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   276
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 277"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   277
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 278"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   278
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 279"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   279
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 280"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   280
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 281"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   281
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 282"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   282
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 283"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   283
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 284"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   284
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 285"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   285
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 286"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   286
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 287"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   287
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 288"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   288
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 289"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   289
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 290"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   290
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 291"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   291
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 292"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   292
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 293"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   293
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 294"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   294
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 295"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   295
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 296"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   296
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 297"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   297
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 298"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   298
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 299"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   299
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 300"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   300
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 301"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   301
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 302"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   302
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 303"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   303
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 304"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   304
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 305"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   305
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 306"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   306
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 307"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   307
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 308"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   308
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 309"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   309
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 310"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   310
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 311"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   311
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 312"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   312
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 313"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   313
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 314"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   314
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 315"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   315
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 316"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   316
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 317"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   317
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 318"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   318
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 319"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   319
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 320"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   320
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 321"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   321
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 322"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   322
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 323"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   323
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 324"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   324
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 325"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   325
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 326"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   326
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 327"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   327
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 328"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   328
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 329"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   329
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 330"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   330
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 331"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   331
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 332"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   332
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 333"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   333
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 334"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   334
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 335"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   335
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 336"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   336
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 337"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   337
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 338"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   338
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 339"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   339
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 340"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   340
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 341"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   341
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 342"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   342
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 343"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   343
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 344"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   344
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 345"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   345
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 346"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   346
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 347"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   347
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 348"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   348
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 349"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   349
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 350"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   350
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 351"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   351
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 352"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   352
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 353"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   353
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 354"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   354
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 355"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   355
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 356"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   356
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 357"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   357
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 358"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   358
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 359"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   359
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 360"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   360
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 361"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   361
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 362"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   362
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 363"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   363
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 364"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   364
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 365"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   365
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 366"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   366
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 367"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   367
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 368"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   368
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 369"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   369
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 370"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   370
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 371"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   371
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 372"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   372
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 373"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   373
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 374"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   374
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 375"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   375
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 376"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   376
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 377"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   377
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 378"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   378
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 379"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   379
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 380"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   380
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 381"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   381
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 382"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   382
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 383"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   383
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 384"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   384
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 385"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   385
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 386"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   386
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 387"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   387
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 388"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   388
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 389"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   389
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 390"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   390
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 391"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   391
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 392"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   392
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 393"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   393
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 394"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   394
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 395"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   395
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 396"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   396
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 397"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   397
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 398"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   398
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 399"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   399
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 400"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   400
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 401"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   401
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 402"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   402
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 403"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   403
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 404"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   404
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 405"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   405
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 406"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   406
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 407"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   407
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 408"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   408
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 409"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   409
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 410"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   410
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 411"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   411
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 412"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   412
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 413"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   413
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 414"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   414
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 415"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   415
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 416"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   416
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 417"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   417
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 418"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   418
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 419"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   419
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 420"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   420
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 421"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   421
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 422"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   422
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 423"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   423
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 424"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   424
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 425"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   425
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 426"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   426
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 427"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   427
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 428"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   428
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 429"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   429
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 430"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   430
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 431"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   431
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 432"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   432
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 433"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   433
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 434"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   434
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 435"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   435
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 436"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   436
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 437"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   437
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 438"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   438
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 439"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   439
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 440"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   440
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 441"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   441
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 442"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   442
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 443"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   443
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 444"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   444
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 445"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   445
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 446"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   446
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 447"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   447
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 448"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   448
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 449"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   449
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 450"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   450
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 451"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   451
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 452"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   452
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 453"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   453
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 454"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   454
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 455"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   455
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 456"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   456
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 457"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   457
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 458"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   458
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 459"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   459
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 460"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   460
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 461"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   461
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 462"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   462
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 463"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   463
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 464"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   464
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 465"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   465
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 466"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   466
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 467"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   467
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 468"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   468
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 469"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   469
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 470"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   470
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 471"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   471
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 472"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   472
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 473"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   473
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 474"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   474
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 475"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   475
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 476"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   476
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 477"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   477
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 478"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   478
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 479"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   479
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 480"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   480
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 481"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   481
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 482"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   482
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 483"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   483
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 484"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   484
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 485"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   485
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 486"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   486
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 487"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   487
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 488"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   488
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 489"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   489
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 490"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   490
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 491"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   491
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 492"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   492
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 493"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   493
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 494"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   494
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 495"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   495
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 496"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   496
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 497"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   497
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 498"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   498
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 499"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   499
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "mark": "gain 500"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   500
+  ]
+ },
+ {
+  "pause": 0.02
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.2
+ },
+ {
+  "mark": "speed 0"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 1"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 2"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "speed 3"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]
