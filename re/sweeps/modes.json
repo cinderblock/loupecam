@@ -1,0 +1,533 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size0"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 3.0
+ },
+ {
+  "save": "mode_raw8_s0"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 1
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pullbits": 16
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw16 size0"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 3.0
+ },
+ {
+  "save": "mode_raw16_s0"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 0
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pullbits": 24
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start rgb24 size0"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 3.0
+ },
+ {
+  "save": "mode_rgb24_s0"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size1"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_raw8_s1"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 1
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pullbits": 16
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw16 size1"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_raw16_s1"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 0
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pullbits": 24
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start rgb24 size1"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_rgb24_s1"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_raw8_s2"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 1
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 16
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw16 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_raw16_s2"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 0
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 24
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start rgb24 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "mode_rgb24_s2"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]

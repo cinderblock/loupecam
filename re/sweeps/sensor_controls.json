@@ -1,0 +1,663 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "baseline"
+ },
+ {
+  "pause": 1
+ },
+ {
+  "mark": "expo 100"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.6001
+ },
+ {
+  "mark": "expo 1000"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   1000
+  ]
+ },
+ {
+  "pause": 0.601
+ },
+ {
+  "mark": "expo 5000"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   5000
+  ]
+ },
+ {
+  "pause": 0.605
+ },
+ {
+  "mark": "expo 33333"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   33333
+  ]
+ },
+ {
+  "pause": 0.6333329999999999
+ },
+ {
+  "mark": "expo 100000"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   100000
+  ]
+ },
+ {
+  "pause": 0.7
+ },
+ {
+  "mark": "expo 500000"
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   500000
+  ]
+ },
+ {
+  "pause": 1.1
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 100"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 150"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   150
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 200"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   200
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 300"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   300
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 400"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   400
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gain 500"
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   500
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "speed 0"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "speed 1"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "speed 2"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "speed 3"
+ },
+ {
+  "fn": "put_Speed",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "hz 0"
+ },
+ {
+  "fn": "put_HZ",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "hz 1"
+ },
+ {
+  "fn": "put_HZ",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "hz 2"
+ },
+ {
+  "fn": "put_HZ",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "mode 0"
+ },
+ {
+  "fn": "put_Mode",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "mode 1"
+ },
+ {
+  "fn": "put_Mode",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "mark": "blacklevel 0"
+ },
+ {
+  "option": 21,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "blacklevel 8"
+ },
+ {
+  "option": 21,
+  "value": 8
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "blacklevel 16"
+ },
+ {
+  "option": 21,
+  "value": 16
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "blacklevel 31"
+ },
+ {
+  "option": 21,
+  "value": 31
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "cg 1"
+ },
+ {
+  "option": 25,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "cg 0"
+ },
+ {
+  "option": 25,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "lownoise 1"
+ },
+ {
+  "option": 56,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "lownoise 0"
+ },
+ {
+  "option": 56,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "highfullwell 1"
+ },
+ {
+  "option": 85,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "highfullwell 0"
+ },
+ {
+  "option": 85,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "framerate 5"
+ },
+ {
+  "option": 17,
+  "value": 5
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "framerate 0"
+ },
+ {
+  "option": 17,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "precise_framerate 50"
+ },
+ {
+  "option": 45,
+  "value": 50
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "precise_framerate 0"
+ },
+ {
+  "option": 45,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "bandwidth 50"
+ },
+ {
+  "option": 46,
+  "value": 50
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "bandwidth 100"
+ },
+ {
+  "option": 46,
+  "value": 100
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "defectpixel 0"
+ },
+ {
+  "option": 64,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "defectpixel 1"
+ },
+ {
+  "option": 64,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "zerooffset 1"
+ },
+ {
+  "option": 112,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "zerooffset 0"
+ },
+ {
+  "option": 112,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "HFlip 1"
+ },
+ {
+  "fn": "put_HFlip",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_HFlip",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "VFlip 1"
+ },
+ {
+  "fn": "put_VFlip",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_VFlip",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "getoption": 121
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "getoption": 119
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "getoption": 44
+ },
+ {
+  "pause": 0.3
+ },
+ {
+  "mark": "roi 1000x800 @ 200,100"
+ },
+ {
+  "fn": "put_Roi",
+  "args": [
+   200,
+   100,
+   1000,
+   800
+  ]
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "save": "roi_raw8"
+ },
+ {
+  "mark": "roi off"
+ },
+ {
+  "fn": "put_Roi",
+  "args": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "autoexpo on"
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 3
+ },
+ {
+  "mark": "aetarget 60"
+ },
+ {
+  "fn": "put_AutoExpoTarget",
+  "args": [
+   60
+  ]
+ },
+ {
+  "pause": 3
+ },
+ {
+  "mark": "autoexpo off"
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]

@@ -1,0 +1,199 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "testpattern 3"
+ },
+ {
+  "option": 40,
+  "value": 3
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp3"
+ },
+ {
+  "mark": "testpattern 5"
+ },
+ {
+  "option": 40,
+  "value": 5
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp5"
+ },
+ {
+  "mark": "testpattern 7"
+ },
+ {
+  "option": 40,
+  "value": 7
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp7"
+ },
+ {
+  "mark": "testpattern 9"
+ },
+ {
+  "option": 40,
+  "value": 9
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp9"
+ },
+ {
+  "mark": "testpattern 0"
+ },
+ {
+  "option": 40,
+  "value": 0
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp0"
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ },
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 1
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 16
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw16 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "testpattern 9"
+ },
+ {
+  "option": 40,
+  "value": 9
+ },
+ {
+  "pause": 1.2
+ },
+ {
+  "save": "tp9"
+ },
+ {
+  "option": 40,
+  "value": 0
+ },
+ {
+  "pause": 0.5
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]

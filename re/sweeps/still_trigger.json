@@ -1,0 +1,126 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 1
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 8
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start raw8 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "still 0 (full res) while previewing size2"
+ },
+ {
+  "fn": "Snap",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 4
+ },
+ {
+  "mark": "still 1"
+ },
+ {
+  "fn": "Snap",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 3
+ },
+ {
+  "mark": "trigger mode 1"
+ },
+ {
+  "option": 11,
+  "value": 1
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "trigger 1"
+ },
+ {
+  "fn": "Trigger",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "trigger 3"
+ },
+ {
+  "fn": "Trigger",
+  "args": [
+   3
+  ]
+ },
+ {
+  "pause": 2
+ },
+ {
+  "mark": "trigger mode 0"
+ },
+ {
+  "option": 11,
+  "value": 0
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]

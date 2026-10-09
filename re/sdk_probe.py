@@ -1,15 +1,32 @@
 """Drive the vendor amcam SDK through a scripted sequence of calls while USBPcap
-records, so USB traffic can be correlated with SDK calls.
+records, so USB traffic can be correlated with SDK calls (see correlate.py).
 
-Every step is printed with a high-resolution wall-clock timestamp (also written to
-a .jsonl log next to the capture) so pcap timestamps can be matched to calls.
+Every step is logged with a wall-clock timestamp to a .jsonl file next to the capture.
+pcap timestamps come from the same clock, so traffic can be attributed to steps.
 
-Usage: python re/sdk_probe.py <scenario> [logfile]
+Usage:
+  python re/sdk_probe.py <scenario> [logfile]       built-in scenario (open_close)
+  python re/sdk_probe.py <steps.json> [logfile]     data-driven sweep (see re/sweeps/)
+
+Step syntax (a JSON list, executed in order):
+  {"open": true}                     enumerate + open the first camera
+  {"close": true}
+  {"start": true} / {"stop": true}   pull-mode streaming (a background thread pulls frames)
+  {"fn": "put_ExpoTime", "args": [5000]}   any Amcam_* function; the handle is implicit.
+        Args: int, or {"u16": [...]} / {"i32": [...]} for array pointers.
+  {"get": "get_ExpoTime"}            int out-parameter getter
+  {"option": 0x28, "value": 1}       put_Option
+  {"getoption": 0x28}                get_Option
+  {"pause": 1.0}
+  {"save": "name"}                   write the most recent frame to captures/frames/<name>.bin
+  {"pullbits": 8|16|24|48}           bits for PullImageV2 (8/16 = raw, 24 = RGB24)
 """
 
 import ctypes as C
 import json
+import os
 import sys
+import threading
 import time
 
 DLL = r"C:\Program Files\AmScope\AmScope\x64\amcam.dll"
@@ -44,6 +61,7 @@ dll.Amcam_Version.restype = C.c_wchar_p
 dll.Amcam_Open.restype = H
 dll.Amcam_Open.argtypes = [C.c_wchar_p]
 CB = C.WINFUNCTYPE(None, C.c_uint, C.c_void_p)
+EVENT_IMAGE, EVENT_STILLIMAGE = 0x0004, 0x0005
 
 LOG = None
 
@@ -56,10 +74,12 @@ def log(step, **kw):
         LOG.flush()
 
 
-def call(name, *args, restype=HRESULT):
+def call(name, *args, restype=HRESULT, quiet_args=None):
     fn = getattr(dll, name)
     fn.restype = restype
-    log("call>" + name, args=[a if isinstance(a, (int, float, str)) else None for a in args])
+    shown = quiet_args if quiet_args is not None else [
+        a if isinstance(a, (int, float, str)) else None for a in args]
+    log("call>" + name, args=shown)
     r = fn(*args)
     log("call<" + name, ret=r if isinstance(r, (int, float, str)) or r is None else str(r))
     return r
@@ -105,7 +125,6 @@ def info(h):
     get_int(h, "Amcam_get_Revision", C.c_ushort)
     get_int(h, "Amcam_get_MaxSpeed")
     get_int(h, "Amcam_get_MaxBitDepth")
-    get_int(h, "Amcam_get_Temperature", C.c_short)
     lo, hi, df = C.c_uint(), C.c_uint(), C.c_uint()
     call("Amcam_get_ExpTimeRange", h, C.byref(lo), C.byref(hi), C.byref(df))
     log("value", name="ExpTimeRange", value=[lo.value, hi.value, df.value])
@@ -114,40 +133,122 @@ def info(h):
     log("value", name="ExpoAGainRange", value=[glo.value, ghi.value, gdf.value])
 
 
-frames = []
+class Streamer:
+    """Pull-mode streaming with a background thread that pulls every frame."""
+
+    def __init__(self, h):
+        self.h = h
+        self.bits = 8
+        self.last = None
+        self.count = 0
+        self.ev = threading.Event()
+        self.pending = []
+        self.lock = threading.Lock()
+        self.running = False
+        self.cb = CB(self._cb)  # must outlive streaming
+
+    def _cb(self, ev, ctx):
+        with self.lock:
+            self.pending.append(ev)
+        self.ev.set()
+
+    # Largest possible frame: full sensor at 48 bits/pixel.
+    BUF = (C.c_ubyte * (4912 * 3684 * 6))()
+
+    def _pull(self, still):
+        fi = FrameInfoV2()
+        fn = dll.Amcam_PullStillImageV2 if still else dll.Amcam_PullImageV2
+        hr = fn(self.h, self.BUF, self.bits, C.byref(fi))
+        n = fi.width * fi.height * max(1, self.bits // 8)
+        self.count += 1
+        self.last = (fi.width, fi.height, self.bits, C.string_at(self.BUF, n))
+        log("still" if still else "frame", hr=hr, w=fi.width, h=fi.height, seq=fi.seq,
+            ts=fi.timestamp, flag=fi.flag)
+
+    def _loop(self):
+        while self.running:
+            if not self.ev.wait(0.1):
+                continue
+            self.ev.clear()
+            with self.lock:
+                evs, self.pending = self.pending, []
+            for ev in evs:
+                if ev in (EVENT_IMAGE, EVENT_STILLIMAGE):
+                    try:
+                        self._pull(ev == EVENT_STILLIMAGE)
+                    except OSError as e:
+                        log("pull-error", err=str(e))
+                else:
+                    log("event", ev=ev)
+
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self._loop, daemon=True)
+        self.thread.start()
+        call("Amcam_StartPullModeWithCallback", self.h, self.cb, None)
+
+    def stop(self):
+        call("Amcam_Stop", self.h)
+        self.running = False
+        self.thread.join()
 
 
-def stream(h, model, seconds, raw=False, size_idx=None):
-    if raw:
-        call("Amcam_put_Option", h, 0x04, 1)  # AMCAM_OPTION_RAW
-    if size_idx is not None:
-        call("Amcam_put_eSize", h, size_idx)
-    w, hgt = C.c_int(), C.c_int()
-    call("Amcam_get_Size", h, C.byref(w), C.byref(hgt))
-    log("value", name="Size", value=[w.value, hgt.value])
-    buf = (C.c_ubyte * (w.value * hgt.value * 4))()
-    events = []
+def conv_arg(a):
+    if isinstance(a, dict):
+        if "u16" in a:
+            return (C.c_ushort * len(a["u16"]))(*a["u16"])
+        if "i32" in a:
+            return (C.c_int * len(a["i32"]))(*a["i32"])
+    if isinstance(a, float):
+        return C.c_double(a)
+    return a
 
-    @CB
-    def cb(ev, ctx):
-        events.append((time.time(), ev))
 
-    call("Amcam_StartPullModeWithCallback", h, cb, None)
-    end = time.time() + seconds
-    while time.time() < end:
-        while events:
-            t, ev = events.pop(0)
-            if ev == 0x0004:  # AMCAM_EVENT_IMAGE
-                fi = FrameInfoV2()
-                hr = dll.Amcam_PullImageV2(h, buf, 8 if raw else 24, C.byref(fi))
-                log("frame", hr=hr, w=fi.width, h=fi.height, seq=fi.seq, ts=fi.timestamp, flag=fi.flag)
-                if len(frames) < 3:
-                    frames.append(bytes(buf[: fi.width * fi.height * (1 if raw else 3)]))
+def run_steps(steps):
+    h = st = None
+    os.makedirs("captures/frames", exist_ok=True)
+    for s in steps:
+        if "open" in s:
+            h, _ = open_cam()
+            st = Streamer(h)
+        elif "close" in s:
+            call("Amcam_Close", h)
+            h = None
+        elif "start" in s:
+            st.start()
+        elif "stop" in s:
+            st.stop()
+        elif "pullbits" in s:
+            st.bits = s["pullbits"]
+            log("pullbits", bits=st.bits)
+        elif "fn" in s:
+            args = [conv_arg(a) for a in s.get("args", [])]
+            call("Amcam_" + s["fn"], h, *args, quiet_args=s.get("args", []))
+        elif "get" in s:
+            get_int(h, "Amcam_" + s["get"])
+        elif "option" in s:
+            call("Amcam_put_Option", h, s["option"], s["value"],
+                 quiet_args=[s["option"], s["value"]])
+        elif "getoption" in s:
+            v = C.c_int()
+            hr = call("Amcam_get_Option", h, s["getoption"], C.byref(v))
+            log("value", name=f"option 0x{s['getoption']:02x}", hr=hr, value=v.value)
+        elif "info" in s:
+            info(h)
+        elif "pause" in s:
+            pause(s["pause"], s.get("why", ""))
+        elif "save" in s:
+            if st and st.last:
+                w, hh, bits, data = st.last
+                path = f"captures/frames/{s['save']}_{w}x{hh}_{bits}b.bin"
+                open(path, "wb").write(data)
+                log("saved", path=path)
             else:
-                log("event", ev=ev)
-        time.sleep(0.005)
-    call("Amcam_Stop", h)
-    return cb  # keep alive
+                log("save-skipped", why="no frame yet")
+        elif "mark" in s:
+            log("mark", label=s["mark"])
+        else:
+            raise ValueError(f"unknown step {s}")
 
 
 def scenario_open_close():
@@ -157,39 +258,12 @@ def scenario_open_close():
     call("Amcam_Close", h)
 
 
-def scenario_stream_controls():
-    h, m = open_cam()
-    info(h)
-    call("Amcam_put_AutoExpoEnable", h, 0)
-    call("Amcam_put_ExpoTime", h, 10000)
-    call("Amcam_put_ExpoAGain", h, 100)
-    keep = stream(h, m, 3, raw=True, size_idx=2)
-    pause(0.5, "between")
-    # Controls while streaming: each separated by a pause so traffic is attributable.
-    keep2_events = []
-    keep2 = CB(lambda e, c: keep2_events.append(e))  # must outlive streaming
-    call("Amcam_StartPullModeWithCallback", h, keep2, None)
-    pause(1, "streaming baseline")
-    for us in (5000, 20000, 50000):
-        call("Amcam_put_ExpoTime", h, us)
-        pause(1, f"expo {us}")
-    for g in (100, 200, 400):
-        call("Amcam_put_ExpoAGain", h, g)
-        pause(1, f"gain {g}")
-    call("Amcam_put_HFlip", h, 1); pause(1, "hflip")
-    call("Amcam_put_VFlip", h, 1); pause(1, "vflip")
-    call("Amcam_put_Speed", h, 0); pause(1, "speed 0")
-    call("Amcam_put_Speed", h, 2); pause(1, "speed 2")
-    call("Amcam_Stop", h)
-    call("Amcam_Close", h)
-    with open("captures/frames_raw_size2.bin", "wb") as f:
-        for fr in frames:
-            f.write(fr)
-
-
 if __name__ == "__main__":
     name = sys.argv[1]
     if len(sys.argv) > 2:
         LOG = open(sys.argv[2], "w")
     log("sdk", version=dll.Amcam_Version())
-    globals()["scenario_" + name]()
+    if name.endswith(".json"):
+        run_steps(json.load(open(name)))
+    else:
+        globals()["scenario_" + name]()

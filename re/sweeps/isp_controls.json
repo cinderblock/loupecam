@@ -1,0 +1,622 @@
+[
+ {
+  "open": true
+ },
+ {
+  "info": true
+ },
+ {
+  "option": 4,
+  "value": 0
+ },
+ {
+  "option": 6,
+  "value": 0
+ },
+ {
+  "fn": "put_eSize",
+  "args": [
+   2
+  ]
+ },
+ {
+  "pullbits": 24
+ },
+ {
+  "fn": "put_AutoExpoEnable",
+  "args": [
+   0
+  ]
+ },
+ {
+  "fn": "put_ExpoTime",
+  "args": [
+   20000
+  ]
+ },
+ {
+  "fn": "put_ExpoAGain",
+  "args": [
+   100
+  ]
+ },
+ {
+  "mark": "start rgb24 size2"
+ },
+ {
+  "start": true
+ },
+ {
+  "pause": 1.5
+ },
+ {
+  "mark": "baseline"
+ },
+ {
+  "pause": 1
+ },
+ {
+  "save": "isp_base"
+ },
+ {
+  "mark": "temptint 2000 1000"
+ },
+ {
+  "fn": "put_TempTint",
+  "args": [
+   2000,
+   1000
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "temptint 15000 1000"
+ },
+ {
+  "fn": "put_TempTint",
+  "args": [
+   15000,
+   1000
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "temptint 6503 200"
+ },
+ {
+  "fn": "put_TempTint",
+  "args": [
+   6503,
+   200
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "temptint 6503 2500"
+ },
+ {
+  "fn": "put_TempTint",
+  "args": [
+   6503,
+   2500
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "temptint 6503 1000"
+ },
+ {
+  "fn": "put_TempTint",
+  "args": [
+   6503,
+   1000
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "wbgain (-127, 0, 127)"
+ },
+ {
+  "fn": "put_WhiteBalanceGain",
+  "args": [
+   {
+    "i32": [
+     -127,
+     0,
+     127
+    ]
+   }
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "wbgain (50, -50, 0)"
+ },
+ {
+  "fn": "put_WhiteBalanceGain",
+  "args": [
+   {
+    "i32": [
+     50,
+     -50,
+     0
+    ]
+   }
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "wbgain (0, 0, 0)"
+ },
+ {
+  "fn": "put_WhiteBalanceGain",
+  "args": [
+   {
+    "i32": [
+     0,
+     0,
+     0
+    ]
+   }
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "hue -180"
+ },
+ {
+  "fn": "put_Hue",
+  "args": [
+   -180
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "hue 90"
+ },
+ {
+  "fn": "put_Hue",
+  "args": [
+   90
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "hue 0"
+ },
+ {
+  "fn": "put_Hue",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "saturation 0"
+ },
+ {
+  "fn": "put_Saturation",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "saturation 255"
+ },
+ {
+  "fn": "put_Saturation",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "saturation 128"
+ },
+ {
+  "fn": "put_Saturation",
+  "args": [
+   128
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "brightness -255"
+ },
+ {
+  "fn": "put_Brightness",
+  "args": [
+   -255
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "brightness 255"
+ },
+ {
+  "fn": "put_Brightness",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "brightness 0"
+ },
+ {
+  "fn": "put_Brightness",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "contrast -255"
+ },
+ {
+  "fn": "put_Contrast",
+  "args": [
+   -255
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "contrast 255"
+ },
+ {
+  "fn": "put_Contrast",
+  "args": [
+   255
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "contrast 0"
+ },
+ {
+  "fn": "put_Contrast",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gamma 20"
+ },
+ {
+  "fn": "put_Gamma",
+  "args": [
+   20
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gamma 180"
+ },
+ {
+  "fn": "put_Gamma",
+  "args": [
+   180
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "gamma 100"
+ },
+ {
+  "fn": "put_Gamma",
+  "args": [
+   100
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "levelrange"
+ },
+ {
+  "fn": "put_LevelRange",
+  "args": [
+   {
+    "u16": [
+     20,
+     20,
+     20,
+     20
+    ]
+   },
+   {
+    "u16": [
+     200,
+     200,
+     200,
+     200
+    ]
+   }
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_LevelRange",
+  "args": [
+   {
+    "u16": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "u16": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "chrome 1"
+ },
+ {
+  "fn": "put_Chrome",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_Chrome",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "negative 1"
+ },
+ {
+  "fn": "put_Negative",
+  "args": [
+   1
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "fn": "put_Negative",
+  "args": [
+   0
+  ]
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "colormatrix 0"
+ },
+ {
+  "option": 13,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "colormatrix 1"
+ },
+ {
+  "option": 13,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "wbgain 0"
+ },
+ {
+  "option": 14,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "wbgain 1"
+ },
+ {
+  "option": 14,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "linear 0"
+ },
+ {
+  "option": 9,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "linear 1"
+ },
+ {
+  "option": 9,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "curve 0"
+ },
+ {
+  "option": 10,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "curve 1"
+ },
+ {
+  "option": 10,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "isp -1"
+ },
+ {
+  "option": 95,
+  "value": -1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "isp 1"
+ },
+ {
+  "option": 95,
+  "value": 1
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "isp 0"
+ },
+ {
+  "option": 95,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "denoise 50"
+ },
+ {
+  "option": 53,
+  "value": 50
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "denoise 0"
+ },
+ {
+  "option": 53,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "sharpening 131172"
+ },
+ {
+  "option": 30,
+  "value": 131172
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "sharpening 0"
+ },
+ {
+  "option": 30,
+  "value": 0
+ },
+ {
+  "pause": 0.8
+ },
+ {
+  "mark": "awb once"
+ },
+ {
+  "fn": "AwbOnce",
+  "args": [
+   0,
+   0
+  ]
+ },
+ {
+  "pause": 3
+ },
+ {
+  "stop": true
+ },
+ {
+  "close": true
+ }
+]

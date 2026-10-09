@@ -95,6 +95,121 @@ All vendor requests use `bmRequestType` `0xc0` (IN) / `0x40` (OUT).
 The **challenge/response request numbers** also change per session (0x5e/0x79 vs
 0x4d/0x67), and the rule for that is not found yet.
 
+### Request semantics (from `captures/02_stream_controls.*`, descrambled)
+
+Scrambled requests (wV/wI XOR session key): `0x0a` (read), `0x0b` (FPGA write),
+`0x0d` (sensor write). All the others (`0x01`, `0x0c`, `0x10`, `0x17`, `0x1e`, `0x1f`,
+`0x20`, `0xd9`, `0xda`) are sent plain.
+
+- `0x0d` **sensor register write**, sent as an IN request: wV = 16-bit value, wI = AR1820
+  register address, response 1 byte `08` (ack). Standard SMIA/AR1820 registers seen:
+  `0x0100` mode_select (1 = stream), `0x0104` grouped_parameter_hold, `0x0300-0x030a` PLL
+  (vt_pix 6, vt_sys 1, pre_pll 6, mult 100, op_pix 12, op_sys 1), `0x0112` data format
+  `0x0c0c`, `0x0344-0x034e` crop/output (x 0..4921, y 0..3713, out 1232×930 for the
+  1228×922 mode), `0x0342` line_length_pck, `0x0340` frame_length_lines, `0x3012`
+  coarse_integration_time (exposure), `0x305e` global gain, `0x3040` read_mode (`0x61c7` =
+  binning/skip for the small mode), `0x301a` reset_register, `0x30b4`, `0x31xx`/`0x3exx`
+  analog tuning.
+- `0x0b` **FPGA register write**, IN: wV = value, wI = `addr << 8`. Seen: `0xa2` = width/4
+  (0x133 → 1228), `0xa4` = height (0x39a = 922), `0xa6`, `0xa8`; `0x60-0x70` = 3×3 color
+  matrix (identity, 0x3ff = 1.0); `0xd4/0xd6/0xd8` = 0x100 (WB gains = 1.0?);
+  `0xf2-0xfa`, `0xfc/0xf8`, `0x02`, `0x20`.
+- `0x0a` read (2 bytes): plain wI `0xffff` → sensor chip ID `0x1820`, `0xfeff` → FPGA
+  version `0x0502`.
+- `0x0c` read 3 bytes, wI = some address (`0x30b2`, `0x0000`, `0x3064`). It's a sensor
+  register *read*? Unclear.
+- `0xd9` OUT 2048 bytes × 4 at wI `0x2200/0x2400/0x2600/0x2800`: a 4096-entry u16 LUT
+  (identity ramp in RAW mode).
+- `0xda` OUT 16 bytes ×2: unknown (`00727a00 00747101 00763d00 0078b800` then the same
+  with 0x3x in place of 0x7x).
+- `0x01` OUT, wI=0x0f: wV=3 = stream/transfer enable (also sent right after auth), wV=0 =
+  stop.
+- `0x17` IN 2 bytes after stop: `0000`.
+- SDK `Stop` + `Start` **re-runs the whole session** (new seed, auth, full init).
+- SDK H/V flip generate **no USB traffic** (they're done in software on the host).
+  `put_Speed` changes line_length_pck (0 → 0x6400, 2 → 0x2ee0, default 0x2580) and then
+  re-writes exposure lines.
+- Exposure (µs → 0x3012 lines): 10000 → 0x22c, 5000 → 0x116, 20000 → 0x459,
+  50000 → 0xadd at default speed. Gain 100/200/400 → 0x305e = 0x1609/0x2809/0x258a.
+
+### Sweeps (`re/sweeps/gen.py` → `sw_*` captures; `re/correlate.py`, `re/diff_modes.py`)
+
+**Sensor controls** (`sw_sensor`, RAW8 1228×922):
+- Exposure: `0x3012` = round(µs / line_time). line_time = line_length_pck / ≈533.9 MHz
+  (e.g. 9600 pck → 17.98 µs). `0x0340` frame_length_lines is rewritten each time but
+  unchanged (1022). Exposure longer than the frame just stretches it (500 ms → 27813
+  lines).
+- Speed 0..3 → line_length_pck 25600 / 16800 / 12000 / 9600 at 1228×922. Exposure is
+  re-sent in lines.
+- HZ (anti-flicker): 0 = 60 Hz (20 ms became 927 lines = 16.67 ms), 1 = 50 Hz, 2 = DC.
+  It's host-side rounding of exposure.
+- Gain (`0x305e`, wrapped in group hold `0x0104`): 100 → 0x1609, 150 → 0x1f09, 200 →
+  0x2809, 300 → 0x3989, 400 → 0x258a, 500 → 0x2e0a. Nonlinear (analog coarse/fine +
+  digital fields). **Needs a dense 100..500 sweep or datasheet math.** Full-res mode uses
+  a different base (100 → 0x2c89).
+- put_Mode (bin vs skip): `0x3040` 0x69c7 vs 0x61c7, plus FPGA `0x20` = 2.
+- ROI: sensor crop (x/y_addr_start/end, output size, rounded and padded) + FPGA
+  `0xa2` = w/4, `0xa4` = h, then line_length/frame_length/exposure.
+- Auto-exposure = a host-side loop writing exposure/gain. The trailer stats likely feed
+  it.
+- **No USB traffic** (host-side or unsupported here): black level, CG, low noise, high
+  fullwell, framerate limit, precise framerate, bandwidth, defect pixel on/off, zero
+  offset, H/V flip, the get_Option queries for uptime/line time, software trigger mode +
+  Trigger(), brightness, contrast, LevelRange, chrome, negative, WhiteBalanceGain (RGB-gain
+  mode).
+
+**ISP controls** (`sw_isp_controls`, RGB24): the FPGA has a hardware ISP, enabled by
+FPGA `0xf2` = 1 in RGB mode.
+- White balance (TempTint) → FPGA `0xd4/0xd6/0xd8` = R/G/B gains, 8.8 fixed (0x100 =
+  1.0). Defaults: 0x188, 0x100, 0x1b6.
+- Hue and Saturation → recompute the 3×3 color matrix FPGA `0x60..0x70` (signed 16-bit,
+  0x3ff ≈ 1.0, row-major). Default CCM (hue 0, sat 128): `[1219 -242 46; -461 1533 -49;
+  -164 -527 1714]`. Option COLORMATIX 0 → identity.
+- Gamma → re-upload the 4096-entry 12-bit LUT via `0xd9` (4 × 2048-byte chunks, wI
+  0x2200/2400/2600/2800).
+- Test pattern (option 0x28) → FPGA `0x1c` = pattern number. In the saved SDK RAW frames
+  the pattern was not visible. Re-check natively.
+- Even in RGB mode the bulk stream is **8 bits/pixel** (same byte count as RAW8). The
+  FPGA ISP output is still mosaic-domain, and the host demosaics.
+
+**Modes** (`sw_modes`, 3 sizes × raw8/raw16/rgb24):
+- FPGA `0x02`: 0 = 8-bit transport, 1 = 16-bit (12-bit samples, LSB-aligned in u16 LE).
+- FPGA `0x20`: 0/1/2 = size index (sensor binning/skip level).
+- Sensor per size: `0x3040` read_mode 0x4041 / 0x60c3 / 0x61c7; output 4916×3692 /
+  2460×1850 / 1232×930 (sensor outputs a few extra px, FPGA crops to the model size);
+  frame_length 0x0ec8 / 0x0796 / 0x03fe; line_length 0x2a30 (0x36b0 for 16-bit
+  full-res) / 0x1f40 / 0x2580.
+- `0xda` 16-byte payload differs by size only (`0032eb01…`/`f500`/`7a00`); meaning
+  unknown.
+- Frame sizes on the wire = w×h×(1|2) + 52. Measured rates: full 12.7 fps (8-bit),
+  10 fps (16-bit); 2456×1842 ~34 fps; 1228×922 ~50 fps.
+
+**Stills / trigger** (`sw_still_trigger`): `Snap(n)` = a full re-init to the still size
+(starting with sensor `0x0103` = 0x100, software reset), grab one frame, then re-init
+back to the preview size. Software trigger is purely host-side (no traffic).
+
+### Auth is not required
+
+Seed → reads/writes/stream all work from `native_probe.py` **without** the 16-byte
+challenge-response. The SDK presumably uses it to check that the camera is genuine. The
+challenge/response request numbers are random per session in ranges ~`0x43-0x5e` and
+`0x61-0x80`. Seed values are random too.
+
+### Bulk / frame format (RAW8, 1228×922)
+
+- The SDK reads 512 KiB URBs, and each frame ends with a **short transfer**. Frame =
+  1228×922 bytes of pixels + **52-byte trailer**: 6 × u64 (they look like per-channel
+  statistic sums, two copies of 3 values) + u32 frame counter.
+- Right after stream start there are some 4-byte reads (`00000000`, `01000000`) plus
+  stale partial frames. Discard until the first full-size frame.
+- The test image was very dark (values 0-3), so the lens is probably capped or unlit.
+
+### Flash blob (`req 0x20`)
+
+`[u32 len=6390][u32 ?=0x0019c732][u8 0][bzip2 stream][32-byte ASCII serial + NUL]`. It
+decompresses to 6599 bytes of records `[u16 row?][u16 count][count sorted bytes][packed
+high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet.
+
 ### Gotchas
 
 - USBPcapCMD **silently fails to overwrite** an existing output file; the old pcap
@@ -112,11 +227,17 @@ The **challenge/response request numbers** also change per session (0x5e/0x79 vs
 - [x] Capture tooling: `re/usbpcap.py` (pcap parser), `re/sdk_probe.py` (SDK driver),
       `re/capture.ps1`
 - [x] Open/close capture decoded, XOR session key found
-- [ ] More open/close sessions to pin down the request-number mapping
-- [ ] Does the device require the challenge-response?
-- [ ] Decompress/parse flash blob
-- [ ] Streaming capture + frame format
-- [ ] Controls capture (exposure, gain, flip, speed, resolution, ROI, …)
+- [x] 12 open/close sessions: challenge req numbers are random, not seed-derived
+- [x] Challenge-response is NOT required (native stream works without it)
+- [x] Decompress flash blob (bzip2); [ ] parse it (defect map?)
+- [x] Native RAW8 1228×922 streaming via replay (`native_probe.py stream`)
+- [ ] Trailer stats semantics; RAW12 packing; RGB (non-RAW) mode; other resolutions
+- [ ] Derive register values from first principles (PLL, timing, exposure formula)
+      rather than replaying blobs
+- [x] Controls capture sweeps: sensor, ISP, modes, test patterns, still/trigger
+- [ ] Dense gain sweep (100..500) → gain encoding
+- [ ] Meaning of `0xda` payload, `0x0c` reads, FPGA `0xa6/0xa8/0xf4-0xfc`, trailer stats
+- [ ] Bayer order + color verification (needs a lit, focused, colorful target)
 - [ ] Ghidra on amcam.dll
 - [ ] Python PoC without SDK
 - [ ] Rust workspace
