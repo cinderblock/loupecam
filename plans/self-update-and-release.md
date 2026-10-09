@@ -54,8 +54,23 @@ possible. Automatic updating, with regular checks, is opt-in.
    Tested locally (check, "no update available", setting toggle).
 5. [x] Desktop: tauri-plugin-updater, File menu "Check for Updates…" and "Automatically
    Install Updates" (desktop.json), stops the server before restart.
-6. [ ] **current** Release workflow pushed; tag v0.1.0 building.
-7. [ ] End-to-end: install v0.1.0, release v0.1.1, update both the CLI and the desktop app.
+6. [x] Release workflow. v0.1.0 failed (stale desktop bun.lock): its draft was deleted
+   and the tag kept. v0.1.1 needed two fixes (lockfile; macOS bash 3.2 has no globstar)
+   and was then rebuilt via workflow_dispatch: **published with every artifact signed,
+   latest.json covering 4 platforms**.
+7. [x] End-to-end against real releases (0.1.1 → 0.1.2), on Windows:
+   - CLI `update --yes`: the running exe was replaced; bytes identical to the release
+     asset; no leftover staging file.
+   - `serve` with `updates.autoInstall` set via the API: the update installed ~5 s after
+     the check, the camera was released, it re-exec'd, and it was back as 0.1.2 and
+     streaming ~1 s later.
+   - Desktop (per-user NSIS install): with auto-install off, the "Update available"
+     prompt appeared 20 s after launch with the right versions and notes. With
+     `desktop.json` autoInstall=true it upgraded itself to 0.1.2 and relaunched.
+     desktop.json was removed afterwards (back to the default, off).
+   - Not verified: pressing "Install and restart" in the prompt. UI Automation could
+     not press the TaskDialog button (it is exposed as a pane), so it needs one manual
+     click. Not tested on macOS/Linux hardware (CI built and signed those).
 
 ## Findings / gotchas
 
@@ -65,12 +80,25 @@ possible. Automatic updating, with regular checks, is opt-in.
   (Raspberry Pi OS bookworm has glibc 2.36; ubuntu-latest builds would need 2.39).
 - The signed test fixture is marked `-text` so git line-ending conversion can't
   invalidate its signature.
+- macOS runners use bash 3.2: no `shopt -s globstar`. Use `find`.
+- A stale bun.lock (after editing package.json) fails `--frozen-lockfile`. CI now
+  checks the desktop lockfile too.
+- clap printed `loupecam-cli 0.1.1` for `--version` (package name). Fixed with
+  `#[command(name = "loupecam")]`, effective from the next release.
 - latest.json is built in a final job: tauri-action's per-job merging races with a
   build matrix.
 
 ## Progress log
 
+- 2026-10-09: repo public, v0.1.1 and v0.1.2 published, all update paths verified on Windows.
+
 ## Open questions for the user
+
+1. Code signing: the builds have no Authenticode / Apple Developer ID signature, so
+   SmartScreen/Gatekeeper warn. Do you have (or want) certificates? *Recommendation:
+   Apple Developer ID for macOS notarisation if you will use Macs; Windows via Azure
+   Trusted Signing (cheap) when ready.*
+2. Back up `~/.tauri/loupecam.key` + `.password` (losing them strands every install).
 
 ## Things not to do
 

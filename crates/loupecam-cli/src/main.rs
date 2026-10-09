@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 #[derive(Parser)]
-#[command(version, about = "Native tool for AmScope / ToupTek USB3 microscope cameras")]
+#[command(name = "loupecam", version, about = "Native tool for AmScope / ToupTek USB3 microscope cameras")]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
