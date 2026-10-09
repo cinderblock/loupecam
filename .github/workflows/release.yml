@@ -49,7 +49,7 @@ jobs:
         with:
           ref: ${{ inputs.tag || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
-      - run: .github/scripts/set-version.sh
+      - run: bash .github/scripts/set-version.sh
       - id: kind
         run: echo "prerelease=$([[ "$TAG" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - name: Draft release
@@ -90,7 +90,7 @@ jobs:
           targets: ${{ matrix.target }}
       - if: contains(matrix.target, 'musl')
         run: sudo apt-get update && sudo apt-get install -y musl-tools
-      - run: .github/scripts/set-version.sh
+      - run: bash .github/scripts/set-version.sh
         shell: bash
       - uses: actions/download-artifact@v8
         with:
@@ -111,8 +111,8 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          .github/scripts/windows-sign.sh setup
-          .github/scripts/windows-sign.sh "$ASSET"
+          bash .github/scripts/windows-sign.sh setup
+          bash .github/scripts/windows-sign.sh "$ASSET"
       - name: Developer ID + notarisation
         if: runner.os == 'macOS' && env.HAS_APPLE == 'true'
         shell: bash
@@ -130,7 +130,7 @@ jobs:
           else
             unset APPLE_API_KEY
           fi
-          .github/scripts/macos-sign.sh "$ASSET"
+          bash .github/scripts/macos-sign.sh "$ASSET"
       - uses: oven-sh/setup-bun@v2
       - name: Update signature and upload
         shell: bash
@@ -166,7 +166,7 @@ jobs:
           targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-      - run: .github/scripts/set-version.sh
+      - run: bash .github/scripts/set-version.sh
         shell: bash
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
@@ -177,7 +177,7 @@ jobs:
         if: runner.os == 'Windows' && env.WINDOWS_SIGN_COMMAND != ''
         shell: bash
         run: |
-          .github/scripts/windows-sign.sh setup
+          bash .github/scripts/windows-sign.sh setup
           # Tauri signs the app, the installers and the uninstaller with this.
           jq -n --arg c "$WINDOWS_SIGN_COMMAND" '{bundle: {windows: {signCommand: $c}}}' > "$RUNNER_TEMP/sign.json"
           echo "TAURI_EXTRA_ARGS=--config $(cygpath -w "$RUNNER_TEMP/sign.json")" >> "$GITHUB_ENV"
