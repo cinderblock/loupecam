@@ -67,6 +67,7 @@ pub struct AppState {
     pub service: Arc<Service>,
     pub preview: Arc<preview::Preview>,
     pub updates: Arc<updates::Updates>,
+    pub calibration: Arc<calibration::runner::Runner>,
     pub token: Option<Arc<str>>,
     pub web: WebUi,
     pub captures_dir: PathBuf,
@@ -119,7 +120,9 @@ impl Server {
         let service = Service::spawn(settings);
         let preview = preview::spawn(service.shared.clone());
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());
+        let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
         let state = AppState {
+            calibration,
             service,
             preview,
             updates,

@@ -2,8 +2,6 @@
 
 use crate::captures;
 use crate::geometry::{NormRect, display_to_frame};
-use crate::preview::Preview;
-use crate::service::Service;
 use crate::{AppState, WebUi};
 use axum::body::Body;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
@@ -51,6 +49,10 @@ pub fn router(state: AppState) -> Router {
         .route("/update", get(update_status))
         .route("/update/check", post(update_check))
         .route("/update/install", post(update_install))
+        .route("/calibration", get(calibration_get))
+        .route("/calibration/run", post(calibration_run))
+        .route("/calibration/cancel", post(calibration_cancel))
+        .route("/calibration/{section}", axum::routing::delete(calibration_delete))
         .route("/ws", get(ws));
     Router::new()
         .nest("/api", api)
@@ -200,6 +202,52 @@ async fn update_install(State(s): State<AppState>) -> ApiResult<Json<serde_json:
     Ok(Json(json!({ "installed": version, "restarting": true })))
 }
 
+async fn calibration_get(State(s): State<AppState>) -> Json<serde_json::Value> {
+    let profile = s.service.shared.calibration.borrow().profile.clone();
+    Json(json!({
+        "profile": profile,
+        "status": &*s.calibration.status.borrow(),
+        "targetConnected": s.calibration.target.is_connected(),
+    }))
+}
+
+async fn calibration_run(
+    State(s): State<AppState>,
+    Json(req): Json<crate::calibration::runner::StepRequest>,
+) -> ApiResult<StatusCode> {
+    s.calibration.start(req).map_err(|e| ApiError(StatusCode::CONFLICT, e))?;
+    Ok(StatusCode::ACCEPTED)
+}
+
+async fn calibration_cancel(State(s): State<AppState>) -> StatusCode {
+    s.calibration.cancel();
+    StatusCode::NO_CONTENT
+}
+
+/// Forget a calibration section: `dark`, `gain`, `color`, `flatField-<size>`, or
+/// `scale-<name>`.
+async fn calibration_delete(State(s): State<AppState>, Path(section): Path<String>) -> ApiResult<StatusCode> {
+    let serial = s.service.shared.state.borrow().device.as_ref().map(|d| d.serial.clone()).ok_or_else(|| unavailable("no camera connected"))?;
+    let mut p = crate::calibration::load(&serial);
+    match section.as_str() {
+        "dark" => p.dark = None,
+        "gain" => p.gain = None,
+        "color" => p.color = None,
+        s if s.starts_with("flatField-") => {
+            let size: usize = s["flatField-".len()..].parse().map_err(bad)?;
+            p.flat_field.remove(&size);
+        }
+        s if s.starts_with("scale-") => {
+            let name = &s["scale-".len()..];
+            p.scale.retain(|q| q.name != name);
+        }
+        _ => return Err(ApiError(StatusCode::NOT_FOUND, "unknown calibration section".into())),
+    }
+    crate::calibration::save(&p).map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    s.service.reload_calibration();
+    Ok(StatusCode::NO_CONTENT)
+}
+
 async fn snapshot(State(s): State<AppState>) -> ApiResult<Response> {
     let p = s.preview.next(Duration::from_secs(3)).await.ok_or_else(|| unavailable("no frame from camera"))?;
     Ok(([(header::CONTENT_TYPE, "image/jpeg"), (header::CACHE_CONTROL, "no-store")], p.jpeg.clone()).into_response())
@@ -225,18 +273,36 @@ async fn mjpeg(State(s): State<AppState>) -> Response {
 }
 
 async fn ws(State(s): State<AppState>, upgrade: WebSocketUpgrade) -> Response {
-    upgrade.on_upgrade(move |socket| ws_session(socket, s.service.clone(), s.preview.clone(), s.updates.clone()))
+    upgrade.on_upgrade(move |socket| ws_session(socket, s))
 }
 
-/// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s, and,
-/// after the client sends `{"type":"preview","enabled":true}`, binary JPEG frames.
-async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Preview>, updates: Arc<crate::updates::Updates>) {
+/// Keeps a WebSocket registered as a screen target while alive.
+struct TargetGuard(Arc<crate::calibration::target::TargetHub>);
+
+impl Drop for TargetGuard {
+    fn drop(&mut self) {
+        self.0.connected.fetch_sub(1, std::sync::atomic::Ordering::AcqRel);
+    }
+}
+
+/// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s,
+/// `{"type":"update",…}`, `{"type":"calibration",…}` and, after the client sends
+/// `{"type":"preview","enabled":true}`, binary JPEG frames. A client that sends
+/// `{"type":"target"}` becomes a screen target: it receives
+/// `{"type":"targetShow","id":n,"pattern":{…}}` and answers `{"type":"targetAck","id":n}`.
+async fn ws_session(socket: WebSocket, app: AppState) {
+    let (service, preview) = (app.service.clone(), app.preview.clone());
+    let hub = app.calibration.target.clone();
     let (mut tx, mut rx) = socket.split();
     let mut state = service.shared.state.subscribe();
     let mut stats = service.shared.stats.subscribe();
     let mut frames = preview.frames.subscribe();
-    let mut update = updates.status.subscribe();
+    let mut update = app.updates.status.subscribe();
     update.mark_changed();
+    let mut calib = app.calibration.status.subscribe();
+    calib.mark_changed();
+    let mut show = hub.show.subscribe();
+    let mut target: Option<TargetGuard> = None;
     let mut viewer = None;
     let msg = |kind: &str, v: serde_json::Value| {
         let mut v = v;
@@ -261,6 +327,15 @@ async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Previ
                 if r.is_err() { break }
                 msg("stats", serde_json::to_value(&*stats.borrow_and_update()).unwrap())
             }
+            r = calib.changed() => {
+                if r.is_err() { break }
+                msg("calibration", serde_json::to_value(&*calib.borrow_and_update()).unwrap())
+            }
+            r = show.changed(), if target.is_some() => {
+                if r.is_err() { break }
+                let (id, pattern) = show.borrow_and_update().clone();
+                msg("targetShow", json!({ "id": id, "pattern": pattern }))
+            }
             r = frames.changed(), if viewer.is_some() => {
                 if r.is_err() { break }
                 let Some(p) = frames.borrow_and_update().clone() else { continue };
@@ -268,11 +343,29 @@ async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Previ
             }
             m = rx.next() => match m {
                 Some(Ok(Message::Text(t))) => {
-                    if let Ok(v) = serde_json::from_str::<serde_json::Value>(&t)
-                        && v["type"] == "preview"
-                    {
-                        viewer = v["enabled"].as_bool().unwrap_or(false).then(|| preview.viewer());
-                        frames.mark_changed();
+                    let Ok(v) = serde_json::from_str::<serde_json::Value>(&t) else { continue };
+                    match v["type"].as_str() {
+                        Some("preview") => {
+                            viewer = v["enabled"].as_bool().unwrap_or(false).then(|| preview.viewer());
+                            frames.mark_changed();
+                        }
+                        Some("target") if target.is_none() => {
+                            hub.connected.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+                            target = Some(TargetGuard(hub.clone()));
+                            show.mark_changed();
+                        }
+                        Some("targetAck") => {
+                            if let Some(id) = v["id"].as_u64() {
+                                hub.ack.send_if_modified(|a| {
+                                    let newer = id > *a;
+                                    if newer {
+                                        *a = id;
+                                    }
+                                    newer
+                                });
+                            }
+                        }
+                        _ => {}
                     }
                     continue;
                 }
