@@ -78,11 +78,11 @@ step list with instructions, live preview, progress, and per-step results/accept
 5. [x] Scale presets (lines or screen grid) used by the scale bar.
 6. [x] Screen target page + WebSocket pairing.
 7. [x] Colour chart step (24-patch, orientation-tolerant fit).
-8. [ ] **current** Merge into master (branch `calibration`, worktree
-   `../loupecam-calibration`). The other thread had uncommitted changes in the same
-   files (`server/src/lib.rs`, Cargo files), so the branch is pushed and a PR opened
-   instead of merging over them.
-9. [ ] Real-scene validation once the tape is off: dark (lens covered), flat field on
+8. [x] Merged into local `master` (fast-forward after merging master, with the mDNS and
+   firewall work, into `calibration`; one lib.rs conflict and the mDNS test fixed).
+   **Not pushed**: master also carries the other thread's unpushed commits. Push when
+   the user OKs.
+9. [ ] **current** Real-scene validation once the tape is off: dark (lens covered), flat field on
    white paper, scale on a ruler, colour chart if available; check the `/target` page
    in a real browser on a real screen.
 
