@@ -1,0 +1,2 @@
+# udev rules are copied verbatim to Linux systems: keep LF.
+*.rules text eol=lf
