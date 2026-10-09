@@ -68,4 +68,7 @@ jobs:
           path: apps/web/dist
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        working-directory: apps/desktop
       - run: cargo build --release -p loupecam-desktop
