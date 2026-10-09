@@ -108,6 +108,7 @@ possible. Automatic updating, with regular checks, is opt-in.
 ## Progress log
 
 - 2026-10-09: repo public, v0.1.1 and v0.1.2 published, all update paths verified on Windows.
+- 2026-10-09: v0.1.3 (tag-only release flow) and v0.2.0 (calibration, mDNS, firewall) published; checksums and attestations verified; a 0.1.2 install sees 0.2.0.
 
 ## Open questions for the user
 

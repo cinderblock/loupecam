@@ -80,8 +80,7 @@ step list with instructions, live preview, progress, and per-step results/accept
 7. [x] Colour chart step (24-patch, orientation-tolerant fit).
 8. [x] Merged into local `master` (fast-forward after merging master, with the mDNS and
    firewall work, into `calibration`; one lib.rs conflict and the mDNS test fixed).
-   **Not pushed**: master also carries the other thread's unpushed commits. Push when
-   the user OKs.
+   Pushed with the user's OK and **released in v0.2.0** (2026-10-09).
 9. [ ] **current** Real-scene validation once the tape is off: dark (lens covered), flat field on
    white paper, scale on a ruler, colour chart if available; check the `/target` page
    in a real browser on a real screen.
