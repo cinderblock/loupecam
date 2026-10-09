@@ -45,7 +45,7 @@ enum Cmd {
         #[arg(long)]
         no_persist: bool,
     },
-    /// Capture frames to files (PGM: 8-bit or 16-bit greyscale mosaic).
+    /// Capture frames: .png/.tif/.jpg are developed images; .pgm (or --raw) is undeveloped sensor data.
     Snap {
         #[command(flatten)]
         opts: StreamOpts,

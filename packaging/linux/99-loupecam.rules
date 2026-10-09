@@ -1,0 +1,5 @@
+# Give the logged-in user (uaccess) and the plugdev group access to AmScope /
+# ToupTek USB3 cameras, so `loupecam` runs without root.
+#   sudo cp 99-loupecam.rules /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+# MU1803-HS
+SUBSYSTEM=="usb", ATTR{idVendor}=="0547", ATTR{idProduct}=="1142", MODE="0660", GROUP="plugdev", TAG+="uaccess"
