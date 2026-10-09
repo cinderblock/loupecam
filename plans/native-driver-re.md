@@ -289,6 +289,14 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
   before capturing (`capture.ps1` checks).
 - Most SDK getters (serial, versions, ranges) are served from cached open-time data and
   generate no USB traffic.
+- mDNS on this machine (a dozen Hyper-V VLAN vNICs, and a network that reflects mDNS
+  between VLANs): with `mdns-sd`'s default conflict probing, the server heard its own
+  records reflected back on `vEthernet (VLAN-3)` with other interfaces' addresses, took
+  them for a conflict, and announced a second `LoupeCam on Noook (2)` /
+  `noook-2.local.` alongside the original. Probing is off (`set_requires_probe(false)`),
+  and the host name is `loupecam-<hostname>.local.`, not the OS's own `<hostname>.local.`.
+- `mdns-sd`: browsing a second service type on the same `ServiceDaemon` didn't resolve
+  our `_http._tcp` instance; a separate daemon did (the network test uses two).
 
 ## Progress log
 
@@ -325,7 +333,9 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - [x] Reconnect: the actor polls for the camera and reopens after loss/stall
 - [ ] Video recording (format TBD, see open questions)
 - [x] Microscope extras: calibrated scale bar (objective × adapter), crosshair, grid
-- [ ] mDNS advertisement for the headless appliance
+- [x] mDNS advertisement for the headless appliance (`crates/loupecam-server/src/mdns.rs`:
+      `_loupecam._tcp` + `_http._tcp`, live model/serial TXT, goodbye on stop;
+      `loupecam discover`). Verified on this machine's VLANs
 - [ ] Desktop: "share on network" toggle (today: `loupecam serve --listen 0.0.0.0:… --token`)
 - [ ] Gallery thumbnails (the list currently links full-size files)
 - [ ] Create the GitHub repo and push (outward-facing: needs your go-ahead)
@@ -350,3 +360,4 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - Don't commit raw pcaps wholesale (they're large and contain the device serial).
   Curate small fixtures deliberately.
 - Don't leave the AmScope app running during captures.
+- Don't re-enable mDNS conflict probing or announce as `<hostname>.local.` (see Gotchas).

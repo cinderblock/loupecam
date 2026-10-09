@@ -47,6 +47,8 @@ fn main() {
         settings_file: Config::default_settings_file(),
         // The Tauri updater owns updates for the desktop app.
         self_update: false,
+        // Localhost only; nothing to announce.
+        announce: None,
     };
 
     let app = tauri::Builder::default()

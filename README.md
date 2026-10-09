@@ -11,7 +11,7 @@ directly over USB, so it runs anywhere Rust and USB do, including ARM Linux boar
   output.
 - **Headless server** (`loupecam serve`): live MJPEG stream, a JSON + WebSocket API for
   all controls and captures, and an optional web UI. Run it on a small board and the
-  camera becomes a network device.
+  camera becomes a network device that announces itself on the LAN (mDNS / DNS-SD).
 - **Desktop app** (Tauri): the same UI in a native window, backed by the same server.
 
 > Status: early. Developed and verified against an **AmScope MU1803-HS** (18 MP,
@@ -99,6 +99,7 @@ sudo udevadm control --reload && sudo udevadm trigger
 | `loupecam stream` | Stream for a while and report frame rate, drops and throughput |
 | `loupecam snap -o file.{png,tif,jpg,pgm}` | Capture: `.pgm` and `--raw` are undeveloped sensor data; the rest are developed images |
 | `loupecam serve` | The network service (below) |
+| `loupecam discover` | Find LoupeCam servers on the local network |
 | `loupecam update` | Install the latest release (signature-verified) |
 
 Stream options: `--size` (0 = largest), `--mode raw8|raw12`, `-e/--exposure` µs,
@@ -128,6 +129,26 @@ it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`
 | `POST /api/white-balance` `{"region": {x,y,width,height} \| null}` | One-shot white balance over a region of the displayed image (normalised 0..1) |
 | `POST /api/roi` `{"region": … \| null}` | Set or clear the sensor ROI from a region of the displayed image |
 | `WS /api/ws` | Pushes `state` and `stats` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
+
+### Finding cameras on the network
+
+A server listening beyond loopback announces itself over mDNS / DNS-SD as
+`_loupecam._tcp`, and also as `_http._tcp` when it serves the web UI, so it shows up in
+generic Bonjour/Avahi browsers. It's reachable as `http://loupecam-<hostname>.local:<port>/`.
+
+```sh
+loupecam discover
+# LoupeCam on scope-pi: MU1803-HS (serial TP2306…)
+#   version 0.1.2, token required
+#   http://loupecam-scope-pi.local:8080/
+#   http://192.168.1.40:8080/
+```
+
+The TXT records carry `version`, `path`, `ui` (`1`/`0`), `auth` (`token`/`none`), and the
+connected camera's `model` and `serial`. The token is never announced. Set the
+announced name with `--mdns-name`, or turn announcing off with `--no-mdns`. The default
+name is "LoupeCam on <hostname>", so give each server a distinct name if one machine
+runs several.
 
 Settings persist across restarts (in the OS config directory, e.g.
 `%APPDATA%\loupecam\settings.json`). Captures go to `Pictures/LoupeCam` unless

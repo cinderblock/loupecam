@@ -9,6 +9,7 @@
 pub mod captures;
 pub mod geometry;
 pub mod http;
+pub mod mdns;
 pub mod preview;
 pub mod service;
 pub mod settings;
@@ -48,6 +49,8 @@ pub struct Config {
     /// Check for and install updates of this executable. Off when something else (the
     /// desktop app's updater) owns updates.
     pub self_update: bool,
+    /// Announce the server over mDNS / DNS-SD (only when listening beyond loopback).
+    pub announce: Option<mdns::Announce>,
 }
 
 impl Config {
@@ -109,6 +112,7 @@ pub struct Server {
     pub state: AppState,
     shutdown: tokio::sync::oneshot::Sender<()>,
     task: tokio::task::JoinHandle<std::io::Result<()>>,
+    announcer: Option<mdns::Announcer>,
 }
 
 impl Server {
@@ -117,7 +121,9 @@ impl Server {
         let settings = load_settings(cfg.settings_file.as_ref());
         let service = Service::spawn(settings);
         let preview = preview::spawn(service.shared.clone());
+        let shared = service.shared.clone();
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());
+        let token = cfg.token.is_some();
         let state = AppState {
             service,
             preview,
@@ -141,7 +147,9 @@ impl Server {
                 .await
         });
         tracing::info!("listening on http://{addr}");
-        Ok(Server { addr, state, shutdown, task })
+        let web_ui = !matches!(state.web, WebUi::Disabled);
+        let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, token, shared));
+        Ok(Server { addr, state, shutdown, task, announcer })
     }
 
     /// Resolves when an update has been installed and the process should restart
@@ -152,6 +160,9 @@ impl Server {
 
     /// Stop serving and release the camera.
     pub async fn stop(self) -> std::io::Result<()> {
+        if let Some(a) = self.announcer {
+            a.stop().await;
+        }
         let _ = self.shutdown.send(());
         let r = self.task.await.map_err(std::io::Error::other)?;
         let service = self.state.service.clone();

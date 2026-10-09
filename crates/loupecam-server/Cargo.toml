@@ -31,3 +31,5 @@ mime_guess.workspace = true
 dirs.workspace = true
 jiff.workspace = true
 rust-embed = { workspace = true, optional = true }
+mdns-sd.workspace = true
+gethostname.workspace = true
