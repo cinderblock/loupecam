@@ -11,7 +11,7 @@ identity (serials/flash data come from the open sequence, which is not extracted
 
 Usage: python re/make_fixture.py <capture> "<mark label>" <SDK fn> <out.txt>
   e.g. python re/make_fixture.py sw_modes "start raw8 size2" Amcam_StartPullModeWithCallback \
-       crates/amscope-protocol/tests/fixtures/start_raw8_1228x922.txt
+       crates/loupecam-protocol/tests/fixtures/start_raw8_1228x922.txt
 """
 
 import json

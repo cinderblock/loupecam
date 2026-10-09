@@ -1,10 +1,10 @@
-//! AmScope desktop app: runs the camera server on a private localhost port and shows
-//! its web UI in a native window. Headless mode (`amscope serve`) runs the same
+//! LoupeCam desktop app: runs the camera server on a private localhost port and shows
+//! its web UI in a native window. Headless mode (`loupecam serve`) runs the same
 //! server, so the two behave identically.
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use amscope_server::{Config, Server, WebUi};
+use loupecam_server::{Config, Server, WebUi};
 use std::sync::Mutex;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
@@ -25,7 +25,7 @@ fn web_ui() -> WebUi {
 
 fn main() {
     tracing_subscriber::fmt()
-        .with_env_filter(std::env::var("RUST_LOG").unwrap_or_else(|_| "warn,amscope=info,amscope_server=info".into()))
+        .with_env_filter(std::env::var("RUST_LOG").unwrap_or_else(|_| "warn,loupecam=info,loupecam_server=info".into()))
         .init();
 
     let captures_dir = Config::default_captures_dir();
@@ -55,7 +55,7 @@ fn main() {
             let menu = Menu::with_items(app, &[&file])?;
 
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url.parse()?))
-                .title("AmScope")
+                .title("LoupeCam")
                 .inner_size(1400.0, 900.0)
                 .min_inner_size(800.0, 500.0)
                 .menu(menu)

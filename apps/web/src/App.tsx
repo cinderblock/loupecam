@@ -86,7 +86,7 @@ export default function App() {
   if (cam.authNeeded) {
     return (
       <div className="auth">
-        <h2>AmScope</h2>
+        <h2>LoupeCam</h2>
         <p>This camera server requires an access token.</p>
         <form
           onSubmit={(e) => {
@@ -120,7 +120,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <strong>AmScope</strong>
+        <strong>LoupeCam</strong>
         <span className="muted">{dev ? `${dev.model} · ${dev.serial}` : 'no camera'}</span>
         <span className="spacer" />
         {cam.stats && (

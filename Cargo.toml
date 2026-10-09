@@ -6,14 +6,14 @@ members = ["crates/*", "apps/desktop/src-tauri"]
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/cinderblock/amscope-reader"
+repository = "https://github.com/cinderblock/loupecam"
 rust-version = "1.88"
 
 [workspace.dependencies]
-amscope-protocol = { path = "crates/amscope-protocol" }
-amscope = { path = "crates/amscope" }
-amscope-isp = { path = "crates/amscope-isp" }
-amscope-server = { path = "crates/amscope-server" }
+loupecam-protocol = { path = "crates/loupecam-protocol" }
+loupecam = { path = "crates/loupecam" }
+loupecam-isp = { path = "crates/loupecam-isp" }
+loupecam-server = { path = "crates/loupecam-server" }
 nusb = "0.2.7"
 thiserror = "2"
 tracing = "0.1"

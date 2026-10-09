@@ -1,0 +1,55 @@
+//! [`Transport`] over an `nusb` interface.
+
+use loupecam_protocol::{Error, Result, Transport};
+use nusb::MaybeFuture;
+use nusb::transfer::{ControlIn, ControlOut, ControlType, Recipient};
+use std::time::Duration;
+
+pub(crate) struct UsbTransport {
+    interface: nusb::Interface,
+    timeout: Duration,
+}
+
+impl UsbTransport {
+    pub fn new(interface: nusb::Interface, timeout: Duration) -> Self {
+        UsbTransport { interface, timeout }
+    }
+}
+
+impl Transport for UsbTransport {
+    fn control_in(&mut self, request: u8, value: u16, index: u16, length: u16) -> Result<Vec<u8>> {
+        self.interface
+            .control_in(
+                ControlIn {
+                    control_type: ControlType::Vendor,
+                    recipient: Recipient::Device,
+                    request,
+                    value,
+                    index,
+                    length,
+                },
+                self.timeout,
+            )
+            .wait()
+            .inspect(|r| tracing::trace!("IN  {request:02x} {value:04x} {index:04x} {length} -> {:02x?}{}", &r[..r.len().min(16)], if r.len() > 16 { " …" } else { "" }))
+            .map_err(|e| Error::Transfer(format!("IN {request:#04x} wValue={value:#06x} wIndex={index:#06x}: {e}")))
+    }
+
+    fn control_out(&mut self, request: u8, value: u16, index: u16, data: &[u8]) -> Result<()> {
+        self.interface
+            .control_out(
+                ControlOut {
+                    control_type: ControlType::Vendor,
+                    recipient: Recipient::Device,
+                    request,
+                    value,
+                    index,
+                    data,
+                },
+                self.timeout,
+            )
+            .wait()
+            .inspect(|()| tracing::trace!("OUT {request:02x} {value:04x} {index:04x} [{} bytes]", data.len()))
+            .map_err(|e| Error::Transfer(format!("OUT {request:#04x} wValue={value:#06x} wIndex={index:#06x}: {e}")))
+    }
+}

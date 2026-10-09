@@ -1,0 +1,26 @@
+[package]
+name = "loupecam-cli"
+description = "Command-line tool for AmScope / ToupTek USB3 microscope cameras"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+# Embed the built web UI (apps/web/dist) in the binary.
+embed-ui = ["loupecam-server/embed-ui"]
+
+[[bin]]
+name = "loupecam"
+path = "src/main.rs"
+
+[dependencies]
+loupecam.workspace = true
+loupecam-isp.workspace = true
+loupecam-server.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

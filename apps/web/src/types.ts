@@ -1,4 +1,4 @@
-// Mirrors the JSON of crates/amscope-server (settings.rs, service.rs, captures.rs).
+// Mirrors the JSON of crates/loupecam-server (settings.rs, service.rs, captures.rs).
 
 export type DemosaicSetting = 'superpixel' | 'bilinear' | 'mhc'
 export type CaptureFormat = 'png' | 'tiff' | 'jpeg'

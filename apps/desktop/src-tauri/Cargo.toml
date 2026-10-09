@@ -1,5 +1,5 @@
 [package]
-name = "amscope-desktop"
+name = "loupecam-desktop"
 description = "Desktop app for AmScope / ToupTek USB3 microscope cameras"
 version.workspace = true
 edition.workspace = true
@@ -13,11 +13,11 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
-amscope-server.workspace = true
+loupecam-server.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
 [features]
 # Release builds serve the UI compiled into the binary; debug builds read apps/web/dist.
 default = ["embed-ui"]
-embed-ui = ["amscope-server/embed-ui"]
+embed-ui = ["loupecam-server/embed-ui"]

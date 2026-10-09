@@ -1,0 +1,17 @@
+[package]
+name = "loupecam"
+description = "Native driver for AmScope / ToupTek USB3 microscope cameras"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+loupecam-protocol.workspace = true
+nusb.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tracing-subscriber.workspace = true

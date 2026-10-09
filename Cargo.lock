@@ -33,86 +33,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amscope"
-version = "0.1.0"
-dependencies = [
- "amscope-protocol",
- "nusb",
- "thiserror 2.0.21",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "amscope-cli"
-version = "0.1.0"
-dependencies = [
- "amscope",
- "amscope-isp",
- "amscope-server",
- "anyhow",
- "clap",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "amscope-desktop"
-version = "0.1.0"
-dependencies = [
- "amscope-server",
- "tauri",
- "tauri-build",
- "tauri-plugin-opener",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "amscope-isp"
-version = "0.1.0"
-dependencies = [
- "amscope-protocol",
- "jpeg-encoder",
- "png 0.18.1",
- "rayon",
- "thiserror 2.0.21",
- "tiff",
-]
-
-[[package]]
-name = "amscope-protocol"
-version = "0.1.0"
-dependencies = [
- "bzip2",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "amscope-server"
-version = "0.1.0"
-dependencies = [
- "amscope",
- "amscope-isp",
- "anyhow",
- "axum",
- "bytes",
- "dirs 7.0.0",
- "futures-util",
- "jiff",
- "mime_guess",
- "rust-embed",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "tokio",
- "tokio-stream",
- "tower-http 0.7.1",
- "tracing",
-]
-
-[[package]]
 name = "android_system_properties"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2400,6 +2320,86 @@ name = "log"
 version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
+
+[[package]]
+name = "loupecam"
+version = "0.1.0"
+dependencies = [
+ "loupecam-protocol",
+ "nusb",
+ "thiserror 2.0.21",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "loupecam-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "loupecam",
+ "loupecam-isp",
+ "loupecam-server",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "loupecam-desktop"
+version = "0.1.0"
+dependencies = [
+ "loupecam-server",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "loupecam-isp"
+version = "0.1.0"
+dependencies = [
+ "jpeg-encoder",
+ "loupecam-protocol",
+ "png 0.18.1",
+ "rayon",
+ "thiserror 2.0.21",
+ "tiff",
+]
+
+[[package]]
+name = "loupecam-protocol"
+version = "0.1.0"
+dependencies = [
+ "bzip2",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "loupecam-server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "bytes",
+ "dirs 7.0.0",
+ "futures-util",
+ "jiff",
+ "loupecam",
+ "loupecam-isp",
+ "mime_guess",
+ "rust-embed",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio",
+ "tokio-stream",
+ "tower-http 0.7.1",
+ "tracing",
+]
 
 [[package]]
 name = "mach2"

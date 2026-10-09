@@ -3,7 +3,7 @@ import type { CaptureEntry, CaptureInfo, NormRect, Patch, Settings } from './typ
 // The server may require a token (when exposed on a network). It is kept in
 // localStorage and sent as a Bearer header, or as ?token= where headers are
 // impossible (<img>, WebSocket).
-const TOKEN_KEY = 'amscope-token'
+const TOKEN_KEY = 'loupecam-token'
 
 export function getToken(): string | null {
   const fromUrl = new URLSearchParams(location.search).get('token')

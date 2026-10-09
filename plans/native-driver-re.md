@@ -1,4 +1,4 @@
-# AmScope native driver: reverse engineering + library + apps
+# LoupeCam: native AmScope/ToupTek driver, reverse engineering + library + apps
 
 ## Goal
 
@@ -44,6 +44,11 @@ the camera a network appliance, maybe with a local screen and shutter buttons.
 - **Public GitHub repo** (MIT/Apache-2.0 dual license planned). No vendor binaries
   committed.
 - Primary branch `master`.
+- **Name: LoupeCam** (2026-10-08). Crates `loupecam`, `loupecam-protocol`, `loupecam-isp`,
+  `loupecam-server`, binary `loupecam`. Vendor-neutral on purpose: the camera is a
+  rebranded ToupTek, and "AmScope" is the vendor's trademark. "MyScope" and "OpenScope" were
+  rejected as already in use in microscopy. "AmScope" stays only where it names the hardware
+  or the vendor app.
 - The user explicitly OK'd closing the AmScope app and doing whatever is needed for
   captures, including downloading/decompiling the Linux SDK.
 
@@ -60,18 +65,18 @@ the camera a network appliance, maybe with a local screen and shutter buttons.
    6. Static RE of `amcam.dll` (or Linux `libtoupcam.so`) in Ghidra where captures
       aren't enough.
 2. Python proof-of-concept that opens the camera without the SDK and grabs a frame.
-3. Rust workspace: `amscope-core` (protocol), `amscope-isp` (demosaic/WB/etc.),
-   `amscope-server` (headless), `apps/web` (UI), `apps/desktop` (Tauri).
+3. Rust workspace: `loupecam-protocol` (protocol), `loupecam-isp` (demosaic/WB/etc.),
+   `loupecam-server` (headless), `apps/web` (UI), `apps/desktop` (Tauri).
 4. Desktop + headless features, packaging, CI (Windows/Linux x64/arm64, macOS).
 
 ## Architecture (decided, implementing)
 
 ```
-crates/amscope-protocol  pure protocol: Session<T: Transport>, frames, ISP regs   [done]
-crates/amscope           nusb transport, Camera, bulk reader thread           [done]
-crates/amscope-isp       demosaic/colour/tone/stats/AE/AWB/encoders           [done]
-crates/amscope-server    camera actor + preview pipeline + axum HTTP/WS API   [current]
-crates/amscope-cli       `amscope` binary: list/info/stream/snap/serve
+crates/loupecam-protocol pure protocol: Session<T: Transport>, frames, ISP regs   [done]
+crates/loupecam          nusb transport, Camera, bulk reader thread           [done]
+crates/loupecam-isp      demosaic/colour/tone/stats/AE/AWB/encoders           [done]
+crates/loupecam-server   camera actor + preview pipeline + axum HTTP/WS API   [current]
+crates/loupecam-cli      `loupecam` binary: list/info/stream/snap/serve
 apps/web                 React + Vite + TS (Bun) UI, served by the server
 apps/desktop             Tauri v2 shell: embeds the server on 127.0.0.1, same UI
 ```
@@ -238,13 +243,13 @@ challenge/response request numbers are random per session in ranges ~`0x43-0x5e`
 decompresses to 6599 bytes of records `[u16 row?][u16 count][count sorted bytes][packed
 high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet.
 
-### Native driver results (Rust, `target/debug/amscope.exe`)
+### Native driver results (Rust, `target/debug/loupecam.exe`)
 
 - Every mode streams at the sensor-limited rate: full RAW8 13.1 fps, full RAW12 10.1 fps
   (386 MB/s), 2456×1842 34 fps, 1228×922 50 fps (capped by the 20 ms exposure).
   ROI, binning and speed all work.
 - Generated control sequences match the SDK's transfer for transfer
-  (`crates/amscope-protocol/tests/sequences.rs`).
+  (`crates/loupecam-protocol/tests/sequences.rs`).
 - **Bayer = RGGB**, verified with the sensor colour bars (`--sensor-reg 0x0600=2`) at
   full res. The bars come out mirrored left-to-right (the readout is mirrored).
 - RAW12 is LSB-aligned 12-bit in u16 LE. Beware: PIL rescales 16-bit PGMs on read, so
@@ -305,10 +310,10 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - [ ] Ghidra on amcam.dll (not needed so far)
 - [x] Python PoC without SDK (`re/native_probe.py`)
 - [x] Rust workspace: protocol + driver + CLI, verified on hardware
-- [x] amscope-isp: demosaic (superpixel/bilinear/MHC), colour, tone, stats, AE/AWB,
+- [x] loupecam-isp: demosaic (superpixel/bilinear/MHC), colour, tone, stats, AE/AWB,
       PNG/TIFF/JPEG. Full-res MHC 66 ms
-- [x] amscope-server (actor, preview, REST/WS/MJPEG, captures, ROI/WB from display regions,
-      token auth, settings persistence) + `amscope serve`. Verified on hardware
+- [x] loupecam-server (actor, preview, REST/WS/MJPEG, captures, ROI/WB from display regions,
+      token auth, settings persistence) + `loupecam serve`. Verified on hardware
 - [ ] apps/web UI
 - [ ] apps/desktop (Tauri)
 - [ ] README, docs/protocol.md, udev rule, CI (Win/Linux x64+arm64/macOS), license files
@@ -321,7 +326,8 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 ## Open questions for the user
 
 1. License: MIT/Apache-2.0 dual (Rust convention)? *Recommendation: yes.*
-2. Repo name on GitHub (e.g. `cinderblock/amscope-reader`)?
+2. ~~Repo name on GitHub~~ Answered 2026-10-08: the project is **LoupeCam**,
+   repo `cinderblock/loupecam` (not created yet).
 3. Video recording: (a) MJPEG-in-AVI/MKV (pure Rust, big files, every frame
    lossless-ish), (b) H.264 via openh264 (a native build, small files), or (c) a
    browser-side MediaRecorder for desktop use only. *Recommendation: (a) first, (b)
