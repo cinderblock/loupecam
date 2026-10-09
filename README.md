@@ -36,9 +36,10 @@ Download from [Releases](https://github.com/cinderblock/loupecam/releases/latest
   `loupecam-aarch64-apple-darwin`, `loupecam-x86_64-apple-darwin`. The web UI is
   built in (`loupecam serve --web-ui embedded`).
 
-Every release includes `SHA256SUMS` and GitHub build-provenance attestations. Windows
-and macOS code signing are wired up but not yet active (no certificates yet), so
-SmartScreen and Gatekeeper warn on first launch. See [docs/releasing.md](docs/releasing.md).
+Every release is signed with LoupeCam's update key (which the built-in updaters
+require) and includes `SHA256SUMS` and GitHub build-provenance attestations. The builds
+are not yet OS code-signed (an EV certificate is planned), so SmartScreen and Gatekeeper
+warn on first launch. See [docs/releasing.md](docs/releasing.md).
 
 ## Updates
 

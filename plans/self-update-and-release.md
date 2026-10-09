@@ -12,6 +12,9 @@ possible. Automatic updating, with regular checks, is opt-in.
 - The user authorised creating the public repo under `cinderblock` and deploying there
   (2026-10-09). That covers the repo, the release workflow, its secrets, and tagged
   releases.
+- "Signing" for releases means the update signature (done). OS code signing is
+  deferred: an EV certificate later, not now (user, 2026-10-09). The inert workflow
+  hooks stay.
 - Licence: MIT/Apache-2.0 dual was added as the recommendation; the user published
   without objecting. (Still reported as changeable.)
 - **One signing key for everything**: a minisign key from `tauri signer generate`.
@@ -78,7 +81,7 @@ possible. Automatic updating, with regular checks, is opt-in.
    `WINDOWS_SIGN_COMMAND` (provider-agnostic; Azure Artifact Signing documented).
    Tauri signCommand tested locally with a stand-in: it signs the app exe, the NSIS
    plugins, the uninstaller and the installer. macOS via `APPLE_*` secrets (Tauri for the
-   app/dmg; `macos-sign.sh` for the CLI). **Inactive until the user obtains certificates.**
+   app/dmg; `macos-sign.sh` for the CLI). **Inactive by design: EV signing is planned for later.**
 10. [x] SHA256SUMS + build-provenance attestations on every release (v0.1.3 verified;
     a tampered file is rejected).
 
@@ -108,10 +111,7 @@ possible. Automatic updating, with regular checks, is opt-in.
 
 ## Open questions for the user
 
-1. OS code signing needs accounts only the user can open (identity verification,
-   payment): Azure Artifact Signing (~$10/mo) and/or Apple Developer Program ($99/yr).
-   The pipeline is ready; steps are in docs/releasing.md. Which, if any?
-2. Back up `~/.tauri/loupecam.key` + `.password` (losing them strands every install).
+1. Back up `~/.tauri/loupecam.key` + `.password` (losing them strands every install).
 
 ## Things not to do
 

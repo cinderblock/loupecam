@@ -24,11 +24,12 @@ GitHub release, and updates the manifest that installed copies check for updates
 | --- | --- | --- | --- |
 | Update signature (minisign) | Every artifact | secret `TAURI_SIGNING_PRIVATE_KEY` (+ `_PASSWORD`) | **Active** |
 | Checksums + build provenance | Every artifact | built in (`SHA256SUMS`, GitHub attestations) | **Active** |
-| Windows Authenticode | CLI `.exe`, the desktop app, its installers and uninstaller | variable `WINDOWS_SIGN_COMMAND` + provider secrets | Waiting for a certificate |
-| macOS Developer ID + notarisation | CLI binaries, `LoupeCam.app`, `.dmg` | `APPLE_*` secrets | Waiting for an Apple Developer account |
+| Windows Authenticode | CLI `.exe`, the desktop app, its installers and uninstaller | variable `WINDOWS_SIGN_COMMAND` + provider secrets | Later (EV certificate planned) |
+| macOS Developer ID + notarisation | CLI binaries, `LoupeCam.app`, `.dmg` | `APPLE_*` secrets | Not planned yet |
 
-Until OS signing is configured, those steps are skipped and releases still work. Windows
-SmartScreen and macOS Gatekeeper warn on first run.
+The update signature is what makes self-update safe, and it is all that releases need
+today. OS code signing is optional polish against first-run SmartScreen/Gatekeeper
+warnings. Its hooks are in the workflow but do nothing until configured.
 
 The update signature is what the built-in updaters trust: they refuse anything not
 signed with this key. **Back up `~/.tauri/loupecam.key` and
@@ -42,40 +43,22 @@ sha256sum -c SHA256SUMS --ignore-missing
 gh attestation verify loupecam-x86_64-unknown-linux-musl -R cinderblock/loupecam
 ```
 
-## Windows: Authenticode
+## Windows: Authenticode (later, EV)
 
-Any signing service works. Set the repository **variable** `WINDOWS_SIGN_COMMAND` to its
-command line, with `%1` where the file goes, and add the service's credentials as
-secrets. The workflow passes `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` and
-`AZURE_TENANT_ID` through. For another provider, add its secrets to the
-`Authenticode` / `Build, sign, upload` steps.
+The plan is an EV code-signing certificate. EV keys live in an HSM, so signing goes
+through the issuer's tooling (e.g. DigiCert KeyLocker with `signtool` or `smctl`). The
+workflow already has a provider-agnostic hook for it: set the repository **variable**
+`WINDOWS_SIGN_COMMAND` to the signing command line, with `%1` where the file goes, e.g.
 
-### Recommended: Azure Artifact Signing (formerly Trusted Signing)
-
-About US$10/month, no hardware token, and certificates are trusted by SmartScreen.
-
-1. In the Azure portal, create an **Artifact Signing account** (pick a region, e.g.
-   West US 2 → endpoint `https://wus2.codesigning.azure.net`).
-2. Under the account, complete **Identity validation** (Individual is available in
-   some countries; Organization needs a registered business). This takes a few days.
-3. Create a **Certificate profile** (Public Trust) using the validated identity.
-4. Create an **App registration** in Microsoft Entra ID, add a client secret, and grant
-   it the **Artifact Signing Certificate Profile Signer** role on the account.
-5. In GitHub (Settings → Secrets and variables → Actions):
-   - secrets `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`
-   - variable `WINDOWS_SIGN_COMMAND` =
-     `artifact-signing-cli -e https://wus2.codesigning.azure.net -a <account> -c <profile> -d LoupeCam %1`
-
-```sh
-gh secret set AZURE_CLIENT_ID -R cinderblock/loupecam
-gh secret set AZURE_CLIENT_SECRET -R cinderblock/loupecam
-gh secret set AZURE_TENANT_ID -R cinderblock/loupecam
-gh variable set WINDOWS_SIGN_COMMAND -R cinderblock/loupecam --body 'artifact-signing-cli -e https://wus2.codesigning.azure.net -a ACCOUNT -c PROFILE -d LoupeCam %1'
+```text
+signtool sign /sha1 <cert-thumbprint> /tr http://timestamp.digicert.com /td sha256 /fd sha256 %1
 ```
 
-The workflow installs `artifact-signing-cli` and puts `signtool` on PATH by itself.
-The wiring (Tauri signing the app, NSIS plugins, uninstaller and installer through the
-command) has been tested with a stand-in command.
+and add the provider's credentials as secrets. The command then signs the CLI `.exe`, and
+Tauri runs it for the desktop app, the NSIS plugins, the uninstaller and the installer
+(this wiring was tested with a stand-in command). The provider's client setup (e.g.
+installing KeyLocker tools and its client certificate) still needs adding to the
+`windows-sign.sh setup` step, and its secrets to the signing steps' `env`.
 
 ## macOS: Developer ID and notarisation
 
