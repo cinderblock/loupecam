@@ -7,19 +7,27 @@ name: Release
 on:
   push:
     tags: ['v*']
+  # Re-run for an existing tag with the current workflow (e.g. after fixing it).
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to (re)build, e.g. v0.1.1
+        required: true
 
 permissions:
   contents: write
 
 env:
   CARGO_TERM_COLOR: always
-  TAG: ${{ github.ref_name }}
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   prepare:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Tag matches workspace version
         run: |
           v=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -27,7 +35,9 @@ jobs:
       - name: Draft release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$TAG" --draft --title "LoupeCam ${TAG#v}" --generate-notes --verify-tag
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 ||
+            gh release create "$TAG" --draft --title "LoupeCam ${TAG#v}" --generate-notes --verify-tag
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile && bun run build
         working-directory: apps/web
@@ -50,6 +60,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -86,6 +98,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
@@ -105,26 +119,29 @@ jobs:
         working-directory: apps/desktop
         run: |
           bunx tauri build ${{ matrix.args }}
-          shopt -s globstar nullglob
-          files=(../../target/**/release/bundle/{nsis/*.exe,msi/*.msi,macos/*.app.tar.gz,dmg/*.dmg,appimage/*.AppImage,deb/*.deb,rpm/*.rpm})
-          sigs=(../../target/**/release/bundle/**/*.sig)
+          # (macOS ships bash 3.2: no globstar, so use find.)
           # The macOS updater archive (LoupeCam.app.tar.gz) has no architecture in its
           # name, so both macOS builds would collide; add it.
           if [ "$RUNNER_OS" = macOS ]; then
             arch=$(echo "${{ matrix.args }}" | sed 's/.*--target \([a-z0-9_]*\)-.*/\1/')
-            for f in ../../target/**/release/bundle/macos/*.app.tar.gz{,.sig}; do
+            find ../../target -path '*/release/bundle/macos/*' -name 'LoupeCam.app.tar.gz*' -type f | while read -r f; do
               mv "$f" "${f/LoupeCam.app/LoupeCam_$arch.app}"
             done
-            files=(../../target/**/release/bundle/{macos/*.app.tar.gz,dmg/*.dmg})
-            sigs=(../../target/**/release/bundle/**/*.sig)
           fi
-          gh release upload "$TAG" "${files[@]}" "${sigs[@]}" --clobber
+          files=()
+          while IFS= read -r f; do files+=("$f"); done < <(find ../../target -path '*/release/bundle/*' -type f \
+            \( -name '*-setup.exe' -o -name '*.msi' -o -name '*.app.tar.gz' -o -name '*.dmg' \
+               -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' -o -name '*.sig' \))
+          printf '%s\n' "${files[@]}"
+          gh release upload "$TAG" "${files[@]}" --clobber
 
   publish:
     needs: [cli, desktop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Updater manifest (latest.json) and publish
         env:
           GH_TOKEN: ${{ github.token }}
