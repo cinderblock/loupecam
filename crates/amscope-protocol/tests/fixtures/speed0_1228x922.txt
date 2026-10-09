@@ -1,0 +1,6 @@
+# sw_sensor: speed 0 / Amcam_put_Speed
+in  0d 0100 0104 1
+in  0d 6400 0342 1
+in  0d 0000 0104 1
+in  0d 03fe 0340 1
+in  0d 01a1 3012 1

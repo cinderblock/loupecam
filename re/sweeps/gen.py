@@ -142,8 +142,21 @@ def still_trigger():
     return session("raw8", 2, b)
 
 
+def gain_speed():
+    steps = []
+    for fmt, size in (("raw8", 2), ("raw8", 1), ("raw8", 0), ("raw16", 0)):
+        b = []
+        for g in range(100, 501):
+            b += [mark(f"gain {g}"), fn("put_ExpoAGain", g), P(0.02)]
+        b += [fn("put_ExpoAGain", 100), P(0.2)]
+        for sp in (0, 1, 2, 3):
+            b += [mark(f"speed {sp}"), fn("put_Speed", sp), P(0.3)]
+        steps += session(fmt, size, b, settle=1.0)
+    return steps
+
+
 if __name__ == "__main__":
-    for name, f in (("modes", modes), ("sensor_controls", sensor_controls),
+    for name, f in (("gain_speed", gain_speed), ("modes", modes), ("sensor_controls", sensor_controls),
                     ("test_patterns", test_patterns), ("isp_controls", isp_controls),
                     ("still_trigger", still_trigger)):
         with open(os.path.join(HERE, f"{name}.json"), "w") as fh:
