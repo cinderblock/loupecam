@@ -72,6 +72,29 @@ impl Padded {
                 (false, false) => (gain[2], gain[1]),
             };
             let dst = &mut row[PAD..PAD + w];
+            if let Some(ff) = &p.corrections.flat_field {
+                // Slower path: per-pixel flat-field gain on top of white balance.
+                let (ox, oy) = p.corrections.origin;
+                let mut grow = Vec::new();
+                ff.row((y as u32 + oy) as f32, &mut grow);
+                let ch = |x: usize| crate::correction::color(x, y, rx, ry);
+                let gf = |x: usize| [gain[0], gain[1], gain[2]][ch(x)] as f32 * ff.at(&grow, (x as u32 + ox) as f32, ch(x));
+                let normf = |v: u32, x: usize| ((((v << shift).saturating_sub(black)) as f32 * gf(x)) as u32 >> 8).min(65535) as u16;
+                match frame.format {
+                    SampleFormat::U8 => {
+                        for (x, (d, &s)) in dst.iter_mut().zip(&frame.data[y * w..(y + 1) * w]).enumerate() {
+                            *d = normf(s as u32, x);
+                        }
+                    }
+                    SampleFormat::U16 { .. } => {
+                        let src = &frame.data[y * w * 2..(y + 1) * w * 2];
+                        for (x, (d, s)) in dst.iter_mut().zip(src.as_chunks::<2>().0).enumerate() {
+                            *d = normf(u16::from_le_bytes(*s) as u32, x);
+                        }
+                    }
+                }
+                return;
+            }
             let norm = |v: u32, x: usize| {
                 let g = if x & 1 == 0 { g_even } else { g_odd };
                 (((v << shift).saturating_sub(black) * g) >> 8).min(65535) as u16
@@ -92,8 +115,34 @@ impl Padded {
             }
         });
         let mut m = Padded { w, h, stride, data, rx, ry };
+        if let Some(defects) = &p.corrections.defects {
+            m.fix_defects(defects, p.corrections.origin);
+        }
         m.reflect_borders();
         m
+    }
+
+    /// Replace each defective pixel with the mean of its same-colour neighbours (two
+    /// pixels away horizontally and vertically) that lie inside the frame.
+    fn fix_defects(&mut self, defects: &[(u32, u32)], (ox, oy): (u32, u32)) {
+        let (w, h, s) = (self.w as i64, self.h as i64, self.stride);
+        let at = |x: i64, y: i64| (y as usize + PAD) * s + x as usize + PAD;
+        for &(dx, dy) in defects {
+            let (x, y) = (dx as i64 - ox as i64, dy as i64 - oy as i64);
+            if x < 0 || y < 0 || x >= w || y >= h {
+                continue;
+            }
+            let (mut sum, mut n) = (0u32, 0u32);
+            for (nx, ny) in [(x - 2, y), (x + 2, y), (x, y - 2), (x, y + 2)] {
+                if nx >= 0 && ny >= 0 && nx < w && ny < h {
+                    sum += self.data[at(nx, ny)] as u32;
+                    n += 1;
+                }
+            }
+            if let Some(mean) = sum.checked_div(n) {
+                self.data[at(x, y)] = mean as u16;
+            }
+        }
     }
 
     fn reflect_borders(&mut self) {
@@ -249,5 +298,52 @@ mod tests {
                 }
             }
         }
+    }
+
+    fn flat_frame(w: u32, h: u32, f: impl Fn(u32, u32) -> u16) -> RawFrame {
+        let mut data = Vec::new();
+        for y in 0..h {
+            for x in 0..w {
+                data.extend_from_slice(&f(x, y).to_le_bytes());
+            }
+        }
+        RawFrame { width: w, height: h, format: SampleFormat::U16 { bits: 12 }, data, trailer: Trailer::default() }
+    }
+
+    fn linear(alg: Demosaic) -> DevelopParams {
+        let mut p = DevelopParams::new(BayerPattern::Rggb);
+        p.demosaic = alg;
+        p.tone = ToneCurve::linear();
+        p
+    }
+
+    #[test]
+    fn defect_is_replaced() {
+        let frame = flat_frame(32, 32, |x, y| if (x, y) == (10, 12) { 4095 } else { 1000 });
+        let mut p = linear(Demosaic::Bilinear);
+        let hot = crate::develop16(&frame, &p);
+        p.corrections.defects = Some(std::sync::Arc::new(vec![(10, 12)]));
+        let fixed = crate::develop16(&frame, &p);
+        let px = |img: &crate::Image16| img.data[(12 * 32 + 10) * 3];
+        assert!(px(&hot) > 30000);
+        assert!((px(&fixed) as i32 - (1000 << 4)).abs() < 64, "{}", px(&fixed));
+    }
+
+    #[test]
+    fn flat_field_evens_out_a_vignetted_frame() {
+        let (w, h) = (128u32, 96u32);
+        let level = |x: u32, y: u32| {
+            let (dx, dy) = (x as f32 / w as f32 - 0.5, y as f32 / h as f32 - 0.5);
+            (2000.0 * (1.0 - 0.8 * (dx * dx + dy * dy))) as u16
+        };
+        let frame = flat_frame(w, h, level);
+        let mosaic: Vec<f32> = (0..h).flat_map(|y| (0..w).map(move |x| level(x, y) as f32)).collect();
+        let ff = crate::correction::FlatField::from_mosaic(&mosaic, w, h, BayerPattern::Rggb, 16);
+        let mut p = linear(Demosaic::Bilinear);
+        p.corrections.flat_field = Some(std::sync::Arc::new(ff));
+        let img = crate::develop16(&frame, &p);
+        let g = |x: usize, y: usize| img.data[(y * w as usize + x) * 3 + 1] as f32;
+        let (centre, corner) = (g(64, 48), g(6, 6));
+        assert!((corner / centre - 1.0).abs() < 0.04, "corner {corner} vs centre {centre}");
     }
 }

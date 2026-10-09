@@ -16,6 +16,7 @@
 //! [`encode`] writes PNG, TIFF and JPEG.
 
 pub mod auto;
+pub mod correction;
 mod demosaic;
 pub mod encode;
 pub mod stats;
@@ -89,6 +90,8 @@ pub struct DevelopParams {
     pub monochrome: bool,
     pub negative: bool,
     pub orientation: Orientation,
+    /// Calibration corrections (flat field, defective pixels); empty by default.
+    pub corrections: correction::Corrections,
 }
 
 impl DevelopParams {
@@ -103,6 +106,7 @@ impl DevelopParams {
             monochrome: false,
             negative: false,
             orientation: Orientation::default(),
+            corrections: correction::Corrections::default(),
         }
     }
 }
