@@ -26,6 +26,25 @@ enum Cmd {
         #[arg(long, default_value_t = 5.0)]
         seconds: f64,
     },
+    /// Run the network service: HTTP/WebSocket API, MJPEG stream, optional web UI.
+    Serve {
+        /// Address to listen on. Use 0.0.0.0:8080 to expose on the network.
+        #[arg(long, default_value = "127.0.0.1:8080")]
+        listen: std::net::SocketAddr,
+        /// Require this token (Bearer header, ?token=, or cookie) for API and streams.
+        #[arg(long, env = "AMSCOPE_TOKEN")]
+        token: Option<String>,
+        /// Serve the web UI: "embedded" (if built with the embed-ui feature) or a
+        /// directory containing the built UI.
+        #[arg(long)]
+        web_ui: Option<String>,
+        /// Directory for saved captures.
+        #[arg(long)]
+        captures: Option<PathBuf>,
+        /// Don't load or save settings.
+        #[arg(long)]
+        no_persist: bool,
+    },
     /// Capture frames to files (PGM: 8-bit or 16-bit greyscale mosaic).
     Snap {
         #[command(flatten)]
@@ -173,7 +192,7 @@ impl StreamOpts {
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn".into()))
+        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn,amscope=info,amscope_server=info".into()))
         .with_writer(std::io::stderr)
         .init();
     match Cli::parse().cmd {
@@ -247,6 +266,7 @@ fn main() -> Result<()> {
                 st.bytes as f64 / seconds / 1e6
             );
         }
+        Cmd::Serve { listen, token, web_ui, captures, no_persist } => serve(listen, token, web_ui, captures, no_persist)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
             let mut cam = Camera::open_first()?;
             let rx = start(&mut cam, &opts)?;
@@ -277,6 +297,38 @@ fn mean(f: &RawFrame) -> f64 {
             f.data.as_chunks::<2>().0.iter().map(|c| u16::from_le_bytes([c[0], c[1]]) as u64).sum::<u64>() as f64 / n as f64
         }
     }
+}
+
+fn serve(listen: std::net::SocketAddr, token: Option<String>, web_ui: Option<String>, captures: Option<PathBuf>, no_persist: bool) -> Result<()> {
+    use amscope_server::{Config, Server, WebUi};
+    let web = match web_ui.as_deref() {
+        None => WebUi::Disabled,
+        #[cfg(feature = "embed-ui")]
+        Some("embedded") => WebUi::Embedded,
+        #[cfg(not(feature = "embed-ui"))]
+        Some("embedded") => bail!("this build has no embedded UI; pass the UI directory instead"),
+        Some(dir) => WebUi::Dir(PathBuf::from(dir)),
+    };
+    if !listen.ip().is_loopback() && token.is_none() {
+        eprintln!("warning: listening on {listen} without --token; anyone on the network can control the camera");
+    }
+    let cfg = Config {
+        listen,
+        token,
+        web,
+        captures_dir: captures.unwrap_or_else(Config::default_captures_dir),
+        settings_file: if no_persist { None } else { Config::default_settings_file() },
+    };
+    let rt = tokio::runtime::Runtime::new()?;
+    rt.block_on(async move {
+        let captures_dir = cfg.captures_dir.clone();
+        let server = Server::start(cfg).await?;
+        println!("amscope serving on http://{} (captures in {})", server.addr, captures_dir.display());
+        tokio::signal::ctrl_c().await?;
+        println!("shutting down");
+        server.stop().await?;
+        anyhow::Ok(())
+    })
 }
 
 /// The vendor software's default white balance (colour temperature 6503 K, tint 1000).

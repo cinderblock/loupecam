@@ -13,14 +13,27 @@ rust-version = "1.88"
 amscope-protocol = { path = "crates/amscope-protocol" }
 amscope = { path = "crates/amscope" }
 amscope-isp = { path = "crates/amscope-isp" }
+amscope-server = { path = "crates/amscope-server" }
 nusb = "0.2.7"
 thiserror = "2"
 tracing = "0.1"
 bzip2 = "0.6"
-clap = { version = "4.6", features = ["derive"] }
+clap = { version = "4.6", features = ["derive", "env"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1"
 rayon = "1.12"
 png = "0.18"
 tiff = "0.11"
 jpeg-encoder = "0.7"
+tokio = { version = "1.53", features = ["rt-multi-thread", "macros", "sync", "net", "signal", "time", "fs"] }
+axum = { version = "0.8", features = ["ws"] }
+tower-http = { version = "0.7", features = ["cors", "trace"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bytes = "1"
+futures-util = "0.3"
+tokio-stream = { version = "0.1", features = ["sync"] }
+mime_guess = "2"
+dirs = "7"
+jiff = "0.2"
+rust-embed = "8"
