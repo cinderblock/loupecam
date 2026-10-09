@@ -38,7 +38,42 @@ enum Cmd {
         /// Frames to discard first (lets exposure settle).
         #[arg(long, default_value_t = 6)]
         skip: u32,
+        #[command(flatten)]
+        develop: DevelopOpts,
     },
+}
+
+/// How to turn the mosaic into an image (for .png/.jpg/.tif outputs).
+#[derive(Args, Clone)]
+struct DevelopOpts {
+    #[arg(long, value_enum, default_value_t = DemosaicArg::Mhc)]
+    demosaic: DemosaicArg,
+    /// White balance gains r,g,b. Default: grey-world auto white balance.
+    #[arg(long, value_parser = parse_f32x3)]
+    wb: Option<[f32; 3]>,
+    /// Skip colour correction (identity matrix).
+    #[arg(long)]
+    no_ccm: bool,
+    /// Write 16 bits per channel (PNG/TIFF).
+    #[arg(long)]
+    sixteen: bool,
+    /// Write the undeveloped mosaic as 16-bit greyscale TIFF instead.
+    #[arg(long)]
+    raw: bool,
+    #[arg(long, default_value_t = 92)]
+    jpeg_quality: u8,
+}
+
+#[derive(Copy, Clone, ValueEnum)]
+enum DemosaicArg {
+    Superpixel,
+    Bilinear,
+    Mhc,
+}
+
+fn parse_f32x3(s: &str) -> Result<[f32; 3], String> {
+    let v: Vec<f32> = s.split(',').map(|p| p.trim().parse().map_err(|e| format!("{p}: {e}"))).collect::<Result<_, _>>()?;
+    v.try_into().map_err(|_| "expected r,g,b".to_string())
 }
 
 #[derive(Args, Clone)]
@@ -209,7 +244,7 @@ fn main() -> Result<()> {
                 st.bytes as f64 / seconds / 1e6
             );
         }
-        Cmd::Snap { opts, out, count, skip } => {
+        Cmd::Snap { opts, out, count, skip, develop } => {
             let mut cam = Camera::open_first()?;
             let rx = start(&mut cam, &opts)?;
             for _ in 0..skip {
@@ -222,7 +257,7 @@ fn main() -> Result<()> {
                 } else {
                     out.clone()
                 };
-                write_pgm(&path, &f).with_context(|| format!("writing {}", path.display()))?;
+                save(&path, &f, cam.model(), &develop).with_context(|| format!("writing {}", path.display()))?;
                 println!("{} ({}x{}, seq {}, mean {:.2})", path.display(), f.width, f.height, f.trailer.sequence, mean(&f));
             }
             cam.stop()?;
@@ -236,9 +271,54 @@ fn mean(f: &RawFrame) -> f64 {
         SampleFormat::U8 => f.data.iter().map(|&b| b as u64).sum::<u64>() as f64 / f.data.len() as f64,
         SampleFormat::U16 { .. } => {
             let n = f.data.len() / 2;
-            f.data.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]]) as u64).sum::<u64>() as f64 / n as f64
+            f.data.as_chunks::<2>().0.iter().map(|c| u16::from_le_bytes([c[0], c[1]]) as u64).sum::<u64>() as f64 / n as f64
         }
     }
+}
+
+fn save(path: &std::path::Path, f: &RawFrame, model: &amscope::Model, d: &DevelopOpts) -> Result<()> {
+    use amscope_isp::encode::{self, Format};
+    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+    if ext == "pgm" {
+        return write_pgm(path, f);
+    }
+    if d.raw {
+        std::fs::write(path, encode::raw_tiff(f)?)?;
+        return Ok(());
+    }
+    let format = match ext.as_str() {
+        "png" => Format::Png,
+        "tif" | "tiff" => Format::Tiff,
+        "jpg" | "jpeg" => Format::Jpeg { quality: d.jpeg_quality },
+        _ => bail!("unknown output extension {ext:?} (use .pgm, .png, .tif or .jpg)"),
+    };
+    let amscope::ColorFilter::Bayer(pattern) = model.color else { bail!("monochrome sensors not supported yet") };
+    let mut p = amscope_isp::DevelopParams::new(pattern);
+    p.demosaic = match d.demosaic {
+        DemosaicArg::Superpixel => amscope_isp::Demosaic::Superpixel,
+        DemosaicArg::Bilinear => amscope_isp::Demosaic::Bilinear,
+        DemosaicArg::Mhc => amscope_isp::Demosaic::Mhc,
+    };
+    p.wb = d.wb.unwrap_or_else(|| amscope_isp::auto::grey_world(&amscope_isp::stats::compute(f, pattern, None, 4, [1.0; 3])));
+    if !d.no_ccm {
+        p.ccm = amscope::ColorMatrix::mu1803_default().0;
+    }
+    let t = Instant::now();
+    let bytes = if d.sixteen {
+        let img = amscope_isp::develop16(f, &p);
+        let dt = t.elapsed();
+        let b = encode::encode16(&img, format)?;
+        eprintln!("developed in {:.0} ms, encoded in {:.0} ms (wb {:.2?})", dt.as_secs_f64() * 1e3, (t.elapsed() - dt).as_secs_f64() * 1e3, p.wb);
+        b
+    } else {
+        let img = amscope_isp::develop(f, &p);
+        let dt = t.elapsed();
+        let b = encode::encode8(&img, format)?;
+        eprintln!("developed in {:.0} ms, encoded in {:.0} ms (wb {:.2?})", dt.as_secs_f64() * 1e3, (t.elapsed() - dt).as_secs_f64() * 1e3, p.wb);
+        b
+    };
+    std::fs::write(path, bytes)?;
+    Ok(())
 }
 
 /// Netpbm greyscale: P5 with maxval 255 (8-bit) or 4095 (12-bit, big-endian samples).
@@ -251,7 +331,7 @@ fn write_pgm(path: &std::path::Path, f: &RawFrame) -> Result<()> {
         }
         SampleFormat::U16 { bits } => {
             write!(w, "P5\n{} {}\n{}\n", f.width, f.height, (1u32 << bits) - 1)?;
-            let be: Vec<u8> = f.data.chunks_exact(2).flat_map(|c| [c[1], c[0]]).collect();
+            let be: Vec<u8> = f.data.as_chunks::<2>().0.iter().flat_map(|c| [c[1], c[0]]).collect();
             w.write_all(&be)?;
         }
     }

@@ -12,6 +12,7 @@ rust-version = "1.88"
 [workspace.dependencies]
 amscope-protocol = { path = "crates/amscope-protocol" }
 amscope = { path = "crates/amscope" }
+amscope-isp = { path = "crates/amscope-isp" }
 nusb = "0.2.7"
 thiserror = "2"
 tracing = "0.1"
@@ -19,3 +20,7 @@ bzip2 = "0.6"
 clap = { version = "4.6", features = ["derive"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1"
+rayon = "1.12"
+png = "0.18"
+tiff = "0.11"
+jpeg-encoder = "0.7"

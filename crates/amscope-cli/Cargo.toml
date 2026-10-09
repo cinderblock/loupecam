@@ -13,6 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 amscope.workspace = true
+amscope-isp.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 tracing.workspace = true
