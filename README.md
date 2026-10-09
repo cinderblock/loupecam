@@ -24,7 +24,39 @@ directly over USB, so it runs anywhere Rust and USB do, including ARM Linux boar
 | --- | --- | --- | --- |
 | AmScope MU1803-HS | `0547:1142` | AR1820HS, 4912×3684, 1.25 µm | Working: all sizes, 8/12-bit, ROI, binning, speeds |
 
-## Quick start
+## Install
+
+Download from [Releases](https://github.com/cinderblock/loupecam/releases/latest):
+
+- **Desktop app**: the Windows installer (`…-setup.exe` or `.msi`), the macOS `.dmg`
+  (Apple silicon or Intel), or a Linux `.AppImage`/`.deb`/`.rpm`.
+- **Command line / headless**: one self-contained binary per platform:
+  `loupecam-x86_64-pc-windows-msvc.exe`, `loupecam-x86_64-unknown-linux-musl`,
+  `loupecam-aarch64-unknown-linux-musl` (Raspberry Pi and other ARM64 boards),
+  `loupecam-aarch64-apple-darwin`, `loupecam-x86_64-apple-darwin`. The web UI is
+  built in (`loupecam serve --web-ui embedded`).
+
+The builds are not code-signed with an OS vendor certificate yet, so Windows SmartScreen
+and macOS Gatekeeper will warn on first launch.
+
+## Updates
+
+Every build can update itself. Downloads are verified against LoupeCam's release
+signing key, which is compiled into the app, before anything is installed.
+
+- **CLI**: `loupecam update` (or `--check` to only look).
+- **Headless server**: checks for new releases every 6 hours (`updates.checkIntervalHours`)
+  and shows a banner in the web UI with **Update and restart**. Set
+  `updates.autoInstall` (web UI → About & updates) to install automatically; the
+  server then releases the camera and restarts itself. `--no-update-check` disables
+  checking.
+- **Desktop app**: checks at launch and every 6 hours and asks before installing.
+  File → **Automatically Install Updates** makes it silent; File → **Check for Updates…**
+  checks now.
+
+## Building from source
+
+### Quick start
 
 Requirements: [Rust](https://rustup.rs) (stable) and, for the web UI and desktop app,
 [Bun](https://bun.sh).
@@ -65,6 +97,7 @@ sudo udevadm control --reload && sudo udevadm trigger
 | `loupecam stream` | Stream for a while and report frame rate, drops and throughput |
 | `loupecam snap -o file.{png,tif,jpg,pgm}` | Capture: `.pgm` and `--raw` are undeveloped sensor data; the rest are developed images |
 | `loupecam serve` | The network service (below) |
+| `loupecam update` | Install the latest release (signature-verified) |
 
 Stream options: `--size` (0 = largest), `--mode raw8|raw12`, `-e/--exposure` µs,
 `-g/--gain` (multiplier), `--speed 0..3`, `--binning`, `--roi x,y,w,h`. Develop options:
@@ -107,6 +140,15 @@ cd apps/desktop && bun install && bun run dev     # or: bun run build for an ins
 For UI work, `cd apps/web && bun run dev` serves the UI with hot reload and proxies
 the API to a running `loupecam serve` (override with `LOUPECAM_SERVER=http://host:port`).
 
+## Releasing
+
+Bump `version` in the workspace `Cargo.toml`, commit, and push a matching tag
+(`git tag -a v0.2.0 -m … && git push origin v0.2.0`). The Release workflow builds and
+signs everything and publishes the release, with the updater manifest the desktop app
+reads. The signing key is the `TAURI_SIGNING_PRIVATE_KEY` repository secret; keep the
+offline copy (`~/.tauri/loupecam.key` + `.password`) backed up, because without it no
+existing install can be updated.
+
 ## Layout
 
 ```text
@@ -115,6 +157,7 @@ crates/loupecam           USB driver over nusb (pure Rust)
 crates/loupecam-isp       image pipeline and encoders
 crates/loupecam-server    headless service: camera actor, preview, HTTP/WS API
 crates/loupecam-cli       the `loupecam` binary
+crates/loupecam-update    signed self-update from GitHub Releases
 apps/web                 web UI (React, Vite, Bun)
 apps/desktop             Tauri desktop shell
 docs/protocol.md         the USB protocol, documented

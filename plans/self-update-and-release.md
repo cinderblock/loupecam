@@ -46,15 +46,27 @@ possible. Automatic updating, with regular checks, is opt-in.
 
 ## Plan / steps
 
-1. [ ] Create the repo, push `master`, see CI run.
-2. [ ] Generate the signing key and set the secrets.
-3. [ ] `loupecam-update` crate + CLI `update`.
-4. [ ] Server periodic check, auto-update setting, API, UI banner.
-5. [ ] Desktop updater plugin, menu, auto setting.
-6. [ ] Release workflow. Tag v0.1.0, check the assets.
+1. [x] Created the repo (public) and pushed. First CI run green on every OS, including the arm64 runner.
+2. [x] Signing key `~/.tauri/loupecam.key` (+ `.password`, `.pub`); secrets set.
+3. [x] `loupecam-update` crate + `loupecam update`. Verified with a real signature
+   fixture; tampering is rejected.
+4. [x] Server: checks every 6 h, `updates.autoInstall` (default off), API, UI banner/panel.
+   Tested locally (check, "no update available", setting toggle).
+5. [x] Desktop: tauri-plugin-updater, File menu "Check for Updates…" and "Automatically
+   Install Updates" (desktop.json), stops the server before restart.
+6. [ ] **current** Release workflow pushed; tag v0.1.0 building.
 7. [ ] End-to-end: install v0.1.0, release v0.1.1, update both the CLI and the desktop app.
 
 ## Findings / gotchas
+
+- GitHub returns 404 for `releases/latest` when there are no releases yet. This is
+  treated as "up to date".
+- The Linux CLI is built for musl (fully static) so it runs on older glibc distros
+  (Raspberry Pi OS bookworm has glibc 2.36; ubuntu-latest builds would need 2.39).
+- The signed test fixture is marked `-text` so git line-ending conversion can't
+  invalidate its signature.
+- latest.json is built in a final job: tauri-action's per-job merging races with a
+  build matrix.
 
 ## Progress log
 
