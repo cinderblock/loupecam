@@ -124,6 +124,11 @@ impl StreamGeometry {
     }
 }
 
+/// Time the sensor needs after [`rq::TRANSFER`] enable before it answers on I²C.
+/// Without it, sensor reads/writes answer `09` instead of the `08` ack. The vendor SDK
+/// waits ~138 ms.
+const SENSOR_POWER_UP: std::time::Duration = std::time::Duration::from_millis(150);
+
 /// Lines the sensor needs beyond the output height (blanking).
 const FRAME_BLANKING_LINES: u16 = 92;
 /// Exposure programmed before streaming starts; the real one follows.
@@ -150,6 +155,7 @@ impl<T: Transport> Session<T> {
         expect_ack(rq::SEED, &r)?;
         let mut s = Session { t, key: rq::session_key(seed), model, streaming: None };
         s.transfer_enable(true)?;
+        s.t.delay(SENSOR_POWER_UP);
         let sensor_id = s.read16(rq::READ_SENSOR_ID)?;
         if sensor_id != model.sensor.chip_id() {
             return Err(Error::UnexpectedResponse {
@@ -175,6 +181,24 @@ impl<T: Transport> Session<T> {
             factory,
         };
         Ok((s, info))
+    }
+
+    /// Start a new scrambling session on an already-open camera. Required before
+    /// starting again after [`stop`](Self::stop): until re-seeded, the camera rejects
+    /// register writes (it answers `09` instead of the `08` ack). The vendor SDK does the
+    /// same on every restart.
+    pub fn reseed(&mut self, seed: u16) -> Result<()> {
+        let r = self.t.control_in(rq::SEED, seed, 0, 2)?;
+        expect_ack(rq::SEED, &r)?;
+        self.key = rq::session_key(seed);
+        self.transfer_enable(true)?;
+        self.t.delay(SENSOR_POWER_UP);
+        let id = self.read16(rq::READ_SENSOR_ID)?;
+        if id != self.model.sensor.chip_id() {
+            return Err(Error::UnexpectedResponse { request: rq::READ, detail: format!("sensor ID {id:#06x} after reseed") });
+        }
+        let _status = self.t.control_in(rq::STATUS, 0, 0, 1)?;
+        Ok(())
     }
 
     pub fn model(&self) -> &'static Model {
@@ -365,14 +389,14 @@ impl<T: Transport> Session<T> {
     /// Raw access for experimentation: write a sensor register.
     pub fn write_sensor(&mut self, register: u16, value: u16) -> Result<()> {
         let r = self.t.control_in(rq::WRITE_SENSOR, value ^ self.key, register ^ self.key, 1)?;
-        expect_ack(rq::WRITE_SENSOR, &r)
+        expect_ack(rq::WRITE_SENSOR, &r).map_err(|e| context(e, format!("sensor register {register:#06x} = {value:#06x}")))
     }
 
     /// Raw access for experimentation: write an FPGA register.
     pub fn write_fpga(&mut self, register: u8, value: u16) -> Result<()> {
         let index = (register as u16) << 8;
         let r = self.t.control_in(rq::WRITE_FPGA, value ^ self.key, index ^ self.key, 1)?;
-        expect_ack(rq::WRITE_FPGA, &r)
+        expect_ack(rq::WRITE_FPGA, &r).map_err(|e| context(e, format!("FPGA register {register:#04x} = {value:#06x}")))
     }
 
     /// Raw access for experimentation: scrambled 16-bit read.
@@ -499,6 +523,13 @@ impl<T: Transport> Session<T> {
         let b = self.t.control_in(request, 0, 0, 16)?;
         let end = b.iter().position(|&c| c == 0).unwrap_or(b.len());
         Ok(String::from_utf8_lossy(&b[..end]).into_owned())
+    }
+}
+
+fn context(e: Error, what: String) -> Error {
+    match e {
+        Error::UnexpectedResponse { request, detail } => Error::UnexpectedResponse { request, detail: format!("{what}: {detail}") },
+        e => e,
     }
 }
 

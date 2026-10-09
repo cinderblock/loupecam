@@ -43,6 +43,11 @@ pub trait Transport {
     fn control_in(&mut self, request: u8, value: u16, index: u16, length: u16) -> Result<Vec<u8>>;
     /// Vendor OUT request.
     fn control_out(&mut self, request: u8, value: u16, index: u16, data: &[u8]) -> Result<()>;
+    /// Wait while the camera settles (e.g. sensor power-up). Override for non-blocking
+    /// environments or tests.
+    fn delay(&mut self, d: std::time::Duration) {
+        std::thread::sleep(d);
+    }
 }
 
 impl<T: Transport + ?Sized> Transport for &mut T {
@@ -51,5 +56,8 @@ impl<T: Transport + ?Sized> Transport for &mut T {
     }
     fn control_out(&mut self, request: u8, value: u16, index: u16, data: &[u8]) -> Result<()> {
         (**self).control_out(request, value, index, data)
+    }
+    fn delay(&mut self, d: std::time::Duration) {
+        (**self).delay(d)
     }
 }

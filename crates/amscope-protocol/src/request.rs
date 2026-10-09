@@ -3,7 +3,10 @@
 /// Seed exchange. IN, `wValue` = random seed, 2-byte read, the camera answers `[0x08]`.
 /// Sets the session's scrambling key (see [`session_key`]).
 pub const SEED: u8 = 0x16;
-/// Transfer enable. OUT, `wIndex` = 0x0f, `wValue` = 3 to enable, 0 to disable.
+/// Enable. OUT, `wIndex` = 0x0f, `wValue` = 3 to enable, 0 to disable. Sent after the
+/// seed and at stream start; disabled (twice) at stop. It gates the sensor itself: after
+/// enabling, sensor I²C requests ([`WRITE_SENSOR`], [`READ3`]) fail with `09` for roughly
+/// the first 140 ms, so it most likely switches sensor power or clock.
 pub const TRANSFER: u8 = 0x01;
 /// Scrambled 16-bit read. IN, 2 bytes, big-endian result. See [`READ_SENSOR_ID`] and
 /// [`READ_FPGA_VERSION`] for the known addresses.
@@ -11,8 +14,9 @@ pub const READ: u8 = 0x0a;
 /// Scrambled FPGA register write, sent as an IN request: `wValue` = value,
 /// `wIndex` = `register << 8`. The camera answers `[0x08]`.
 pub const WRITE_FPGA: u8 = 0x0b;
-/// Unscrambled 3-byte read, `wIndex` = address. Purpose unknown. The vendor SDK issues
-/// it at open and at stream start.
+/// Unscrambled 3-byte read, `wIndex` = address; the last byte is the ack (`08`, or `09`
+/// when the sensor does not answer). Probably a sensor register read. The vendor SDK
+/// issues it at open and at stream start.
 pub const READ3: u8 = 0x0c;
 /// Scrambled sensor (I²C) register write, sent as an IN request: `wValue` = value,
 /// `wIndex` = 16-bit register address. The camera answers `[0x08]`.

@@ -78,6 +78,8 @@ pub struct Camera {
     info: DeviceInfo,
     interface: nusb::Interface,
     stream: Option<stream::Reader>,
+    /// A stream was stopped since the session was seeded; re-seed before restarting.
+    needs_reseed: bool,
 }
 
 impl Camera {
@@ -88,7 +90,7 @@ impl Camera {
         let transport = UsbTransport::new(interface.clone(), Duration::from_millis(1000));
         let (session, info) = Session::open(transport, device.model, random_u16())?;
         tracing::info!(model = info.model.name, serial = %info.serial, fw = %info.firmware_version, "camera opened");
-        Ok(Camera { session, info, interface, stream: None })
+        Ok(Camera { session, info, interface, stream: None, needs_reseed: false })
     }
 
     /// Open the first supported camera found.
@@ -122,6 +124,10 @@ impl Camera {
     /// reconfigures; earlier receivers are disconnected.
     pub fn start(&mut self, cfg: &StreamConfig) -> Result<FrameReceiver> {
         self.stop()?;
+        if self.needs_reseed {
+            self.session.reseed(random_u16())?;
+            self.needs_reseed = false;
+        }
         // Queue bulk transfers before the camera starts sending.
         let res = self.model().resolutions.get(cfg.size_index).copied();
         let res = match (cfg.roi, res) {
@@ -147,6 +153,7 @@ impl Camera {
 
     pub fn stop(&mut self) -> Result<()> {
         if let Some(reader) = self.stream.take() {
+            self.needs_reseed = true;
             let r = self.session.stop();
             reader.shutdown();
             r?;

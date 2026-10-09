@@ -31,6 +31,7 @@ impl Transport for UsbTransport {
                 self.timeout,
             )
             .wait()
+            .inspect(|r| tracing::trace!("IN  {request:02x} {value:04x} {index:04x} {length} -> {:02x?}{}", &r[..r.len().min(16)], if r.len() > 16 { " …" } else { "" }))
             .map_err(|e| Error::Transfer(format!("IN {request:#04x} wValue={value:#06x} wIndex={index:#06x}: {e}")))
     }
 
@@ -48,6 +49,7 @@ impl Transport for UsbTransport {
                 self.timeout,
             )
             .wait()
+            .inspect(|()| tracing::trace!("OUT {request:02x} {value:04x} {index:04x} [{} bytes]", data.len()))
             .map_err(|e| Error::Transfer(format!("OUT {request:#04x} wValue={value:#06x} wIndex={index:#06x}: {e}")))
     }
 }

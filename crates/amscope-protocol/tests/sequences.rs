@@ -57,6 +57,8 @@ impl Transport for Mock {
         })
     }
 
+    fn delay(&mut self, _: std::time::Duration) {}
+
     fn control_out(&mut self, req: u8, value: u16, index: u16, data: &[u8]) -> Result<()> {
         let hex: String = data.iter().map(|b| format!("{b:02x}")).collect();
         self.log.push(format!("out {req:02x} {value:04x} {index:04x} {hex}").trim_end().to_string());
