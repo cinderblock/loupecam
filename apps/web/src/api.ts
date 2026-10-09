@@ -1,4 +1,4 @@
-import type { CaptureEntry, CaptureInfo, NormRect, Patch, Settings } from './types'
+import type { CaptureEntry, CaptureInfo, NormRect, Patch, Settings, UpdateStatus } from './types'
 
 // The server may require a token (when exposed on a network). It is kept in
 // localStorage and sent as a Bearer header, or as ?token= where headers are
@@ -48,6 +48,8 @@ export const api = {
   captureUrl: (name: string) => withToken(`/api/captures/${encodeURIComponent(name)}`),
   whiteBalance: (region: NormRect | null) => request<{ gains: [number, number, number] }>('POST', '/api/white-balance', { region }),
   roi: (region: NormRect | null) => request<Settings>('POST', '/api/roi', { region }),
+  checkUpdate: () => request<UpdateStatus>('POST', '/api/update/check'),
+  installUpdate: () => request<{ installed: string; restarting: boolean }>('POST', '/api/update/install'),
 }
 
 export function wsUrl(): string {

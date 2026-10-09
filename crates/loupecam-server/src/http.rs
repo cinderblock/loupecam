@@ -48,6 +48,9 @@ pub fn router(state: AppState) -> Router {
         .route("/captures/{name}", get(get_capture).delete(delete_capture))
         .route("/white-balance", post(white_balance))
         .route("/roi", post(set_roi))
+        .route("/update", get(update_status))
+        .route("/update/check", post(update_check))
+        .route("/update/install", post(update_install))
         .route("/ws", get(ws));
     Router::new()
         .nest("/api", api)
@@ -183,6 +186,20 @@ async fn set_roi(State(s): State<AppState>, Json(b): Json<RegionBody>) -> ApiRes
     Ok(Json(serde_json::to_value(settings).unwrap()))
 }
 
+async fn update_status(State(s): State<AppState>) -> Json<serde_json::Value> {
+    Json(serde_json::to_value(&*s.updates.status.borrow()).unwrap())
+}
+
+async fn update_check(State(s): State<AppState>) -> Json<serde_json::Value> {
+    Json(serde_json::to_value(s.updates.check().await).unwrap())
+}
+
+/// Install the available update; the server restarts shortly after responding.
+async fn update_install(State(s): State<AppState>) -> ApiResult<Json<serde_json::Value>> {
+    let version = s.updates.install().await.map_err(bad)?;
+    Ok(Json(json!({ "installed": version, "restarting": true })))
+}
+
 async fn snapshot(State(s): State<AppState>) -> ApiResult<Response> {
     let p = s.preview.next(Duration::from_secs(3)).await.ok_or_else(|| unavailable("no frame from camera"))?;
     Ok(([(header::CONTENT_TYPE, "image/jpeg"), (header::CACHE_CONTROL, "no-store")], p.jpeg.clone()).into_response())
@@ -208,16 +225,18 @@ async fn mjpeg(State(s): State<AppState>) -> Response {
 }
 
 async fn ws(State(s): State<AppState>, upgrade: WebSocketUpgrade) -> Response {
-    upgrade.on_upgrade(move |socket| ws_session(socket, s.service.clone(), s.preview.clone()))
+    upgrade.on_upgrade(move |socket| ws_session(socket, s.service.clone(), s.preview.clone(), s.updates.clone()))
 }
 
 /// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s, and,
 /// after the client sends `{"type":"preview","enabled":true}`, binary JPEG frames.
-async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Preview>) {
+async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Preview>, updates: Arc<crate::updates::Updates>) {
     let (mut tx, mut rx) = socket.split();
     let mut state = service.shared.state.subscribe();
     let mut stats = service.shared.stats.subscribe();
     let mut frames = preview.frames.subscribe();
+    let mut update = updates.status.subscribe();
+    update.mark_changed();
     let mut viewer = None;
     let msg = |kind: &str, v: serde_json::Value| {
         let mut v = v;
@@ -233,6 +252,10 @@ async fn ws_session(socket: WebSocket, service: Arc<Service>, preview: Arc<Previ
             r = state.changed() => {
                 if r.is_err() { break }
                 msg("state", serde_json::to_value(&*state.borrow_and_update()).unwrap())
+            }
+            r = update.changed() => {
+                if r.is_err() { break }
+                msg("update", serde_json::to_value(&*update.borrow_and_update()).unwrap())
             }
             r = stats.changed() => {
                 if r.is_err() { break }

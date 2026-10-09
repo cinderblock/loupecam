@@ -345,3 +345,15 @@ input.number {
     border-top: 1px solid var(--border);
   }
 }
+
+.update-banner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 12px;
+  background: #1d3550;
+  border-bottom: 1px solid var(--accent);
+}
+.update-banner a {
+  color: var(--accent);
+}

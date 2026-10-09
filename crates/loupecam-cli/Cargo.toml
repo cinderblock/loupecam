@@ -19,6 +19,7 @@ path = "src/main.rs"
 loupecam.workspace = true
 loupecam-isp.workspace = true
 loupecam-server.workspace = true
+loupecam-update.workspace = true
 tokio.workspace = true
 anyhow.workspace = true
 clap.workspace = true

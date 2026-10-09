@@ -44,6 +44,19 @@ enum Cmd {
         /// Don't load or save settings.
         #[arg(long)]
         no_persist: bool,
+        /// Never check for updates (automatic installation is otherwise controlled by the
+        /// `updates.autoInstall` setting, off by default).
+        #[arg(long)]
+        no_update_check: bool,
+    },
+    /// Check for a new release and install it (verified against the release signing key).
+    Update {
+        /// Only report whether an update is available.
+        #[arg(long)]
+        check: bool,
+        /// Install without asking.
+        #[arg(short, long)]
+        yes: bool,
     },
     /// Capture frames: .png/.tif/.jpg are developed images; .pgm (or --raw) is undeveloped sensor data.
     Snap {
@@ -266,7 +279,10 @@ fn main() -> Result<()> {
                 st.bytes as f64 / seconds / 1e6
             );
         }
-        Cmd::Serve { listen, token, web_ui, captures, no_persist } => serve(listen, token, web_ui, captures, no_persist)?,
+        Cmd::Serve { listen, token, web_ui, captures, no_persist, no_update_check } => {
+            serve(listen, token, web_ui, captures, no_persist, !no_update_check)?
+        }
+        Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
             let mut cam = Camera::open_first()?;
             let rx = start(&mut cam, &opts)?;
@@ -299,7 +315,40 @@ fn mean(f: &RawFrame) -> f64 {
     }
 }
 
-fn serve(listen: std::net::SocketAddr, token: Option<String>, web_ui: Option<String>, captures: Option<PathBuf>, no_persist: bool) -> Result<()> {
+fn update(check_only: bool, yes: bool) -> Result<()> {
+    println!("loupecam {} ({})", loupecam_update::current_version(), loupecam_update::TARGET);
+    let Some(rel) = loupecam_update::check()? else {
+        println!("up to date");
+        return Ok(());
+    };
+    println!("version {} is available: {}", rel.version, rel.url);
+    if check_only {
+        return Ok(());
+    }
+    if !rel.installable {
+        bail!("release {} has no build for {}", rel.version, loupecam_update::TARGET);
+    }
+    if !yes {
+        eprint!("install it? [y/N] ");
+        let mut answer = String::new();
+        std::io::stdin().read_line(&mut answer)?;
+        if !matches!(answer.trim(), "y" | "Y" | "yes") {
+            return Ok(());
+        }
+    }
+    loupecam_update::install(&rel)?;
+    println!("updated to {}", rel.version);
+    Ok(())
+}
+
+fn serve(
+    listen: std::net::SocketAddr,
+    token: Option<String>,
+    web_ui: Option<String>,
+    captures: Option<PathBuf>,
+    no_persist: bool,
+    self_update: bool,
+) -> Result<()> {
     use loupecam_server::{Config, Server, WebUi};
     let web = match web_ui.as_deref() {
         None => WebUi::Disabled,
@@ -318,17 +367,27 @@ fn serve(listen: std::net::SocketAddr, token: Option<String>, web_ui: Option<Str
         web,
         captures_dir: captures.unwrap_or_else(Config::default_captures_dir),
         settings_file: if no_persist { None } else { Config::default_settings_file() },
+        self_update,
     };
     let rt = tokio::runtime::Runtime::new()?;
-    rt.block_on(async move {
+    let restart = rt.block_on(async move {
         let captures_dir = cfg.captures_dir.clone();
         let server = Server::start(cfg).await?;
         println!("loupecam serving on http://{} (captures in {})", server.addr, captures_dir.display());
-        tokio::signal::ctrl_c().await?;
-        println!("shutting down");
+        let restart = tokio::select! {
+            r = tokio::signal::ctrl_c() => { r?; false }
+            () = server.restart_requested() => true,
+        };
+        println!("{}", if restart { "update installed; restarting" } else { "shutting down" });
         server.stop().await?;
-        anyhow::Ok(())
-    })
+        anyhow::Ok(restart)
+    })?;
+    drop(rt);
+    if restart {
+        // Only returns on failure.
+        return Err(loupecam_update::restart().into());
+    }
+    Ok(())
 }
 
 /// The vendor software's default white balance (colour temperature 6503 K, tint 1000).

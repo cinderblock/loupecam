@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, AuthError, getToken, wsUrl } from './api'
-import type { LiveStats, Patch, Settings, State } from './types'
+import type { LiveStats, Patch, Settings, State, UpdateStatus } from './types'
 
 export interface Camera {
   state: State | null
   stats: LiveStats | null
+  update: UpdateStatus | null
   /** Latest preview frame, decoded. */
   frame: ImageBitmap | null
   connected: boolean
@@ -33,6 +34,7 @@ export function useCamera(onError: (message: string) => void): Camera {
   })
   const [state, setState] = useState<State | null>(null)
   const [stats, setStats] = useState<LiveStats | null>(null)
+  const [update, setUpdate] = useState<UpdateStatus | null>(null)
   const [frame, setFrame] = useState<ImageBitmap | null>(null)
   const [connected, setConnected] = useState(false)
   const [authNeeded, setAuthNeeded] = useState(false)
@@ -67,6 +69,7 @@ export function useCamera(onError: (message: string) => void): Camera {
           const msg = JSON.parse(ev.data)
           if (msg.type === 'state') setState(msg as State)
           else if (msg.type === 'stats') setStats(msg as LiveStats)
+          else if (msg.type === 'update') setUpdate(msg as UpdateStatus)
           return
         }
         // Skip frames while the previous one is still decoding.
@@ -128,5 +131,5 @@ export function useCamera(onError: (message: string) => void): Camera {
     [flush],
   )
 
-  return { state, stats, frame, connected, authNeeded, patch }
+  return { state, stats, update, frame, connected, authNeeded, patch }
 }

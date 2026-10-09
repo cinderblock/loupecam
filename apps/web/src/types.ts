@@ -39,6 +39,27 @@ export interface Settings {
     demosaic: DemosaicSetting
     saveRaw: boolean
   }
+  updates: { autoInstall: boolean; checkIntervalHours: number }
+}
+
+export interface Release {
+  version: string
+  tag: string
+  notes: string
+  url: string
+  publishedAt: string | null
+  installable: boolean
+}
+
+export interface UpdateStatus {
+  /** False when the desktop app's own updater handles updates. */
+  enabled: boolean
+  currentVersion: string
+  checking: boolean
+  installing: boolean
+  available: Release | null
+  lastCheck: string | null
+  lastError: string | null
 }
 
 export type Status =

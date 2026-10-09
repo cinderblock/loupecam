@@ -12,6 +12,7 @@ pub mod http;
 pub mod preview;
 pub mod service;
 pub mod settings;
+pub mod updates;
 
 use service::Service;
 use settings::Settings;
@@ -44,6 +45,9 @@ pub struct Config {
     pub captures_dir: PathBuf,
     /// Where settings are persisted (JSON). `None` = don't persist.
     pub settings_file: Option<PathBuf>,
+    /// Check for and install updates of this executable. Off when something else (the
+    /// desktop app's updater) owns updates.
+    pub self_update: bool,
 }
 
 impl Config {
@@ -61,6 +65,7 @@ impl Config {
 pub struct AppState {
     pub service: Arc<Service>,
     pub preview: Arc<preview::Preview>,
+    pub updates: Arc<updates::Updates>,
     pub token: Option<Arc<str>>,
     pub web: WebUi,
     pub captures_dir: PathBuf,
@@ -112,9 +117,11 @@ impl Server {
         let settings = load_settings(cfg.settings_file.as_ref());
         let service = Service::spawn(settings);
         let preview = preview::spawn(service.shared.clone());
+        let updates = updates::Updates::spawn(cfg.self_update, service.clone());
         let state = AppState {
             service,
             preview,
+            updates,
             token: cfg.token.map(Into::into),
             web: cfg.web,
             captures_dir: cfg.captures_dir,
@@ -135,6 +142,12 @@ impl Server {
         });
         tracing::info!("listening on http://{addr}");
         Ok(Server { addr, state, shutdown, task })
+    }
+
+    /// Resolves when an update has been installed and the process should restart
+    /// (after [`stop`](Self::stop), so the camera is released).
+    pub async fn restart_requested(&self) {
+        self.state.updates.restart.notified().await
     }
 
     /// Stop serving and release the camera.

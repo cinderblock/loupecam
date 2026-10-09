@@ -6,6 +6,7 @@ import { Histogram } from './components/Histogram'
 import { Section, Slider } from './components/widgets'
 import { formatExposure } from './format'
 import { Viewer, type Overlays, type Tool } from './components/Viewer'
+import { UpdateBanner, UpdatesPanel } from './components/Updates'
 import type { NormRect } from './types'
 import { useCamera } from './useCamera'
 
@@ -130,6 +131,7 @@ export default function App() {
         )}
         <span className={cam.connected && st?.status.state === 'streaming' ? 'dot ok' : 'dot'} />
       </header>
+      {cam.update && <UpdateBanner u={cam.update} onError={flash} />}
       <main className="main">
         <div className="stage">
           <div className="toolbar">
@@ -176,6 +178,11 @@ export default function App() {
           <Section title="Captures">
             <Gallery version={galleryVersion} />
           </Section>
+          {s && (
+            <Section title="About & updates" defaultOpen={false}>
+              <UpdatesPanel u={cam.update} s={s} patch={cam.patch} />
+            </Section>
+          )}
           {dev && (
             <Section title="Camera" defaultOpen={false}>
               <dl className="info">

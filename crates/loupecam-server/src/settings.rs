@@ -38,6 +38,16 @@ pub struct Settings {
     pub orientation: OrientationSettings,
     pub preview: PreviewSettings,
     pub capture: CaptureSettings,
+    pub updates: UpdateSettings,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UpdateSettings {
+    /// Install new releases automatically (and restart). Off unless the user opts in.
+    pub auto_install: bool,
+    /// How often to look for a new release.
+    pub check_interval_hours: f32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
@@ -211,6 +221,7 @@ impl Default for Settings {
                 demosaic: DemosaicSetting::Mhc,
                 save_raw: false,
             },
+            updates: UpdateSettings { auto_install: false, check_interval_hours: 6.0 },
         }
     }
 }
