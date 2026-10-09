@@ -150,6 +150,18 @@ announced name with `--mdns-name`, or turn announcing off with `--no-mdns`. The 
 name is "LoupeCam on <hostname>", so give each server a distinct name if one machine
 runs several.
 
+### Windows Firewall
+
+The first time `loupecam serve` listens on the network, Windows asks whether to allow
+it. The answer is remembered for that executable's path, so updates installed in place
+(`loupecam update`) don't ask again. A copy run from somewhere else does. If the
+dialog was dismissed, Windows silently blocks the program from then on. The server
+detects that at startup and prints the PowerShell commands that allow it.
+
+The `.msi` desktop installer adds an inbound rule for the app on domain and private
+networks, and removes it on uninstall. The `-setup.exe` installer installs per user,
+without the administrator rights that adding a rule needs.
+
 Settings persist across restarts (in the OS config directory, e.g.
 `%APPDATA%\loupecam\settings.json`). Captures go to `Pictures/LoupeCam` unless
 `--captures` says otherwise.

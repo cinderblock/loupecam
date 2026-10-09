@@ -23,7 +23,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "wix": {
+        "fragmentPaths": ["wix/firewall.wxs"],
+        "componentRefs": ["FirewallRules"]
+      }
+    }
   },
   "plugins": {
     "updater": {

@@ -33,3 +33,11 @@ jiff.workspace = true
 rust-embed = { workspace = true, optional = true }
 mdns-sd.workspace = true
 gethostname.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = [
+  "Win32_NetworkManagement_WindowsFirewall",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_Variant",
+] }

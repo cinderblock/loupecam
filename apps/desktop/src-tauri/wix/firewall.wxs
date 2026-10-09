@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Inbound Windows Firewall rules for the desktop app, so Windows doesn't ask about it
+  when it serves on the network. The MSI installs per machine (elevated), which is what
+  adding firewall rules needs; uninstalling removes them. Domain and private networks
+  only: on public networks Windows still asks.
+
+  Tauri adds the extension named by the xmlns below to candle/light, and
+  `[#Path]` is the main executable's File Id in Tauri's main.wxs template.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="FirewallRules" Guid="{2D6830B9-EEE0-4C9C-B029-1936BBD8455A}">
+        <RegistryValue Root="HKLM" Key="Software\[Manufacturer]\[ProductName]" Name="FirewallRules" Type="integer" Value="1" KeyPath="yes" />
+        <fire:FirewallException Id="FirewallDomain" Name="LoupeCam" Description="LoupeCam camera server" Program="[#Path]" Profile="domain" Scope="any" IgnoreFailure="yes" />
+        <fire:FirewallException Id="FirewallPrivate" Name="LoupeCam" Description="LoupeCam camera server" Program="[#Path]" Profile="private" Scope="any" IgnoreFailure="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>

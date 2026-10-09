@@ -7,6 +7,7 @@
 //! See [`http`] for the API surface.
 
 pub mod captures;
+pub mod firewall;
 pub mod geometry;
 pub mod http;
 pub mod mdns;
@@ -149,6 +150,14 @@ impl Server {
         tracing::info!("listening on http://{addr}");
         let web_ui = !matches!(state.web, WebUi::Disabled);
         let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, token, shared));
+        if !addr.ip().is_loopback() {
+            let mdns = announcer.is_some();
+            tokio::task::spawn_blocking(move || {
+                for w in firewall::check(addr.port(), mdns) {
+                    tracing::warn!("{w}");
+                }
+            });
+        }
         Ok(Server { addr, state, shutdown, task, announcer })
     }
 
