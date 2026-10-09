@@ -2455,7 +2455,7 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "loupecam"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "loupecam-protocol",
  "nusb",
@@ -2466,7 +2466,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -2481,7 +2481,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-desktop"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dirs 7.0.0",
  "loupecam-server",
@@ -2499,7 +2499,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-isp"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "jpeg-encoder",
  "loupecam-protocol",
@@ -2511,7 +2511,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-protocol"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bzip2",
  "thiserror 2.0.21",
@@ -2519,7 +2519,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-server"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -2543,7 +2543,7 @@ dependencies = [
 
 [[package]]
 name = "loupecam-update"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64 0.23.1",
  "minisign-verify 0.3.0",
