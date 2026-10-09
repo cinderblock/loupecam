@@ -1,17 +1,35 @@
 name: Release
 
-# Push a tag like v0.2.0 (matching the workspace version) to build, sign and publish
-# a release. Every artifact is signed with the release key (TAURI_SIGNING_PRIVATE_KEY);
-# the CLI and the desktop app only install updates whose signature verifies.
+# Releasing = pushing a tag:   git tag -a v1.2.3 -m "LoupeCam 1.2.3" && git push origin v1.2.3
+#
+# The version comes from the tag (no version-bump commit needed). Tags with a
+# pre-release suffix (v1.2.3-rc.1) publish a pre-release that updaters ignore.
+#
+# Signing, in layers:
+#   1. Update signature (always): every artifact is signed with the release key
+#      (secret TAURI_SIGNING_PRIVATE_KEY). The CLI and desktop updaters only install
+#      artifacts whose signature verifies against the key compiled into them.
+#   2. OS code signing (when configured; skipped otherwise):
+#      - Windows Authenticode: repository *variable* WINDOWS_SIGN_COMMAND (a command
+#        with %1 for the file) plus the provider's secrets, e.g. Azure Artifact Signing:
+#        artifact-signing-cli -e <endpoint> -a <account> -c <profile> -d LoupeCam %1
+#        with secrets AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID.
+#      - macOS Developer ID + notarisation: secrets APPLE_CERTIFICATE (base64 .p12),
+#        APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY, and for notarisation
+#        APPLE_API_ISSUER, APPLE_API_KEY (key id), APPLE_API_PRIVATE_KEY (.p8 contents).
+#   3. Integrity (always): SHA256SUMS and GitHub build-provenance attestations
+#      (`gh attestation verify <file> -R cinderblock/loupecam`).
 
 on:
   push:
-    tags: ['v*']
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
   # Re-run for an existing tag with the current workflow (e.g. after fixing it).
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing tag to (re)build, e.g. v0.1.1
+        description: Existing tag to (re)build, e.g. v0.1.3
         required: true
 
 permissions:
@@ -24,24 +42,26 @@ env:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.kind.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
-      - name: Tag matches workspace version
-        run: |
-          v=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
-          [ "v$v" = "$TAG" ] || { echo "tag $TAG != workspace version $v"; exit 1; }
+      - uses: dtolnay/rust-toolchain@stable
+      - run: .github/scripts/set-version.sh
+      - id: kind
+        run: echo "prerelease=$([[ "$TAG" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - name: Draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release view "$TAG" >/dev/null 2>&1 ||
-            gh release create "$TAG" --draft --title "LoupeCam ${TAG#v}" --generate-notes --verify-tag
+            gh release create "$TAG" --draft --title "LoupeCam $VERSION" --generate-notes --verify-tag
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile && bun run build
         working-directory: apps/web
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: web-dist
           path: apps/web/dist
@@ -58,8 +78,11 @@ jobs:
           - { os: macos-latest, target: aarch64-apple-darwin, exe: '' }
           - { os: macos-latest, target: x86_64-apple-darwin, exe: '' }
     runs-on: ${{ matrix.os }}
+    env:
+      WINDOWS_SIGN_COMMAND: ${{ vars.WINDOWS_SIGN_COMMAND }}
+      HAS_APPLE: ${{ secrets.APPLE_CERTIFICATE != '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
@@ -67,23 +90,58 @@ jobs:
           targets: ${{ matrix.target }}
       - if: contains(matrix.target, 'musl')
         run: sudo apt-get update && sudo apt-get install -y musl-tools
-      - uses: actions/download-artifact@v5
+      - run: .github/scripts/set-version.sh
+        shell: bash
+      - uses: actions/download-artifact@v8
         with:
           name: web-dist
           path: apps/web/dist
       - run: cargo build --release --locked -p loupecam-cli --features embed-ui --target ${{ matrix.target }}
+      - name: Stage
+        shell: bash
+        run: |
+          name="loupecam-${{ matrix.target }}${{ matrix.exe }}"
+          cp "target/${{ matrix.target }}/release/loupecam${{ matrix.exe }}" "$name"
+          echo "ASSET=$name" >> "$GITHUB_ENV"
+      - name: Authenticode
+        if: runner.os == 'Windows' && env.WINDOWS_SIGN_COMMAND != ''
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          .github/scripts/windows-sign.sh setup
+          .github/scripts/windows-sign.sh "$ASSET"
+      - name: Developer ID + notarisation
+        if: runner.os == 'macOS' && env.HAS_APPLE == 'true'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+        run: |
+          if [ -n "$APPLE_API_PRIVATE_KEY" ]; then
+            export APPLE_API_KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+            printf '%s' "$APPLE_API_PRIVATE_KEY" > "$APPLE_API_KEY_PATH"
+          else
+            unset APPLE_API_KEY
+          fi
+          .github/scripts/macos-sign.sh "$ASSET"
       - uses: oven-sh/setup-bun@v2
-      - name: Sign and upload
+      - name: Update signature and upload
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
-          name="loupecam-${{ matrix.target }}${{ matrix.exe }}"
-          cp "target/${{ matrix.target }}/release/loupecam${{ matrix.exe }}" "$name"
-          (cd apps/desktop && bun install --frozen-lockfile && bunx tauri signer sign "../../$name")
-          gh release upload "$TAG" "$name" "$name.sig" --clobber
+          # Over the final (OS-signed) bytes.
+          (cd apps/desktop && bun install --frozen-lockfile && bunx tauri signer sign "../../$ASSET")
+          gh release upload "$TAG" "$ASSET" "$ASSET.sig" --clobber
 
   desktop:
     needs: prepare
@@ -96,8 +154,11 @@ jobs:
           - { os: macos-latest, args: '--target aarch64-apple-darwin' }
           - { os: macos-latest, args: '--target x86_64-apple-darwin' }
     runs-on: ${{ matrix.os }}
+    env:
+      WINDOWS_SIGN_COMMAND: ${{ vars.WINDOWS_SIGN_COMMAND }}
+      HAS_APPLE: ${{ secrets.APPLE_CERTIFICATE != '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
@@ -105,20 +166,58 @@ jobs:
           targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - run: .github/scripts/set-version.sh
+        shell: bash
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
         working-directory: apps/web
       - run: bun install --frozen-lockfile
         working-directory: apps/desktop
+      - name: Windows signing setup
+        if: runner.os == 'Windows' && env.WINDOWS_SIGN_COMMAND != ''
+        shell: bash
+        run: |
+          .github/scripts/windows-sign.sh setup
+          # Tauri signs the app, the installers and the uninstaller with this.
+          jq -n --arg c "$WINDOWS_SIGN_COMMAND" '{bundle: {windows: {signCommand: $c}}}' > "$RUNNER_TEMP/sign.json"
+          echo "TAURI_EXTRA_ARGS=--config $(cygpath -w "$RUNNER_TEMP/sign.json")" >> "$GITHUB_ENV"
+      - name: macOS signing setup
+        if: runner.os == 'macOS' && env.HAS_APPLE == 'true'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+        run: |
+          # Tauri imports the certificate, signs, and notarises (when API keys are set).
+          {
+            echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+            echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+            echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+          } >> "$GITHUB_ENV"
+          if [ -n "$APPLE_API_PRIVATE_KEY" ]; then
+            printf '%s' "$APPLE_API_PRIVATE_KEY" > "$RUNNER_TEMP/AuthKey.p8"
+            {
+              echo "APPLE_API_ISSUER=$APPLE_API_ISSUER"
+              echo "APPLE_API_KEY=$APPLE_API_KEY"
+              echo "APPLE_API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8"
+            } >> "$GITHUB_ENV"
+          fi
       - name: Build, sign, upload
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         working-directory: apps/desktop
         run: |
-          bunx tauri build ${{ matrix.args }}
+          # shellcheck disable=SC2086 # TAURI_EXTRA_ARGS is intentionally split
+          bunx tauri build ${{ matrix.args }} ${TAURI_EXTRA_ARGS:-}
           # (macOS ships bash 3.2: no globstar, so use find.)
           # The macOS updater archive (LoupeCam.app.tar.gz) has no architecture in its
           # name, so both macOS builds would collide; add it.
@@ -136,13 +235,17 @@ jobs:
           gh release upload "$TAG" "${files[@]}" --clobber
 
   publish:
-    needs: [cli, desktop]
+    needs: [prepare, cli, desktop]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
-      - name: Updater manifest (latest.json) and publish
+      - name: Updater manifest (latest.json)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -165,4 +268,25 @@ jobs:
             printf '}}\n'; } > latest.json
           jq . latest.json
           gh release upload "$TAG" latest.json --clobber
-          gh release edit "$TAG" --draft=false --latest
+      - name: Checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir all && cd all
+          gh release download "$TAG" --pattern '*'
+          rm -f SHA256SUMS
+          sha256sum * > ../SHA256SUMS
+          cd .. && mv SHA256SUMS all/ && cat all/SHA256SUMS
+          gh release upload "$TAG" all/SHA256SUMS --clobber
+      - uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: 'all/*'
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ needs.prepare.outputs.prerelease }}" = true ]; then
+            gh release edit "$TAG" --draft=false --prerelease
+          else
+            gh release edit "$TAG" --draft=false --latest
+          fi

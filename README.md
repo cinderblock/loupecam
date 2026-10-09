@@ -36,8 +36,9 @@ Download from [Releases](https://github.com/cinderblock/loupecam/releases/latest
   `loupecam-aarch64-apple-darwin`, `loupecam-x86_64-apple-darwin`. The web UI is
   built in (`loupecam serve --web-ui embedded`).
 
-The builds are not code-signed with an OS vendor certificate yet, so Windows SmartScreen
-and macOS Gatekeeper will warn on first launch.
+Every release includes `SHA256SUMS` and GitHub build-provenance attestations. Windows
+and macOS code signing are wired up but not yet active (no certificates yet), so
+SmartScreen and Gatekeeper warn on first launch. See [docs/releasing.md](docs/releasing.md).
 
 ## Updates
 
@@ -142,12 +143,10 @@ the API to a running `loupecam serve` (override with `LOUPECAM_SERVER=http://hos
 
 ## Releasing
 
-Bump `version` in the workspace `Cargo.toml`, commit, and push a matching tag
-(`git tag -a v0.2.0 -m … && git push origin v0.2.0`). The Release workflow builds and
-signs everything and publishes the release, with the updater manifest the desktop app
-reads. The signing key is the `TAURI_SIGNING_PRIVATE_KEY` repository secret; keep the
-offline copy (`~/.tauri/loupecam.key` + `.password`) backed up, because without it no
-existing install can be updated.
+Push a tag: `git tag -a v1.2.3 -m "LoupeCam 1.2.3" && git push origin v1.2.3`. The
+version comes from the tag. Signing (update signatures, checksums, provenance, and
+Windows/macOS code signing once certificates are configured) is described in
+[docs/releasing.md](docs/releasing.md).
 
 ## Layout
 
