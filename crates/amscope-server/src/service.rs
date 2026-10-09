@@ -201,18 +201,18 @@ impl Actor {
 
     fn run(mut self) {
         loop {
-            if self.live.is_none() {
-                if let Err(e) = self.connect() {
-                    self.set_status(Status::Searching(Some(e)));
-                    // Wait for a command or retry in a second.
-                    match self.rx.recv_timeout(Duration::from_secs(1)) {
-                        Ok(Command::Shutdown) | Err(mpsc::RecvTimeoutError::Disconnected) => return,
-                        Ok(cmd) => self.handle(cmd),
-                        Err(mpsc::RecvTimeoutError::Timeout) => {}
-                    }
-                    self.publish_state(false);
-                    continue;
+            if self.live.is_none()
+                && let Err(e) = self.connect()
+            {
+                self.set_status(Status::Searching(Some(e)));
+                // Wait for a command or retry in a second.
+                match self.rx.recv_timeout(Duration::from_secs(1)) {
+                    Ok(Command::Shutdown) | Err(mpsc::RecvTimeoutError::Disconnected) => return,
+                    Ok(cmd) => self.handle(cmd),
+                    Err(mpsc::RecvTimeoutError::Timeout) => {}
                 }
+                self.publish_state(false);
+                continue;
             }
             let live = self.live.as_mut().unwrap();
             match live.frames.recv_timeout(Duration::from_millis(50)) {
