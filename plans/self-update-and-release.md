@@ -72,6 +72,16 @@ possible. Automatic updating, with regular checks, is opt-in.
      not press the TaskDialog button (it is exposed as a pane), so it needs one manual
      click. Not tested on macOS/Linux hardware (CI built and signed those).
 
+8. [x] Release = push `vX.Y.Z` (version taken from the tag; `-pre` → pre-release).
+   Verified with v0.1.3 while Cargo.toml still said 0.1.2.
+9. [x] OS code signing wired, gated on config: Windows via the repo variable
+   `WINDOWS_SIGN_COMMAND` (provider-agnostic; Azure Artifact Signing documented).
+   Tauri signCommand tested locally with a stand-in: it signs the app exe, the NSIS
+   plugins, the uninstaller and the installer. macOS via `APPLE_*` secrets (Tauri for the
+   app/dmg; `macos-sign.sh` for the CLI). **Inactive until the user obtains certificates.**
+10. [x] SHA256SUMS + build-provenance attestations on every release (v0.1.3 verified;
+    a tampered file is rejected).
+
 ## Findings / gotchas
 
 - GitHub returns 404 for `releases/latest` when there are no releases yet. This is
@@ -85,6 +95,10 @@ possible. Automatic updating, with regular checks, is opt-in.
   checks the desktop lockfile too.
 - clap printed `loupecam-cli 0.1.1` for `--version` (package name). Fixed with
   `#[command(name = "loupecam")]`, effective from the next release.
+- Windows checkouts commit scripts as 100644 (no +x). The workflow calls them via
+  `bash`; the modes were also fixed with `git update-index --chmod=+x`.
+- On a dispatch re-run, the attestation's sourceRepositoryRef is `refs/heads/master`;
+  on a tag push it is the tag.
 - latest.json is built in a final job: tauri-action's per-job merging races with a
   build matrix.
 
@@ -94,10 +108,9 @@ possible. Automatic updating, with regular checks, is opt-in.
 
 ## Open questions for the user
 
-1. Code signing: the builds have no Authenticode / Apple Developer ID signature, so
-   SmartScreen/Gatekeeper warn. Do you have (or want) certificates? *Recommendation:
-   Apple Developer ID for macOS notarisation if you will use Macs; Windows via Azure
-   Trusted Signing (cheap) when ready.*
+1. OS code signing needs accounts only the user can open (identity verification,
+   payment): Azure Artifact Signing (~$10/mo) and/or Apple Developer Program ($99/yr).
+   The pipeline is ready; steps are in docs/releasing.md. Which, if any?
 2. Back up `~/.tauri/loupecam.key` + `.password` (losing them strands every install).
 
 ## Things not to do
