@@ -300,13 +300,17 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
 - [x] Challenge-response is NOT required (native stream works without it)
 - [x] Decompress flash blob (bzip2); [ ] parse it (defect map?)
 - [x] Native RAW8 1228×922 streaming via replay (`native_probe.py stream`)
-- [ ] Trailer stats semantics; RAW12 packing; RGB (non-RAW) mode; other resolutions
-- [ ] Derive register values from first principles (PLL, timing, exposure formula)
+- [x] Trailer = R/G/B sums over the two stats windows + frame counter; RAW12 = LSB-aligned
+      u16 LE; RGB mode = FPGA ISP, still 8-bit Bayer; all three sizes
+- [x] Sequences built from parameters: exposure formula, frame length = out_h + 92, ROI
+      mapping, stats-window rules (fixture tests match the SDK transfer for transfer)
       rather than replaying blobs
 - [x] Controls capture sweeps: sensor, ISP, modes, test patterns, still/trigger
-- [ ] Dense gain sweep (100..500) → gain encoding
-- [ ] Meaning of `0xda` payload, `0x0c` reads, FPGA `0xa6/0xa8/0xf4-0xfc`, trailer stats
-- [ ] Bayer order + color verification (needs a lit, focused, colorful target)
+- [x] Dense gain sweep → analog stage (bits 6:0) × digital/64 (bits 15:7)
+- [x] `0xda` = stats windows. [ ] Still unknown: `0x0c` reads, `0x10`, `0x17`, FPGA
+      `0xa6/0xa8/0xf4-0xfc`, FPGA test-pattern reg `0x1c` (no effect)
+- [x] Bayer RGGB (sensor colour bars); colour and orientation matched against the
+      vendor reference image. [ ] Sharpness check needs a focused target
 - [ ] Ghidra on amcam.dll (not needed so far)
 - [x] Python PoC without SDK (`re/native_probe.py`)
 - [x] Rust workspace: protocol + driver + CLI, verified on hardware
@@ -314,13 +318,17 @@ high bits…]`, which looks like a factory **defect pixel map**. Not decoded yet
       PNG/TIFF/JPEG. Full-res MHC 66 ms
 - [x] loupecam-server (actor, preview, REST/WS/MJPEG, captures, ROI/WB from display regions,
       token auth, settings persistence) + `loupecam serve`. Verified on hardware
-- [ ] apps/web UI
-- [ ] apps/desktop (Tauri)
-- [ ] README, docs/protocol.md, udev rule, CI (Win/Linux x64+arm64/macOS), license files
-- [ ] Hotplug / reconnect
+- [x] apps/web UI (verified in a browser: live view, capture, 12-bit switch)
+- [x] apps/desktop (Tauri): window, menu, embedded server, verified on hardware
+- [x] README, docs/protocol.md, udev rule, CI workflow (not yet run: repo not pushed),
+      licence files (MIT/Apache, pending your OK)
+- [x] Reconnect: the actor polls for the camera and reopens after loss/stall
 - [ ] Video recording (format TBD, see open questions)
-- [ ] Microscope extras: scale bar/calibration per objective, crosshair/grid overlays
+- [x] Microscope extras: calibrated scale bar (objective × adapter), crosshair, grid
 - [ ] mDNS advertisement for the headless appliance
+- [ ] Desktop: "share on network" toggle (today: `loupecam serve --listen 0.0.0.0:… --token`)
+- [ ] Gallery thumbnails (the list currently links full-size files)
+- [ ] Create the GitHub repo and push (outward-facing: needs your go-ahead)
 - [ ] Optical calibration of analog gain stages; black level; decode defect map
 
 ## Open questions for the user
