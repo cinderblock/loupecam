@@ -64,28 +64,42 @@ everything goes in the repo (`packaging/linux/`) and is tested first on a stand-
   `CAP_NET_BIND_SERVICE`, camera opened inside the sandbox, token enforced (401 without
   it), `/api/stats` reported frames, and the server re-opened the camera on its own
   after each USB reset.
-- `/var/lib/loupecam` was still empty after the first run: settings are written only
-  when something changes. Still to check: a PATCH lands in
-  `/var/lib/loupecam/config/loupecam/settings.json`.
+- **Fix applied on odriver2 (user-authorized 2026-10-16):** `usb_max_current_enable=1`
+  appended to `/boot/firmware/config.txt` (backup `config.txt.bak-loupecam`), rebooted.
+  Device tree then showed `usb_max_current_enable` = 1. Zero over-current events after
+  that, both with `motion` stopped and with it running alongside (90 s).
+- `/var/lib/loupecam` is empty until the first settings change; a PATCH then wrote
+  `/var/lib/loupecam/config/loupecam/settings.json` (owned by `loupecam`).
+- Verified after the fix: starts at boot; `/snapshot.jpg`, `/stream.mjpg` (~1.1 MB/s);
+  full-resolution capture, 4912x3684 PNG (48 MB) in 2.4 s, saved to
+  `/var/lib/loupecam/captures`; `loupecam discover` finds it alongside avahi-daemon;
+  inside the sandbox `/opt/loupecam` is writable and `/etc` read-only (so self-update
+  can replace the binary); a simulated replug (`/sys/bus/usb/devices/4-1/authorized`
+  0 then 1) recovered in ~4 s. While the camera is absent, nusb logs
+  `ERROR nusb::error: interface not found (errno 2)` once a second: noisy but harmless.
+- Web UI serves and shows its token prompt. Logging in with the token was left to the
+  user (the agent doesn't type credentials into a non-localhost page).
+- `loupecam discover` also lists `http://127.0.0.1:80/` among the URLs for a remote
+  server. Cosmetic; not chased.
 
 ## Progress log
 
 - [x] Unit + installer (`packaging/linux/loupecam.service`, `install.sh`)
-- [x] Installed on odriver2 (v0.2.0, token generated). **Service stopped** (still
-      enabled) because of the over-current resets, so it won't disrupt the ODrive rig.
-- [ ] Verified (UI, stream, capture, mDNS, reboot, replug): blocked on USB power
-- [ ] README
-- [ ] Committed
+- [x] Installed on odriver2 (v0.2.0, token generated). Running and enabled.
+- [x] USB power fixed on odriver2 (`usb_max_current_enable=1`, rebooted)
+- [x] Verified (stream, capture, settings, mDNS, reboot, replug, coexisting with motion)
+- [x] README
+- [x] Committed
+- [ ] Final dedicated Pi: run the installer there (use a 27 W PSU or set
+      `usb_max_current_enable=1`). Needs the commits pushed for the `curl | sh` form;
+      otherwise copy `packaging/linux/` over and run `sudo sh install.sh`.
 
 ## Open questions for the user
 
-1. How to power the camera on odriver2 for testing: (a) set `usb_max_current_enable=1`
-   and reboot odriver2, (b) stop `motion` while testing, or (c) a powered hub or a 5 A
-   PSU. Recommendation: (c) if one is to hand, otherwise (a). For the final Pi, use the
-   official 27 W PSU.
+1. Push to `origin/master`? Needed before the README's `curl | sh` one-liner works.
 
 ## Things not to do
 
 - Don't touch `motion`, `odrive-websocket` or anything else on odriver2 — odriver2 is an
   idle ODrive rig lent for testing. The USB resets above already knocked its ODrive and
-  StreamCam off the bus several times, so don't stream on it until power is sorted.
+  StreamCam off the bus several times, which is why the USB current limit had to be raised before streaming.
