@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { type AccessState, ROLE_LABEL, roleLabel } from '../access'
 import { api, setToken } from '../api'
+import { ConfirmButton } from './widgets'
 import type { AccessInfo, AccessLevel, ConfigLock, KeyInfo, Levels, Role } from '../types'
 
 interface Preset {
@@ -264,18 +265,18 @@ function Keys({ flash }: { flash: (m: string) => void }) {
             <span className="muted">
               {ROLE_LABEL[k.role]} · {k.lastUsed ? `used ${new Date(k.lastUsed * 1000).toLocaleDateString()}` : 'never used'}
             </span>
-            <button
+            <ConfirmButton
               className="icon"
               title="Revoke"
-              onClick={async () => {
-                if (confirm(`Revoke the key “${k.name}”? Clients using it lose access.`)) {
-                  await api.deleteKey(k.id).catch((e) => flash(e.message))
-                  refresh()
-                }
+              question="Revoke? Clients using it lose access."
+              yes="Revoke"
+              onConfirm={async () => {
+                await api.deleteKey(k.id).catch((e) => flash(e.message))
+                refresh()
               }}
             >
               ✕
-            </button>
+            </ConfirmButton>
           </li>
         ))}
       </ul>
@@ -328,14 +329,18 @@ function ChangeLevels({ access, flash }: { access: AccessState; flash: (m: strin
   const [adminPw, setAdminPw] = useState<[string, string]>(['', ''])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // Locking takes a second click on Save, with the consequence spelled out.
+  const [lockArmed, setLockArmed] = useState(false)
   const keep = { access: info.access === 'password', admin: info.config === 'password' }
+  const locking = preset.config === 'locked' && info.config !== 'locked'
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault()
         const levels = levelsFrom(preset, accessPw, adminPw, keep)
         if (typeof levels === 'string') return setError(levels)
-        if (preset.config === 'locked' && !confirm('Lock the configuration? After this it can only be changed on the server itself, with `loupecam access`.')) return
+        if (locking && !lockArmed) return setLockArmed(true)
+        setLockArmed(false)
         setBusy(true)
         try {
           access.setInfo(await api.changeAccess(levels))
@@ -350,14 +355,32 @@ function ChangeLevels({ access, flash }: { access: AccessState; flash: (m: strin
         }
       }}
     >
-      <LevelCards value={preset.id} onChange={setPreset} />
+      <LevelCards
+        value={preset.id}
+        onChange={(p) => {
+          setPreset(p)
+          setLockArmed(false)
+        }}
+      />
       {preset.access === 'password' && <PasswordPair label="Access password" value={accessPw} onChange={setAccessPw} optional={keep.access} />}
       {preset.config === 'password' && <PasswordPair label="Admin password" value={adminPw} onChange={setAdminPw} optional={keep.admin} />}
       {(preset.access === 'password' || preset.config === 'password') && <PlainHttpWarning />}
       {error && <p className="warn">{error}</p>}
-      <button className="primary" type="submit" disabled={busy}>
-        {busy ? 'Saving…' : 'Save'}
-      </button>
+      {lockArmed && (
+        <p className="warn">
+          After this, the configuration can only be changed on the server itself, with <code>loupecam access</code>. Click again to lock it.
+        </p>
+      )}
+      <div className="row">
+        <button className="primary" type="submit" disabled={busy}>
+          {busy ? 'Saving…' : lockArmed ? 'Lock the configuration' : 'Save'}
+        </button>
+        {lockArmed && (
+          <button type="button" onClick={() => setLockArmed(false)}>
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   )
 }
@@ -390,13 +413,9 @@ export function AccessPanel({ access, flash }: { access: AccessState; flash: (m:
           <Keys flash={flash} />
           <h4>Sessions</h4>
           <div className="row">
-            <button
-              onClick={async () => {
-                if (confirm('Log out everyone, including you?')) access.setInfo(await api.logoutAll().catch((e) => (flash(e.message), info)))
-              }}
-            >
+            <ConfirmButton question="Log out everyone, including you?" yes="Log out everyone" onConfirm={async () => access.setInfo(await api.logoutAll().catch((e) => (flash(e.message), info)))}>
               Log out everyone
-            </button>
+            </ConfirmButton>
           </div>
         </AdminGate>
       )}

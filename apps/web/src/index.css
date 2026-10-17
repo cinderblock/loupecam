@@ -590,3 +590,13 @@ button.record.active .record-dot {
   user-select: all;
   word-break: break-all;
 }
+.confirm {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+button.danger {
+  border-color: #e5484d;
+  background: #4a1d20;
+}

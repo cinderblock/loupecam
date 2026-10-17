@@ -142,3 +142,36 @@ export function Segmented<T extends string | number>({ value, options, onChange 
     </div>
   )
 }
+
+/**
+ * A button that asks before acting: the first click swaps it for the question and
+ * Yes / Cancel, inline in the page (never a browser dialog).
+ */
+export function ConfirmButton({ children, question, yes = 'Yes', onConfirm, className, title }: { children: ReactNode; question: string; yes?: string; onConfirm: () => void; className?: string; title?: string }) {
+  const [asking, setAsking] = useState(false)
+  if (!asking) {
+    return (
+      <button type="button" className={className} title={title} onClick={() => setAsking(true)}>
+        {children}
+      </button>
+    )
+  }
+  return (
+    <span className="confirm">
+      <span>{question}</span>
+      <button
+        type="button"
+        className="danger"
+        onClick={() => {
+          setAsking(false)
+          onConfirm()
+        }}
+      >
+        {yes}
+      </button>
+      <button type="button" autoFocus onClick={() => setAsking(false)}>
+        Cancel
+      </button>
+    </span>
+  )
+}

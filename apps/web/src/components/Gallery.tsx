@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api'
 import type { CaptureEntry } from '../types'
 import { formatBytes } from '../format'
+import { ConfirmButton } from './widgets'
 
 /** Saved captures, newest first. `version` changes trigger a refresh. */
 export function Gallery({ version, canDelete }: { version: number | string; canDelete: boolean }) {
@@ -24,18 +25,18 @@ export function Gallery({ version, canDelete }: { version: number | string; canD
             ⤓
           </a>
           {canDelete && (
-          <button
+          <ConfirmButton
             className="icon"
             title="Delete"
-            onClick={async () => {
-              if (confirm(`Delete ${c.name}?`)) {
-                await api.deleteCapture(c.name).catch(() => {})
-                refresh()
-              }
+            question="Delete?"
+            yes="Delete"
+            onConfirm={async () => {
+              await api.deleteCapture(c.name).catch(() => {})
+              refresh()
             }}
           >
             ✕
-          </button>
+          </ConfirmButton>
           )}
         </li>
       ))}

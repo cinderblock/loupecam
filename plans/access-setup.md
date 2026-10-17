@@ -36,6 +36,9 @@ From the user (2026-10-16):
   3. **Passworded**: a password is needed for even basic access. The config password
      may either require this password first or bypass it.
   4. **Full auth**: requires HTTPS. Passkeys, and an admin user is set up.
+- **No browser dialogs** (`alert`, `confirm`, `prompt`; user, 2026-10-17). Ask inline
+  instead: `ConfirmButton` in `widgets.tsx`, or a second click with the consequence
+  spelled out (locking the configuration).
 - **No minimum password length** (user, 2026-10-17). Any non-empty password is
   accepted.
 - **First-run setup**: by default the first connection runs setup. A CLI option
@@ -272,8 +275,9 @@ Phase 3: HTTPS and passkeys.
 
 1. Which settings count as "configuration" (admin-only), and what should defaults and
    limits cover? I'll propose a split in phase 2; nothing is blocked before then.
-2. Run the real setup on odriver2 in a browser (the logged-in UI hasn't been seen by
-   anyone yet), and say whether the wizard's wording and choices are right.
+2. The user ran setup on odriver2 (2026-10-17: "Configuration protected"). Still to hear:
+   whether the wizard's wording and choices are right. The agent checked the Access
+   panel, Gallery delete and lock flows on a local loopback server (simulated camera).
 3. Fast-forward master to `access-setup` now (master is already merged in, so it's a
    clean fast-forward unless master moves), or keep the branch until phase 2?
    Recommendation: now, once you've tried the setup on odriver2.
