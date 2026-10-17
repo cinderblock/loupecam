@@ -130,6 +130,29 @@ it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`
 | `POST /api/roi` `{"region": … \| null}` | Set or clear the sensor ROI from a region of the displayed image |
 | `WS /api/ws` | Pushes `state` and `stats` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
 
+### Running as a service (Raspberry Pi, Linux)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packaging/linux/install.sh | sudo sh
+```
+
+This downloads the release binary for the machine (checked against `SHA256SUMS`) and
+installs it as the systemd service `loupecam`, running as its own `loupecam` user on
+port 80 with a generated token. The installer prints the token and the URL. Settings are
+in `/etc/loupecam/loupecam.env` (listen address, token, extra `serve` arguments; edit,
+then `sudo systemctl restart loupecam`). Captures and saved settings go to
+`/var/lib/loupecam`. Logs: `journalctl -u loupecam -f`. Re-running the installer
+upgrades the binary and keeps your settings; the server's own updater works under the
+service too. Options: `--version vX.Y.Z`, `--binary ./loupecam` (a local build), and
+`--listen ADDR:PORT` (used only on first install).
+
+**Power:** the camera needs up to 800 mA from USB. A Raspberry Pi 5 allows only 600 mA
+across all its USB ports unless its supply is the official 27 W (5 A) USB-C one. With
+a lesser supply the camera trips over-current protection when it starts streaming, and
+every USB device on the Pi resets (`dmesg`: `over-current change`). Use the 27 W supply
+or a powered USB 3 hub. Alternatively, if the supply can genuinely deliver the current,
+set `usb_max_current_enable=1` in `/boot/firmware/config.txt`.
+
 ### Finding cameras on the network
 
 A server listening beyond loopback announces itself over mDNS / DNS-SD as

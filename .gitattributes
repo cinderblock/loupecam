@@ -1,3 +1,5 @@
 # udev rules are copied verbatim to Linux systems: keep LF.
 *.rules text eol=lf
 *.sh text eol=lf
+# systemd units are installed verbatim too.
+*.service text eol=lf
