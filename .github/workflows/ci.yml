@@ -43,7 +43,13 @@ jobs:
       # The desktop crate needs WebKitGTK on Linux; it has its own job.
       - run: cargo clippy --workspace --exclude loupecam-desktop --all-targets -- -D warnings
       - run: cargo test --workspace --exclude loupecam-desktop
-      - run: cargo build --release --locked -p loupecam-cli --features embed-ui
+      # The kiosk command (Linux release builds include it), and recording end to end
+      # with the software encoder.
+      - if: runner.os == 'Linux'
+        run: cargo clippy -p loupecam-cli --features kiosk,openh264 --all-targets -- -D warnings
+      - if: runner.os == 'Linux'
+        run: cargo test -p loupecam-server --features openh264
+      - run: cargo build --release --locked -p loupecam-cli --features "embed-ui${{ runner.os == 'Linux' && ',kiosk' || '' }}"
       - uses: actions/upload-artifact@v7
         with:
           name: loupecam-${{ matrix.os }}

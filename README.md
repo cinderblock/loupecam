@@ -195,6 +195,44 @@ every USB device on the Pi resets (`dmesg`: `over-current change`). Use the 27 W
 or a powered USB 3 hub. Alternatively, if the supply can genuinely deliver the current,
 set `usb_max_current_enable=1` in `/boot/firmware/config.txt`.
 
+### Touchscreen kiosk (Raspberry Pi display)
+
+With a display attached (e.g. the official Raspberry Pi 7" touch display), the machine
+running the server can show a fullscreen touch UI: the live view (drag to pan, pinch to
+zoom, double-tap to fit), big **Snap** and **Record** buttons, the record mode
+(Smooth / Detailed / Timelapse), auto exposure, white balance, and exposure and gain
+sliders. Snapshots and recordings are saved with the server's captures, so they can be
+fetched from the web UI on another device later.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packaging/linux/install.sh | sudo sh -s -- --kiosk
+```
+
+The kiosk draws straight to the display through DRM/KMS and reads the touchscreen
+through evdev. There's no X server, Wayland compositor or desktop, so use Raspberry Pi
+OS **Lite**. It starts at boot on tty1 in place of the console login. Settings are in
+`/etc/loupecam/kiosk.env`:
+
+| Variable | |
+| --- | --- |
+| `LOUPECAM_KIOSK_ROTATE` | `0`, `90`, `180` or `270`, for how the display is mounted (installer: `--rotate`) |
+| `LOUPECAM_KIOSK_SLEEP` | Minutes without a touch before the backlight turns off (`0` = never); a touch wakes it |
+| `LOUPECAM_KIOSK_HOME` | `native` (the touch UI), or `browser` to show the full web UI instead |
+
+Images and SVGs cast to the display are shown natively, with pan and zoom. PDFs, HTML
+and web pages open in Chromium under `cage`. The installer adds both unless you pass
+`--no-browser`. The kiosk hands the screen over and takes it back when the cast ends;
+**✕ Camera** on the page, or a three-finger tap, returns to the camera. That browser
+never gets the camera token, only the display token if one is set.
+
+To develop the kiosk on a desktop, run it in a window. `--simulate-camera` gives the
+server a synthetic moving specimen when no camera is attached:
+
+```sh
+cargo run -p loupecam-cli -- serve --simulate-camera &
+cargo run -p loupecam-cli --features kiosk-window -- kiosk --window
+```
+
 ### Finding cameras on the network
 
 A server listening beyond loopback announces itself over mDNS / DNS-SD as

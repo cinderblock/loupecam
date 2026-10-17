@@ -96,7 +96,8 @@ jobs:
         with:
           name: web-dist
           path: apps/web/dist
-      - run: cargo build --release --locked -p loupecam-cli --features embed-ui --target ${{ matrix.target }}
+      # Linux builds include the touchscreen kiosk (`loupecam kiosk`).
+      - run: cargo build --release --locked -p loupecam-cli --features "embed-ui${{ contains(matrix.target, 'linux') && ',kiosk' || '' }}" --target ${{ matrix.target }}
       - name: Stage
         shell: bash
         run: |
