@@ -27,35 +27,7 @@ enum Cmd {
         seconds: f64,
     },
     /// Run the network service: HTTP/WebSocket API, MJPEG stream, optional web UI.
-    Serve {
-        /// Address to listen on. Use 0.0.0.0:8080 to expose on the network.
-        #[arg(long, default_value = "127.0.0.1:8080")]
-        listen: std::net::SocketAddr,
-        /// Require this token (Bearer header, ?token=, or cookie) for API and streams.
-        #[arg(long, env = "LOUPECAM_TOKEN")]
-        token: Option<String>,
-        /// Serve the web UI: "embedded" (if built with the embed-ui feature) or a
-        /// directory containing the built UI.
-        #[arg(long)]
-        web_ui: Option<String>,
-        /// Directory for saved captures.
-        #[arg(long)]
-        captures: Option<PathBuf>,
-        /// Don't load or save settings.
-        #[arg(long)]
-        no_persist: bool,
-        /// Never check for updates (automatic installation is otherwise controlled by the
-        /// `updates.autoInstall` setting, off by default).
-        #[arg(long)]
-        no_update_check: bool,
-        /// Don't announce the server on the local network (mDNS / DNS-SD). Announcing
-        /// only happens when listening beyond loopback.
-        #[arg(long)]
-        no_mdns: bool,
-        /// Name to announce on the network [default: "LoupeCam on <hostname>"].
-        #[arg(long)]
-        mdns_name: Option<String>,
-    },
+    Serve(ServeArgs),
     /// Find LoupeCam servers on the local network (mDNS / DNS-SD).
     Discover {
         /// Seconds to listen for answers.
@@ -86,6 +58,41 @@ enum Cmd {
         #[command(flatten)]
         develop: DevelopOpts,
     },
+}
+
+#[derive(Args, Debug)]
+struct ServeArgs {
+    /// Address to listen on. Use 0.0.0.0:8080 to expose on the network.
+    #[arg(long, default_value = "127.0.0.1:8080")]
+    listen: std::net::SocketAddr,
+    /// Require this token (Bearer header, ?token=, or cookie) for API and streams.
+    #[arg(long, env = "LOUPECAM_TOKEN")]
+    token: Option<String>,
+    /// Require this token (or --token) to cast content to the display. Without it,
+    /// anyone who can reach the server can cast (it grants nothing else).
+    #[arg(long, env = "LOUPECAM_DISPLAY_TOKEN")]
+    display_token: Option<String>,
+    /// Serve the web UI: "embedded" (if built with the embed-ui feature) or a
+    /// directory containing the built UI.
+    #[arg(long)]
+    web_ui: Option<String>,
+    /// Directory for saved captures.
+    #[arg(long)]
+    captures: Option<PathBuf>,
+    /// Don't load or save settings.
+    #[arg(long)]
+    no_persist: bool,
+    /// Never check for updates (automatic installation is otherwise controlled by the
+    /// `updates.autoInstall` setting, off by default).
+    #[arg(long)]
+    no_update_check: bool,
+    /// Don't announce the server on the local network (mDNS / DNS-SD). Announcing
+    /// only happens when listening beyond loopback.
+    #[arg(long)]
+    no_mdns: bool,
+    /// Name to announce on the network [default: "LoupeCam on <hostname>"].
+    #[arg(long)]
+    mdns_name: Option<String>,
 }
 
 /// How to turn the mosaic into an image (for .png/.jpg/.tif outputs).
@@ -292,10 +299,7 @@ fn main() -> Result<()> {
                 st.bytes as f64 / seconds / 1e6
             );
         }
-        Cmd::Serve { listen, token, web_ui, captures, no_persist, no_update_check, no_mdns, mdns_name } => {
-            let announce = (!no_mdns).then_some(loupecam_server::mdns::Announce { name: mdns_name });
-            serve(listen, token, web_ui, captures, no_persist, !no_update_check, announce)?
-        }
+        Cmd::Serve(args) => serve(args)?,
         Cmd::Discover { seconds } => discover(Duration::from_secs_f64(seconds))?,
         Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
@@ -377,17 +381,9 @@ fn discover(timeout: Duration) -> Result<()> {
     Ok(())
 }
 
-fn serve(
-    listen: std::net::SocketAddr,
-    token: Option<String>,
-    web_ui: Option<String>,
-    captures: Option<PathBuf>,
-    no_persist: bool,
-    self_update: bool,
-    announce: Option<loupecam_server::mdns::Announce>,
-) -> Result<()> {
+fn serve(a: ServeArgs) -> Result<()> {
     use loupecam_server::{Config, Server, WebUi};
-    let web = match web_ui.as_deref() {
+    let web = match a.web_ui.as_deref() {
         None => WebUi::Disabled,
         #[cfg(feature = "embed-ui")]
         Some("embedded") => WebUi::Embedded,
@@ -395,17 +391,18 @@ fn serve(
         Some("embedded") => bail!("this build has no embedded UI; pass the UI directory instead"),
         Some(dir) => WebUi::Dir(PathBuf::from(dir)),
     };
-    if !listen.ip().is_loopback() && token.is_none() {
-        eprintln!("warning: listening on {listen} without --token; anyone on the network can control the camera");
+    if !a.listen.ip().is_loopback() && a.token.is_none() {
+        eprintln!("warning: listening on {} without --token; anyone on the network can control the camera", a.listen);
     }
     let cfg = Config {
-        listen,
-        token,
+        listen: a.listen,
+        token: a.token,
+        display_token: a.display_token,
         web,
-        captures_dir: captures.unwrap_or_else(Config::default_captures_dir),
-        settings_file: if no_persist { None } else { Config::default_settings_file() },
-        self_update,
-        announce,
+        captures_dir: a.captures.unwrap_or_else(Config::default_captures_dir),
+        settings_file: if a.no_persist { None } else { Config::default_settings_file() },
+        self_update: !a.no_update_check,
+        announce: (!a.no_mdns).then_some(loupecam_server::mdns::Announce { name: a.mdns_name }),
     };
     let rt = tokio::runtime::Runtime::new()?;
     let restart = rt.block_on(async move {

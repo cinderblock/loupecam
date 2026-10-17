@@ -8,6 +8,7 @@
 
 pub mod calibration;
 pub mod captures;
+pub mod cast;
 pub mod firewall;
 pub mod geometry;
 pub mod http;
@@ -44,6 +45,9 @@ pub struct Config {
     pub listen: SocketAddr,
     /// Require this bearer token for the API and streams.
     pub token: Option<String>,
+    /// Require this token (or `token`) to cast to the display. `None` = casting is open
+    /// to anyone who can reach the server.
+    pub display_token: Option<String>,
     pub web: WebUi,
     pub captures_dir: PathBuf,
     /// Where settings are persisted (JSON). `None` = don't persist.
@@ -73,6 +77,8 @@ pub struct AppState {
     pub updates: Arc<updates::Updates>,
     pub calibration: Arc<calibration::runner::Runner>,
     pub token: Option<Arc<str>>,
+    pub display_token: Option<Arc<str>>,
+    pub casting: Arc<cast::Casting>,
     pub web: WebUi,
     pub captures_dir: PathBuf,
     settings_file: Option<PathBuf>,
@@ -128,12 +134,15 @@ impl Server {
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());
         let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
         let token = cfg.token.is_some();
+        let cast_token = cfg.display_token.is_some();
         let state = AppState {
             calibration,
             service,
             preview,
             updates,
             token: cfg.token.map(Into::into),
+            display_token: cfg.display_token.map(Into::into),
+            casting: Arc::default(),
             web: cfg.web,
             captures_dir: cfg.captures_dir,
             settings_file: cfg.settings_file,
@@ -153,7 +162,7 @@ impl Server {
         });
         tracing::info!("listening on http://{addr}");
         let web_ui = !matches!(state.web, WebUi::Disabled);
-        let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, token, shared));
+        let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, token, cast_token, shared));
         if !addr.ip().is_loopback() {
             let mdns = announcer.is_some();
             tokio::task::spawn_blocking(move || {

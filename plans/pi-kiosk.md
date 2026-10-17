@@ -120,8 +120,8 @@ work in both the camera view and cast content.
 
 ## Plan / steps
 
-1. **← current** Casting API + display token (server) and the `/cast` page (web).
-2. Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
+1. ✅ Casting API + display token (server) and the `/cast` page (web).
+2. **← current** Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
    dev backend, recorder actor, API, timelapse.
 3. Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
@@ -134,6 +134,13 @@ work in both the camera view and cast content.
 
 ## Findings / gotchas
 
+- Cast HTML/SVG is served with `Content-Security-Policy: sandbox allow-scripts`, so its
+  scripts get an opaque origin and can't use the camera-token cookie. PDFs aren't
+  sandboxed (Chromium's PDF viewer refuses to load under a CSP sandbox).
+- The `/cast` page reads `?displayToken=`, never the stored camera token.
+- URL casts are shown in an iframe; sites that forbid framing show blank, so the
+  kiosk also needs a native "back to camera" gesture while Chromium runs (planned:
+  read evdev without grabbing it, so cage still gets the touches).
 - openh264 is C++, and the release musl toolchain is C only (`musl-tools`). It also
   carries the H.264 patent caveat above. So it's dev-only, and the Pi relies on the
   hardware encoder.
@@ -141,7 +148,9 @@ work in both the camera view and cast content.
 ## Progress log
 
 - [x] Questions answered (hardware, stack, recording modes, cast auth)
-- [ ] Casting API + display token + `/cast` page
+- [x] Casting API + display token + `/cast` page: `PUT/DELETE/GET /api/display`,
+      `/content`, `/events` (SSE), WebSocket `display` message, mDNS `cast` TXT key,
+      `--display-token`. Checked end to end with curl in both auth modes.
 - [ ] Recording: muxer, encoder trait, openh264, recorder, API, timelapse
 - [ ] Web UI: record, gallery video, touch viewer
 - [ ] Native kiosk: window backend

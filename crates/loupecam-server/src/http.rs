@@ -1,9 +1,11 @@
 //! HTTP / WebSocket API.
 
 use crate::captures;
+use crate::cast;
 use crate::geometry::{NormRect, display_to_frame};
 use crate::{AppState, WebUi};
 use axum::body::Body;
+use axum::extract::DefaultBodyLimit;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Path, Query, Request, State};
 use axum::http::{HeaderMap, HeaderValue, StatusCode, header};
@@ -53,6 +55,12 @@ pub fn router(state: AppState) -> Router {
         .route("/calibration/run", post(calibration_run))
         .route("/calibration/cancel", post(calibration_cancel))
         .route("/calibration/{section}", axum::routing::delete(calibration_delete))
+        .route(
+            "/display",
+            get(display_get).put(display_put).post(display_put).delete(display_clear).layer(DefaultBodyLimit::max(cast::MAX_BYTES)),
+        )
+        .route("/display/content", get(display_content))
+        .route("/display/events", get(display_events))
         .route("/ws", get(ws));
     Router::new()
         .nest("/api", api)
@@ -65,9 +73,23 @@ pub fn router(state: AppState) -> Router {
 
 /// Bearer-token check when a token is configured. Browsers can't set headers on
 /// `<img>`/WebSocket requests, so `?token=` and a cookie are accepted too.
+///
+/// Casting (`/api/display…`) has its own rule: open to anyone unless a display token is
+/// set, in which case it or the camera token is required.
 async fn auth(State(s): State<AppState>, req: Request, next: Next) -> Response {
-    let Some(token) = s.token.as_deref() else { return next.run(req).await };
     let path = req.uri().path();
+    let is_cast = path == "/api/display" || path.starts_with("/api/display/");
+    let accepted: Vec<&str> = if is_cast {
+        match s.display_token.as_deref() {
+            None => return next.run(req).await,
+            Some(d) => [Some(d), s.token.as_deref()].into_iter().flatten().collect(),
+        }
+    } else {
+        match s.token.as_deref() {
+            None => return next.run(req).await,
+            Some(t) => vec![t],
+        }
+    };
     // The UI shell itself is public so it can ask for the token.
     let is_ui = !(path.starts_with("/api") || path.ends_with(".mjpg") || path.ends_with(".jpg"));
     let h = req.headers();
@@ -77,7 +99,10 @@ async fn auth(State(s): State<AppState>, req: Request, next: Next) -> Response {
         .and_then(|v| v.to_str().ok())
         .and_then(|c| c.split(';').find_map(|kv| kv.trim().strip_prefix("loupecam_token=")));
     let query = req.uri().query().and_then(|q| q.split('&').find_map(|kv| kv.strip_prefix("token=")));
-    let ok = [bearer, cookie, query].into_iter().flatten().any(|t| constant_time_eq(t.as_bytes(), token.as_bytes()));
+    let ok = [bearer, cookie, query]
+        .into_iter()
+        .flatten()
+        .any(|t| accepted.iter().any(|a| constant_time_eq(t.as_bytes(), a.as_bytes())));
     if ok || is_ui { next.run(req).await } else { ApiError(StatusCode::UNAUTHORIZED, "token required".into()).into_response() }
 }
 
@@ -248,6 +273,80 @@ async fn calibration_delete(State(s): State<AppState>, Path(section): Path<Strin
     Ok(StatusCode::NO_CONTENT)
 }
 
+async fn display_get(State(s): State<AppState>) -> Json<serde_json::Value> {
+    Json(json!({ "cast": s.casting.info() }))
+}
+
+#[derive(Deserialize)]
+struct CastQuery {
+    name: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct CastUrl {
+    url: String,
+}
+
+/// Cast to the display: a file as the body (its type is detected from the content), or
+/// a web page as `{"url": "…"}` (or a `text/uri-list` body).
+async fn display_put(State(s): State<AppState>, Query(q): Query<CastQuery>, headers: HeaderMap, body: Bytes) -> ApiResult<Json<cast::CastInfo>> {
+    let content_type = headers.get(header::CONTENT_TYPE).and_then(|v| v.to_str().ok());
+    let base = content_type.map(|t| t.split(';').next().unwrap_or("").trim().to_ascii_lowercase());
+    let info = match base.as_deref() {
+        Some("application/json") => {
+            let u: CastUrl = serde_json::from_slice(&body).map_err(bad)?;
+            s.casting.cast_url(&u.url)
+        }
+        Some("text/uri-list") => {
+            let text = std::str::from_utf8(&body).map_err(bad)?;
+            let url = text.lines().map(str::trim).find(|l| !l.is_empty() && !l.starts_with('#')).unwrap_or("");
+            s.casting.cast_url(url)
+        }
+        _ => s.casting.cast_file(body, content_type, q.name),
+    }
+    .map_err(|e| match e {
+        cast::CastError::Unsupported => ApiError(StatusCode::UNSUPPORTED_MEDIA_TYPE, e.to_string()),
+        e => bad(e),
+    })?;
+    tracing::info!(id = info.id, kind = ?info.kind, bytes = info.bytes, "casting");
+    Ok(Json(info))
+}
+
+async fn display_clear(State(s): State<AppState>) -> StatusCode {
+    if s.casting.clear() {
+        tracing::info!("cast cleared");
+    }
+    StatusCode::NO_CONTENT
+}
+
+async fn display_content(State(s): State<AppState>) -> ApiResult<Response> {
+    let cast = s.casting.current.borrow().clone();
+    let cast = cast.filter(|c| c.info.kind != cast::CastKind::Url).ok_or(ApiError(StatusCode::NOT_FOUND, "no file is being cast".into()))?;
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, HeaderValue::from_str(&cast.info.mime).map_err(bad)?);
+    headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+    headers.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+    // Cast documents are arbitrary content from the network: scripts in them must not run
+    // with this origin (and so with anyone's camera-token cookie).
+    if matches!(cast.info.kind, cast::CastKind::Html | cast::CastKind::Svg) {
+        headers.insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static("sandbox allow-scripts"));
+    }
+    Ok((headers, cast.content).into_response())
+}
+
+/// Server-sent events: a `display` event with `{"cast": …}` now and on every change.
+/// For displays and casting tools that don't hold the camera token (the WebSocket
+/// needs it).
+async fn display_events(State(s): State<AppState>) -> impl IntoResponse {
+    use axum::response::sse::{Event, KeepAlive, Sse};
+    let rx = s.casting.current.subscribe();
+    let stream = tokio_stream::wrappers::WatchStream::new(rx).map(|c| {
+        let info = c.map(|c| c.info);
+        Ok::<_, std::convert::Infallible>(Event::default().event("display").data(json!({ "cast": info }).to_string()))
+    });
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
 async fn snapshot(State(s): State<AppState>) -> ApiResult<Response> {
     let p = s.preview.next(Duration::from_secs(3)).await.ok_or_else(|| unavailable("no frame from camera"))?;
     Ok(([(header::CONTENT_TYPE, "image/jpeg"), (header::CACHE_CONTROL, "no-store")], p.jpeg.clone()).into_response())
@@ -286,7 +385,8 @@ impl Drop for TargetGuard {
 }
 
 /// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s,
-/// `{"type":"update",…}`, `{"type":"calibration",…}` and, after the client sends
+/// `{"type":"update",…}`, `{"type":"calibration",…}`, `{"type":"display","cast":…}`
+/// (see [`display_get`]) and, after the client sends
 /// `{"type":"preview","enabled":true}`, binary JPEG frames. A client that sends
 /// `{"type":"target"}` becomes a screen target: it receives
 /// `{"type":"targetShow","id":n,"pattern":{…}}` and answers `{"type":"targetAck","id":n}`.
@@ -302,6 +402,8 @@ async fn ws_session(socket: WebSocket, app: AppState) {
     let mut calib = app.calibration.status.subscribe();
     calib.mark_changed();
     let mut show = hub.show.subscribe();
+    let mut casting = app.casting.current.subscribe();
+    casting.mark_changed();
     let mut target: Option<TargetGuard> = None;
     let mut viewer = None;
     let msg = |kind: &str, v: serde_json::Value| {
@@ -330,6 +432,11 @@ async fn ws_session(socket: WebSocket, app: AppState) {
             r = calib.changed() => {
                 if r.is_err() { break }
                 msg("calibration", serde_json::to_value(&*calib.borrow_and_update()).unwrap())
+            }
+            r = casting.changed() => {
+                if r.is_err() { break }
+                let info = casting.borrow_and_update().as_ref().map(|c| c.info.clone());
+                msg("display", json!({ "cast": info }))
             }
             r = show.changed(), if target.is_some() => {
                 if r.is_err() { break }

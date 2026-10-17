@@ -128,7 +128,28 @@ it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`
 | `GET /api/captures`, `GET`/`DELETE /api/captures/{name}` | Saved captures |
 | `POST /api/white-balance` `{"region": {x,y,width,height} \| null}` | One-shot white balance over a region of the displayed image (normalised 0..1) |
 | `POST /api/roi` `{"region": … \| null}` | Set or clear the sensor ROI from a region of the displayed image |
-| `WS /api/ws` | Pushes `state` and `stats` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
+| `WS /api/ws` | Pushes `state`, `stats` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
+| `PUT /api/display`, `DELETE /api/display` | Cast to the display / stop casting (see below) |
+| `GET /api/display`, `/api/display/content`, `/api/display/events` | What is being cast, its content, and server-sent `display` events on every change |
+
+### Casting to the display
+
+A display attached to the server (the Raspberry Pi kiosk) shows what is cast to it, much
+like a Chromecast. Cast an image (PNG, JPEG, GIF, WebP), SVG, PDF or HTML file by
+sending it as the body, or a web page by its address. `DELETE` goes back to the camera.
+Only the latest cast is kept, in memory, up to 64 MiB.
+
+```sh
+curl -T wiring.pdf http://scope-pi.local/api/display
+curl -X PUT -H 'Content-Type: application/json' -d '{"url": "https://example.com"}' http://scope-pi.local/api/display
+curl -X DELETE http://scope-pi.local/api/display
+```
+
+Casting is open to anyone who can reach the server, even when `--token` is set. Casting
+grants nothing else: the camera, settings and captures stay behind the token. To
+restrict casting too, set `--display-token` (or `LOUPECAM_DISPLAY_TOKEN`); then casting
+needs either token. Cast HTML and SVG are served sandboxed, so their scripts can't use
+the server's origin. `http://<server>/cast` shows the current cast in a browser.
 
 ### Running as a service (Raspberry Pi, Linux)
 
@@ -167,7 +188,8 @@ loupecam discover
 #   http://192.168.1.40:8080/
 ```
 
-The TXT records carry `version`, `path`, `ui` (`1`/`0`), `auth` (`token`/`none`), and the
+The TXT records carry `version`, `path`, `ui` (`1`/`0`), `auth` (`token`/`none`), `cast`
+(`open`/`token`), and the
 connected camera's `model` and `serial`. The token is never announced. Set the
 announced name with `--mdns-name`, or turn announcing off with `--no-mdns`. The default
 name is "LoupeCam on <hostname>", so give each server a distinct name if one machine

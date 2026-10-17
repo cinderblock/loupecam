@@ -164,6 +164,19 @@ export interface CaptureEntry {
   modified: string
 }
 
+export type CastKind = 'image' | 'svg' | 'pdf' | 'html' | 'url'
+
+/** What is being cast to the display (`/api/display`). */
+export interface CastInfo {
+  id: number
+  kind: CastKind
+  mime: string
+  name: string | null
+  bytes: number
+  url: string | null
+  since: string
+}
+
 /** A rectangle in normalised display coordinates (0..1). */
 export interface NormRect {
   x: number

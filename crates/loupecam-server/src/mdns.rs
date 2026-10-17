@@ -14,6 +14,7 @@
 //! | `path` | `/` (where the web UI is, per the `_http._tcp` convention) |
 //! | `ui` | `1` if the web UI is served, else `0` |
 //! | `auth` | `token` if a token is required, else `none` |
+//! | `cast` | `token` if casting to the display needs a token, else `open` |
 //! | `model`, `serial` | the connected camera, when there is one |
 
 use crate::service::{DeviceSummary, Shared};
@@ -49,6 +50,7 @@ struct Template {
     interfaces: Vec<IfKind>,
     web_ui: bool,
     token: bool,
+    cast_token: bool,
 }
 
 impl Template {
@@ -59,6 +61,7 @@ impl Template {
             ("path", "/".to_string()),
             ("ui", if self.web_ui { "1" } else { "0" }.to_string()),
             ("auth", if self.token { "token" } else { "none" }.to_string()),
+            ("cast", if self.cast_token { "token" } else { "open" }.to_string()),
         ]);
         if let Some(d) = device {
             txt.insert("model", d.model.clone());
@@ -112,7 +115,7 @@ fn dns_label(host: &str) -> String {
 impl Announcer {
     /// Announce a server bound to `addr`. Returns `None` (after logging why) when
     /// there is nothing to announce or mDNS isn't available.
-    pub fn start(cfg: &Announce, addr: SocketAddr, web_ui: bool, token: bool, shared: Arc<Shared>) -> Option<Announcer> {
+    pub fn start(cfg: &Announce, addr: SocketAddr, web_ui: bool, token: bool, cast_token: bool, shared: Arc<Shared>) -> Option<Announcer> {
         if addr.ip().is_loopback() {
             tracing::debug!("not announcing over mDNS: listening on loopback only");
             return None;
@@ -127,6 +130,7 @@ impl Announcer {
             interfaces: interfaces(addr.ip()),
             web_ui,
             token,
+            cast_token,
         };
         let daemon = match ServiceDaemon::new() {
             Ok(d) => d,
@@ -325,7 +329,7 @@ mod tests {
             calibration: watch::Sender::new(Default::default()),
         });
         let addr: SocketAddr = "0.0.0.0:48123".parse().unwrap();
-        let announcer = Announcer::start(&Announce { name: Some(name.clone()) }, addr, true, true, shared.clone()).unwrap();
+        let announcer = Announcer::start(&Announce { name: Some(name.clone()) }, addr, true, true, false, shared.clone()).unwrap();
 
         let browser = ServiceDaemon::new().unwrap();
         let rx = browser.browse(SERVICE_TYPE).unwrap();
@@ -338,6 +342,7 @@ mod tests {
         assert_eq!(s.get_port(), 48123);
         assert_eq!(s.get_property_val_str("auth"), Some("token"));
         assert_eq!(s.get_property_val_str("ui"), Some("1"));
+        assert_eq!(s.get_property_val_str("cast"), Some("open"));
         assert_eq!(s.get_property_val_str("model"), None);
         assert!(matches!(next_event(&http, &format!("{name}.{HTTP_SERVICE_TYPE}")), ServiceEvent::ServiceResolved(_)));
 

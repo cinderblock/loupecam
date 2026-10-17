@@ -42,6 +42,7 @@ fn main() {
     let cfg = Config {
         listen: "127.0.0.1:0".parse().unwrap(),
         token: None,
+        display_token: None,
         web: web_ui(),
         captures_dir: captures_dir.clone(),
         settings_file: Config::default_settings_file(),
