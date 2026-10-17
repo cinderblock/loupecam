@@ -1,5 +1,5 @@
-//! H.264 encoders. openh264 (software) where it's compiled in (the `openh264` feature).
-//! The Raspberry Pi 4's hardware encoder (V4L2 mem2mem) is next.
+//! H.264 encoders: a hardware V4L2 memory-to-memory encoder on Linux (the Raspberry Pi
+//! 4's), else openh264 in software where it's compiled in (the `openh264` feature).
 
 use loupecam_isp::yuv::I420;
 use std::time::Duration;
@@ -35,15 +35,22 @@ pub trait VideoEncoder: Send {
 /// Names of the encoders this build can try, in order of preference.
 pub fn backends() -> Vec<&'static str> {
     vec![
+        #[cfg(target_os = "linux")]
+        super::v4l2::NAME,
         #[cfg(feature = "openh264")]
         "openh264",
     ]
 }
 
 /// Open the first encoder that works for `cfg`.
-#[cfg_attr(not(feature = "openh264"), allow(unused_variables, unused_mut))]
+#[cfg_attr(not(any(feature = "openh264", target_os = "linux")), allow(unused_variables, unused_mut))]
 pub fn open(cfg: &EncoderConfig) -> anyhow::Result<Box<dyn VideoEncoder>> {
     let mut errors: Vec<String> = Vec::new();
+    #[cfg(target_os = "linux")]
+    match super::v4l2::M2mEncoder::open(cfg) {
+        Ok(e) => return Ok(Box::new(e)),
+        Err(e) => errors.push(format!("{}: {e:#}", super::v4l2::NAME)),
+    }
     #[cfg(feature = "openh264")]
     match software::Openh264::open(cfg) {
         Ok(e) => return Ok(Box::new(e)),

@@ -127,8 +127,8 @@ work in both the camera view and cast content.
    Viewer.
 4. ✅ Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
 5. ✅ Chromium override (cage handoff).
-6. **← current** V4L2 M2M encoder (needs the Pi 4 to test).
-7. Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
+6. ✅ V4L2 M2M encoder (written; needs the Pi 4 to test).
+7. **← current** Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
    `chromium`, the user, config.txt notes), README.
 8. Hardware test on the Pi 4 + display.
 
@@ -139,8 +139,12 @@ work in both the camera view and cast content.
   be developed with no camera attached.
 - On a Pi 4 `/dev/dri/card0` may be V3D (render only): the kiosk scans `card*` for one
   with a connected connector.
-- The full CLI can't be cross-checked for aarch64-musl on Windows (`ring` in the updater
-  needs `aarch64-linux-musl-gcc`); the kiosk crate alone can. CI builds natively on ARM.
+- To cross-check everything for the Pi from Windows, use LLVM's clang as the C compiler
+  for `ring`: `CC_aarch64_unknown_linux_musl=clang
+  CFLAGS_aarch64_unknown_linux_musl="--target=aarch64-linux-musl -ffreestanding"
+  AR_aarch64_unknown_linux_musl=llvm-ar cargo clippy --target aarch64-unknown-linux-musl
+  -p loupecam-cli --features kiosk,embed-ui`. (Type-check only; linking needs a musl
+  sysroot.)
 - Slint was rejected (license); the kiosk draws with tiny-skia + fontdue (DejaVu Sans via
   the `dejavu` crate), resvg for SVG casts.
 - The embedded test browser (T3 preview) has no PDF viewer: PDF casts show blank
@@ -187,7 +191,8 @@ work in both the camera view and cast content.
 - [x] Chromium override: screen state machine in the KMS loop (native / cast browser /
       home browser), throwaway profile without the camera token for casts, three-finger
       tap back to the camera, `--home browser` for the full web UI. Untested on hardware.
-- [ ] V4L2 M2M encoder
+- [x] V4L2 M2M encoder: raw ioctls (no bindgen), struct sizes asserted at compile time
+      for 64-bit; type-checks for aarch64-musl. Untested on hardware.
 - [ ] Packaging + README
 - [ ] Tested on Pi 4 + display
 

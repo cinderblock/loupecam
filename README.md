@@ -149,7 +149,7 @@ Files are written as fragmented MP4, so a recording cut short by a crash or powe
 still plays up to its last second or so.
 
 Encoding needs an H.264 encoder. The Raspberry Pi 4's hardware encoder is used where
-present (coming soon). Builds with the `openh264` feature (`cargo build --features
+present (V4L2 memory-to-memory, `/dev/video11` on a Pi 4; the Pi 5 has none). Builds with the `openh264` feature (`cargo build --features
 openh264`) encode in software anywhere; the release binaries don't include it. Without
 an encoder, timelapses can still save stills.
 

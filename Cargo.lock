@@ -3086,6 +3086,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "jiff",
+ "libc",
  "loupecam",
  "loupecam-isp",
  "loupecam-update",

@@ -6,6 +6,8 @@
 
 pub mod encoder;
 pub mod mp4;
+#[cfg(target_os = "linux")]
+mod v4l2;
 
 use crate::calibration::Calibration;
 use crate::captures;
