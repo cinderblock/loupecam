@@ -82,7 +82,13 @@ describe('camera', () => {
   it('has a gain limit', () => assert.ok(Camera.maxGain() > 1))
 
   it('fails to open a missing camera', async (t) => {
-    if (listCameras().length) return t.skip('a real camera is connected')
+    let cameras = []
+    try {
+      cameras = listCameras()
+    } catch (e) {
+      assert.equal(e.code, 'ERR_LOUPECAM') // no USB subsystem at all (WSL, containers)
+    }
+    if (cameras.length) return t.skip('a real camera is connected')
     await assert.rejects(open(), { code: 'ERR_LOUPECAM' })
   })
 })

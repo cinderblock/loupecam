@@ -152,7 +152,11 @@ def test_close(cam):
 
 
 def test_open_without_camera():
-    if loupecam.list_cameras():
+    try:
+        cameras = loupecam.list_cameras()
+    except loupecam.LoupecamError:
+        cameras = []  # no USB subsystem at all (WSL, containers)
+    if cameras:
         pytest.skip("a real camera is connected")
     with pytest.raises(loupecam.LoupecamError):
         loupecam.open()
