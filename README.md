@@ -125,12 +125,33 @@ it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`
 | `GET /api/stats` | fps, exposure, gain, channel means, histogram |
 | `GET`/`PATCH /api/settings` | Read / change settings (JSON merge patch, e.g. `{"exposureUs": 50000, "autoExposure": false}`) |
 | `POST /api/capture[?fullResolution=bool]` | Develop and save a still; returns its name |
-| `GET /api/captures`, `GET`/`DELETE /api/captures/{name}` | Saved captures |
+| `GET /api/captures`, `GET`/`DELETE /api/captures/{name}` | Saved captures and recordings (range requests supported) |
+| `GET /api/record` | Recording status, available encoders, and the presets |
+| `POST /api/record/start` `[{"preset": "smooth" \| "detailed" \| "timelapse"}]`, `POST /api/record/stop` | Record video or a timelapse (below) |
 | `POST /api/white-balance` `{"region": {x,y,width,height} \| null}` | One-shot white balance over a region of the displayed image (normalised 0..1) |
 | `POST /api/roi` `{"region": … \| null}` | Set or clear the sensor ROI from a region of the displayed image |
-| `WS /api/ws` | Pushes `state`, `stats` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
+| `WS /api/ws` | Pushes `state`, `stats`, `record` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
 | `PUT /api/display`, `DELETE /api/display` | Cast to the display / stop casting (see below) |
 | `GET /api/display`, `/api/display/content`, `/api/display/events` | What is being cast, its content, and server-sent `display` events on every change |
+
+### Recording
+
+Recordings are H.264 MP4 files saved with the captures, so any browser can play them
+from the web UI. The `record` settings say how; three presets fill them in:
+
+| Preset | |
+| --- | --- |
+| `smooth` | The stream as it is, up to 1280×960 at 30 fps |
+| `detailed` | Switches to the next larger stream size while recording, up to 1920×1080 at 15 fps |
+| `timelapse` | One frame every 10 s, played back at 30 fps; optionally every frame saved as a still too (`timelapseStills`) |
+
+Files are written as fragmented MP4, so a recording cut short by a crash or power loss
+still plays up to its last second or so.
+
+Encoding needs an H.264 encoder. The Raspberry Pi 4's hardware encoder is used where
+present (coming soon). Builds with the `openh264` feature (`cargo build --features
+openh264`) encode in software anywhere; the release binaries don't include it. Without
+an encoder, timelapses can still save stills.
 
 ### Casting to the display
 

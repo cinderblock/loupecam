@@ -121,9 +121,9 @@ work in both the camera view and cast content.
 ## Plan / steps
 
 1. ✅ Casting API + display token (server) and the `/cast` page (web).
-2. **← current** Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
+2. ✅ Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
    dev backend, recorder actor, API, timelapse.
-3. Web UI: record button and mode picker, Gallery video playback, touch gestures in
+3. **← current** Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
 4. Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
 5. Chromium override (cage handoff).
@@ -134,6 +134,11 @@ work in both the camera view and cast content.
 
 ## Findings / gotchas
 
+- The recorder develops frames itself, independently of the preview, so recording and
+  watching both develop each frame. Fine on a desktop; on the Pi 4 measure it, and if
+  it's CPU-bound, share the preview's developed image when the sizes match.
+- Captures are now served with `tower_http::services::ServeFile` (range requests), so
+  `<video>` can seek and big files aren't read into memory.
 - Cast HTML/SVG is served with `Content-Security-Policy: sandbox allow-scripts`, so its
   scripts get an opaque origin and can't use the camera-token cookie. PDFs aren't
   sandboxed (Chromium's PDF viewer refuses to load under a CSP sandbox).
@@ -151,7 +156,10 @@ work in both the camera view and cast content.
 - [x] Casting API + display token + `/cast` page: `PUT/DELETE/GET /api/display`,
       `/content`, `/events` (SSE), WebSocket `display` message, mDNS `cast` TXT key,
       `--display-token`. Checked end to end with curl in both auth modes.
-- [ ] Recording: muxer, encoder trait, openh264, recorder, API, timelapse
+- [x] Recording: muxer, encoder trait, openh264, recorder, API, timelapse. Tests: an
+      openh264 → fMP4 round trip checked by ffprobe/ffmpeg (including a file truncated
+      mid-way), and the full recorder fed synthetic raw frames (video, timelapse with
+      stills).
 - [ ] Web UI: record, gallery video, touch viewer
 - [ ] Native kiosk: window backend
 - [ ] Native kiosk: DRM + evdev

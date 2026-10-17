@@ -64,7 +64,7 @@ pub fn save(c: &Captured, dir: &Path) -> anyhow::Result<CaptureInfo> {
 }
 
 /// `stem`, or `stem-2`, `stem-3`… if a file with that stem already exists.
-fn unique_stem(dir: &Path, stem: &str, ext: &str) -> String {
+pub(crate) fn unique_stem(dir: &Path, stem: &str, ext: &str) -> String {
     let exists = |s: &str| dir.join(format!("{s}.{ext}")).exists();
     if !exists(stem) {
         return stem.to_string();
@@ -80,7 +80,7 @@ pub struct CaptureEntry {
     pub modified: String,
 }
 
-/// Image files in `dir`, newest first.
+/// Image and video files in `dir`, newest first.
 pub fn list(dir: &Path) -> std::io::Result<Vec<CaptureEntry>> {
     let mut v = Vec::new();
     let rd = match std::fs::read_dir(dir) {
@@ -91,7 +91,7 @@ pub fn list(dir: &Path) -> std::io::Result<Vec<CaptureEntry>> {
     for e in rd.flatten() {
         let name = e.file_name().to_string_lossy().into_owned();
         let lower = name.to_ascii_lowercase();
-        if !(lower.ends_with(".png") || lower.ends_with(".jpg") || lower.ends_with(".tiff") || lower.ends_with(".tif")) {
+        if ![".png", ".jpg", ".tiff", ".tif", ".mp4"].iter().any(|e| lower.ends_with(e)) {
             continue;
         }
         let md = e.metadata()?;

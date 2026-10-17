@@ -14,6 +14,7 @@ pub mod geometry;
 pub mod http;
 pub mod mdns;
 pub mod preview;
+pub mod record;
 pub mod service;
 pub mod settings;
 pub mod updates;
@@ -76,6 +77,7 @@ pub struct AppState {
     pub preview: Arc<preview::Preview>,
     pub updates: Arc<updates::Updates>,
     pub calibration: Arc<calibration::runner::Runner>,
+    pub recorder: Arc<record::Recorder>,
     pub token: Option<Arc<str>>,
     pub display_token: Option<Arc<str>>,
     pub casting: Arc<cast::Casting>,
@@ -135,8 +137,10 @@ impl Server {
         let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
         let token = cfg.token.is_some();
         let cast_token = cfg.display_token.is_some();
+        let recorder = record::Recorder::new(service.clone(), cfg.captures_dir.clone());
         let state = AppState {
             calibration,
+            recorder,
             service,
             preview,
             updates,
@@ -185,6 +189,8 @@ impl Server {
         if let Some(a) = self.announcer {
             a.stop().await;
         }
+        // Finish any recording before the camera goes away.
+        self.state.recorder.stop().await;
         let _ = self.shutdown.send(());
         let r = self.task.await.map_err(std::io::Error::other)?;
         let service = self.state.service.clone();

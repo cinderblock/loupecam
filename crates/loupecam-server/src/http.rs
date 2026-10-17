@@ -46,6 +46,9 @@ pub fn router(state: AppState) -> Router {
         .route("/capture", post(capture))
         .route("/captures", get(list_captures))
         .route("/captures/{name}", get(get_capture).delete(delete_capture))
+        .route("/record", get(record_get))
+        .route("/record/start", post(record_start))
+        .route("/record/stop", post(record_stop))
         .route("/white-balance", post(white_balance))
         .route("/roi", post(set_roi))
         .route("/update", get(update_status))
@@ -154,11 +157,12 @@ async fn list_captures(State(s): State<AppState>) -> ApiResult<Json<Vec<captures
         .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))
 }
 
-async fn get_capture(State(s): State<AppState>, Path(name): Path<String>) -> ApiResult<Response> {
+/// A saved capture, with range requests (so videos can be seeked while streaming).
+async fn get_capture(State(s): State<AppState>, Path(name): Path<String>, req: Request) -> ApiResult<Response> {
+    use tower::ServiceExt;
     let path = captures::resolve(&s.captures_dir, &name).ok_or(ApiError(StatusCode::NOT_FOUND, "no such capture".into()))?;
-    let bytes = tokio::fs::read(&path).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
-    let mime = mime_guess::from_path(&path).first_or_octet_stream();
-    Ok(([(header::CONTENT_TYPE, mime.as_ref().to_string())], bytes).into_response())
+    let r = tower_http::services::ServeFile::new(path).oneshot(req).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    Ok(r.map(Body::new))
 }
 
 async fn delete_capture(State(s): State<AppState>, Path(name): Path<String>) -> ApiResult<StatusCode> {
@@ -273,6 +277,39 @@ async fn calibration_delete(State(s): State<AppState>, Path(section): Path<Strin
     Ok(StatusCode::NO_CONTENT)
 }
 
+async fn record_get(State(s): State<AppState>) -> Json<serde_json::Value> {
+    let current = s.service.shared.state.borrow().settings.record.clone();
+    let presets: serde_json::Map<_, _> = crate::settings::RecordPreset::ALL
+        .iter()
+        .map(|p| (serde_json::to_value(p).unwrap().as_str().unwrap().to_string(), serde_json::to_value(p.settings(&current)).unwrap()))
+        .collect();
+    Json(json!({ "status": &*s.recorder.status.borrow(), "presets": presets }))
+}
+
+#[derive(Deserialize, Default)]
+struct RecordStart {
+    /// Switch the record settings to this preset first.
+    preset: Option<crate::settings::RecordPreset>,
+}
+
+/// Start recording with the `record` settings (optionally switching to a preset first).
+async fn record_start(State(s): State<AppState>, body: Option<Json<RecordStart>>) -> ApiResult<Json<crate::record::Recording>> {
+    if let Some(p) = body.and_then(|Json(b)| b.preset) {
+        let current = s.service.shared.state.borrow().settings.record.clone();
+        let settings = s.service.patch(json!({ "record": p.settings(&current) })).await.map_err(bad)?;
+        s.persist(&settings);
+    }
+    s.recorder.start().await.map(Json).map_err(|e| ApiError(StatusCode::CONFLICT, e))
+}
+
+/// Stop recording; returns the finished recording (204 if nothing was recording).
+async fn record_stop(State(s): State<AppState>) -> Response {
+    match s.recorder.stop().await {
+        Some(r) => Json(r).into_response(),
+        None => StatusCode::NO_CONTENT.into_response(),
+    }
+}
+
 async fn display_get(State(s): State<AppState>) -> Json<serde_json::Value> {
     Json(json!({ "cast": s.casting.info() }))
 }
@@ -385,7 +422,8 @@ impl Drop for TargetGuard {
 }
 
 /// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s,
-/// `{"type":"update",…}`, `{"type":"calibration",…}`, `{"type":"display","cast":…}`
+/// `{"type":"update",…}`, `{"type":"calibration",…}`, `{"type":"record",…}`,
+/// `{"type":"display","cast":…}`
 /// (see [`display_get`]) and, after the client sends
 /// `{"type":"preview","enabled":true}`, binary JPEG frames. A client that sends
 /// `{"type":"target"}` becomes a screen target: it receives
@@ -404,6 +442,8 @@ async fn ws_session(socket: WebSocket, app: AppState) {
     let mut show = hub.show.subscribe();
     let mut casting = app.casting.current.subscribe();
     casting.mark_changed();
+    let mut record = app.recorder.status.subscribe();
+    record.mark_changed();
     let mut target: Option<TargetGuard> = None;
     let mut viewer = None;
     let msg = |kind: &str, v: serde_json::Value| {
@@ -432,6 +472,10 @@ async fn ws_session(socket: WebSocket, app: AppState) {
             r = calib.changed() => {
                 if r.is_err() { break }
                 msg("calibration", serde_json::to_value(&*calib.borrow_and_update()).unwrap())
+            }
+            r = record.changed() => {
+                if r.is_err() { break }
+                msg("record", serde_json::to_value(&*record.borrow_and_update()).unwrap())
             }
             r = casting.changed() => {
                 if r.is_err() { break }

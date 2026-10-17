@@ -11,6 +11,9 @@ rust-version.workspace = true
 default = []
 # Embed the built web UI (apps/web/dist) into the binary.
 embed-ui = ["dep:rust-embed"]
+# Software H.264 encoding with openh264 (C++, compiled from source). For development and
+# platforms without a hardware encoder; not in the musl release builds.
+openh264 = ["dep:openh264"]
 
 [dependencies]
 loupecam.workspace = true
@@ -19,6 +22,8 @@ loupecam-update.workspace = true
 tokio.workspace = true
 axum.workspace = true
 tower-http.workspace = true
+tower.workspace = true
+openh264 = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 bytes.workspace = true
