@@ -19,6 +19,19 @@ name: Release
 #        APPLE_API_ISSUER, APPLE_API_KEY (key id), APPLE_API_PRIVATE_KEY (.p8 contents).
 #   3. Integrity (always): SHA256SUMS and GitHub build-provenance attestations
 #      (`gh attestation verify <file> -R cinderblock/loupecam`).
+#
+# Package registries, once the GitHub release is live, each gated on a repository
+# variable so a release works before (or without) the registry accounts:
+#   - crates.io (PUBLISH_CRATES=true): loupecam-protocol, loupecam, loupecam-isp. Trusted
+#     publishing (OIDC); a new crate can't be created that way, so the first release
+#     needs the secret CARGO_REGISTRY_TOKEN (delete it afterwards).
+#   - PyPI (PUBLISH_PYPI=true): the `loupecam` wheels and sdist, by trusted publishing
+#     (a "pending publisher" works for the first release). Environment `pypi`.
+#   - npm (PUBLISH_NPM=true): `loupecam` and its per-platform addon packages, with
+#     provenance. Trusted publishing once the packages exist; the first release needs
+#     the secret NPM_TOKEN.
+# Every registry step skips versions already published, so re-running is safe.
+# docs/releasing.md has the account setup.
 
 on:
   push:
@@ -235,8 +248,169 @@ jobs:
           printf '%s\n' "${files[@]}"
           gh release upload "$TAG" "${files[@]}" --clobber
 
+  # The C API: a zip per platform with the header, shared + static libraries, and the
+  # system libraries a static link needs.
+  capi:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: windows-latest, target: aarch64-pc-windows-msvc }
+          # The oldest supported Ubuntu, for the widest glibc compatibility.
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-22.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    env:
+      WINDOWS_SIGN_COMMAND: ${{ vars.WINDOWS_SIGN_COMMAND }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: bash .github/scripts/set-version.sh
+        shell: bash
+      - name: Build
+        shell: bash
+        run: |
+          cargo rustc --release --locked -p loupecam-capi --target ${{ matrix.target }} \
+            --crate-type cdylib,staticlib -- --print native-static-libs 2>&1 | tee build.log
+          sed -n 's/.*native-static-libs: //p' build.log | head -1 > native-static-libs.txt
+          cat native-static-libs.txt
+      - name: Stage
+        shell: bash
+        run: |
+          t=${{ matrix.target }}
+          dir="loupecam-c-$t"
+          rel="target/$t/release"
+          mkdir -p "$dir/include" "$dir/lib"
+          cp bindings/c/include/loupecam.h "$dir/include/"
+          case "$t" in
+            *windows*) cp "$rel/loupecam_c.dll" "$rel/loupecam_c.dll.lib" "$rel/loupecam_c.lib" "$dir/lib/" ;;
+            *apple*) cp "$rel/libloupecam_c.dylib" "$rel/libloupecam_c.a" "$dir/lib/" ;;
+            *) cp "$rel/libloupecam_c.so" "$rel/libloupecam_c.a" "$dir/lib/" ;;
+          esac
+          cp -r bindings/c/examples "$dir/"
+          cp native-static-libs.txt bindings/c/README.md LICENSE-MIT LICENSE-APACHE "$dir/"
+          echo "DIR=$dir" >> "$GITHUB_ENV"
+      - name: Authenticode
+        if: runner.os == 'Windows' && env.WINDOWS_SIGN_COMMAND != ''
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          bash .github/scripts/windows-sign.sh setup
+          bash .github/scripts/windows-sign.sh "$DIR/lib/loupecam_c.dll"
+      - name: Zip
+        shell: bash
+        run: |
+          if command -v zip >/dev/null; then zip -qr "$DIR.zip" "$DIR"; else 7z a -bd "$DIR.zip" "$DIR"; fi
+          echo "ASSET=$DIR.zip" >> "$GITHUB_ENV"
+      - uses: oven-sh/setup-bun@v2
+      - name: Update signature and upload
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          (cd apps/desktop && bun install --frozen-lockfile && bunx tauri signer sign "../../$ASSET")
+          gh release upload "$TAG" "$ASSET" "$ASSET.sig" --clobber
+
+  # Python wheels (abi3: one per platform covers every CPython 3.10+) and the sdist,
+  # for PyPI.
+  wheels:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: windows-latest, target: aarch64-pc-windows-msvc }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, manylinux: auto }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu, manylinux: auto }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-musl, manylinux: musllinux_1_2 }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-musl, manylinux: musllinux_1_2 }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: bash .github/scripts/set-version.sh
+        shell: bash
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux || 'off' }}
+          args: --release --locked --out dist --manifest-path bindings/python/Cargo.toml
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.target }}
+          path: dist
+
+  sdist:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: bash .github/scripts/set-version.sh
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist --manifest-path bindings/python/Cargo.toml
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-sdist
+          path: dist
+
+  # The Node.js addon for each platform, for npm.
+  node-addons:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: windows-latest, target: aarch64-pc-windows-msvc }
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-22.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: bash .github/scripts/set-version.sh
+        shell: bash
+      - uses: oven-sh/setup-bun@v2
+      - working-directory: bindings/node
+        run: |
+          bun install --frozen-lockfile
+          bunx napi build --platform --release --target ${{ matrix.target }} --js native.js --dts native.d.ts
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-${{ matrix.target }}
+          path: bindings/node/*.node
+
   publish:
-    needs: [prepare, cli, desktop]
+    needs: [prepare, cli, desktop, capi]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -291,3 +465,103 @@ jobs:
           else
             gh release edit "$TAG" --draft=false --latest
           fi
+
+  # --- Package registries (after the GitHub release is live) -------------------------
+
+  crates:
+    needs: [prepare, publish]
+    if: vars.PUBLISH_CRATES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HAS_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: bash .github/scripts/set-version.sh
+      # Trusted publishing, unless a token is set (needed to create the crates).
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+        if: env.HAS_TOKEN != 'true'
+      - run: bash .github/scripts/publish-crates.sh
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN || steps.auth.outputs.token }}
+
+  pypi:
+    needs: [prepare, publish, wheels, sdist]
+    if: vars.PUBLISH_PYPI == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/loupecam/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+      - run: ls -l dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+  npm:
+    needs: [prepare, publish, node-addons]
+    if: vars.PUBLISH_NPM == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: bindings/node
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: bash .github/scripts/set-version.sh
+        working-directory: .
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing (OIDC) needs npm 11.5.1 or later.
+      - run: npm install -g npm@latest
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: node-*
+          path: bindings/node/artifacts
+      - name: Assemble the packages
+        run: |
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          bunx napi create-npm-dirs
+          bunx napi artifacts -d artifacts
+          # optionalDependencies on the platform packages, which are published below.
+          bunx napi pre-publish -t npm --skip-optional-publish
+          cat package.json
+      - name: Publish
+        env:
+          # Only for the first release; afterwards trusted publishing (OIDC) is used.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+        run: |
+          tag=$([ "$PRERELEASE" = true ] && echo next || echo latest)
+          publish() { # directory
+            name=$(node -p "require('./$1/package.json').name")
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+              echo "$name@$VERSION is already on npm; skipping"
+            else
+              (cd "$1" && npm publish --provenance --access public --tag "$tag")
+            fi
+          }
+          for d in npm/*/; do publish "${d%/}"; done
+          publish .

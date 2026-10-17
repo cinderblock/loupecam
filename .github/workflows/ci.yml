@@ -57,6 +57,69 @@ jobs:
             target/release/loupecam
             target/release/loupecam.exe
 
+  # Language bindings (bindings/): each is built and tested against the simulated
+  # camera, the way a user installs it.
+  python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+        # The oldest supported (the abi3 floor) and the newest.
+        python: ['3.10', '3.14']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      # Through pip and the sdist-style build, as `pip install` from source does.
+      - run: python -m pip install ./bindings/python[test] pillow mypy
+        shell: bash
+      - run: python -m pytest -v bindings/python/tests
+      - run: python -m mypy.stubtest loupecam._native --allowlist bindings/python/tests/stubtest-allowlist.txt
+
+  node:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: bindings/node
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      # The committed loader and typings must match the Rust source.
+      - run: git diff --exit-code -- native.js native.d.ts
+      - run: bun run test
+      - run: bun run typecheck
+
+  capi:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # The header check runs with the workspace tests (rust job); this compiles and
+      # runs the C example against the library.
+      - run: bash bindings/c/test.sh
+        shell: bash
+
   desktop:
     needs: web
     strategy:
