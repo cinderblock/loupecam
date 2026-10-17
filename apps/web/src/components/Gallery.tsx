@@ -16,12 +16,13 @@ export function Gallery({ version, canDelete }: { version: number | string; canD
     <ul className="gallery">
       {items.slice(0, 50).map((c) => (
         <li key={c.name}>
-          <a href={api.captureUrl(c.name)} target="_blank" rel="noreferrer" title={c.name.endsWith('.mp4') ? 'Play' : 'Open'}>
+          <a href={api.captureUrl(c.name, c.location)} target="_blank" rel="noreferrer" title={c.name.endsWith('.mp4') ? 'Play' : 'Open'}>
             {c.name.endsWith('.mp4') ? '▶ ' : ''}
             {c.name}
+            {c.location === 'usb' && <span className="badge" title="On the USB stick">USB</span>}
           </a>
           <span className="muted">{formatBytes(c.bytes)}</span>
-          <a href={api.captureUrl(c.name)} download={c.name} title="Download">
+          <a href={api.captureUrl(c.name, c.location)} download={c.name} title="Download">
             ⤓
           </a>
           {canDelete && (
@@ -31,7 +32,7 @@ export function Gallery({ version, canDelete }: { version: number | string; canD
             question="Delete?"
             yes="Delete"
             onConfirm={async () => {
-              await api.deleteCapture(c.name).catch(() => {})
+              await api.deleteCapture(c.name, c.location).catch(() => {})
               refresh()
             }}
           >

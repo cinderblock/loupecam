@@ -118,6 +118,24 @@ work in both the camera view and cast content.
   - With no encoder available, timelapse still works as a still sequence; video modes
     report "no H.264 encoder on this host".
 
+### USB stick storage (added 2026-10-17)
+
+- `storage.usb` setting: `off` (internal), `whenAvailable` (stick if inserted, else
+  internal), `always` (stick only; capture/record fail with "No USB stick…").
+- The server looks for the stick at `--usb-dir` (default on Linux `/media/loupecam/usb`;
+  `none` disables). Presence comes from `/proc/self/mountinfo` (an autofs trap counts),
+  so polling doesn't keep the automount busy. Files go in `LoupeCam/` on the stick.
+  Elsewhere (Windows dev) presence = the directory exists.
+- Captures list both locations with `location`; get/delete take `?location=`. A
+  recording picks its location at start.
+- With `always` and no stick, the kiosk greys out Snap/Record under a "No USB stick" box
+  with **Save on this device**; the web UI does the same in its toolbar. That choice
+  sends `location=internal` per request (the setting isn't changed) and lasts until a
+  stick is inserted. A running recording is never covered (Stop stays reachable).
+- Packaging: `99-loupecam-usb.rules` runs `systemd-mount --automount=yes
+  --timeout-idle-sec=2s --owner=loupecam` for FAT32/exFAT sticks;
+  `loupecam.service` gets `ReadWritePaths=-/media/loupecam`.
+
 ## Plan / steps
 
 1. ✅ Casting API + display token (server) and the `/cast` page (web).
@@ -147,6 +165,9 @@ work in both the camera view and cast content.
   sends it (falling back to `LOUPECAM_TOKEN`). On 409 (setup not done) the kiosk shows
   "Finish setting up LoupeCam: open http://<host>.local/ in a browser".
 
+- The exFAT kernel driver has no `flush` mount option (vfat does), so the udev rule
+  mounts them with separate rules. ext4 sticks aren't automounted: the files' owner is
+  on disk, so the server's user couldn't write without chowning the stick.
 - `serve --simulate-camera` (hidden flag; `loupecam::sim::SimCamera`) streams a
   synthetic specimen through the real pipeline, so the kiosk, recording and web UI can
   be developed with no camera attached.
@@ -209,7 +230,13 @@ work in both the camera view and cast content.
 - [x] Packaging + README: `loupecam-kiosk.service`, backlight udev rule,
       `install.sh --kiosk [--rotate N] [--no-browser]`, release/CI features, README
       sections (kiosk, casting, recording).
-- [ ] Tested on Pi 4 + display
+- [x] USB stick storage: server, web UI, kiosk, packaging. Checked on Windows with a
+      folder standing in for the stick (all three modes, fallback, listing, fetch by
+      location; kiosk shows "No USB stick!" and the capture error).
+- [ ] Tested on Pi 4 + display (now including: a stick automounts, the sandboxed
+      service can write to it through `ReadWritePaths=-/media/loupecam` (mount
+      propagation into the service's namespace is the unverified part), idle unmount,
+      pulling the stick mid-recording fails the recording cleanly)
 
 ## Open questions for the user
 

@@ -600,3 +600,23 @@ button.danger {
   border-color: #e5484d;
   background: #4a1d20;
 }
+
+.badge {
+  margin-left: 6px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.usb-blocked {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid #e5484d;
+  border-radius: 4px;
+  color: #ff8a8d;
+  font-weight: 600;
+}

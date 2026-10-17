@@ -1,0 +1,9 @@
+# Mount a USB stick for LoupeCam captures at /media/loupecam/usb, owned by the
+# `loupecam` user, whenever one is plugged in. The server saves there when its
+# `storage.usb` setting says so.
+#
+# Mounted on demand and unmounted after 2 s idle (an automount), so a stick pulled
+# between captures was cleanly unmounted. FAT32 and exFAT, the usual formats for
+# sticks; other filesystems are left alone. Only one stick is used at a time.
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_FS_TYPE}=="vfat", RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes --timeout-idle-sec=2s --collect --owner=loupecam --options=noexec,nosuid,nodev,flush,umask=0022 $devnode /media/loupecam/usb"
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_FS_TYPE}=="exfat", RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes --timeout-idle-sec=2s --collect --owner=loupecam --options=noexec,nosuid,nodev,umask=0022 $devnode /media/loupecam/usb"

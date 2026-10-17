@@ -4,7 +4,7 @@
 //! Immediate mode: [`App::draw`] paints everything and records each control's hit
 //! rectangle; touches are routed against the rectangles from the last draw.
 
-use crate::client::{CamState, CastInfo, Client, Command, RecordStatus, ServerEvent, Stats};
+use crate::client::{CamState, CastInfo, Client, Command, RecordStatus, ServerEvent, Stats, StorageStatus};
 use crate::gfx::{self, Align, Fonts};
 use crate::view::ZoomView;
 use serde_json::json;
@@ -35,6 +35,9 @@ enum Action {
     Grid,
     Crosshair,
     Preset(&'static str),
+    Storage(&'static str),
+    /// Save on this device for now, though the setting says USB only.
+    SaveLocally,
     StopCast,
     Slider(SliderKind),
 }
@@ -46,6 +49,7 @@ enum SliderKind {
 }
 
 const PRESETS: [(&str, &str); 3] = [("smooth", "Smooth"), ("detailed", "Detailed"), ("timelapse", "Timelapse")];
+const STORAGE: [(&str, &str); 3] = [("off", "This device"), ("whenAvailable", "USB if inserted"), ("always", "USB only")];
 const EXPOSURE_RANGE: (f32, f32) = (50.0, 2_000_000.0);
 
 /// A finger on the screen, and what it's doing.
@@ -75,6 +79,10 @@ pub struct App {
     state: Option<CamState>,
     stats: Stats,
     record: RecordStatus,
+    storage: StorageStatus,
+    /// The user chose to save on this device while no stick is in ("USB only" setting).
+    /// Ends when a stick appears.
+    save_locally: bool,
     cast: Option<CastInfo>,
     /// The current cast, rendered (when the kiosk can show it natively).
     cast_image: Option<Pixmap>,
@@ -112,6 +120,8 @@ impl App {
             state: None,
             stats: Stats::default(),
             record: RecordStatus::default(),
+            storage: StorageStatus::default(),
+            save_locally: false,
             cast: None,
             cast_image: None,
             frame: None,
@@ -208,6 +218,12 @@ impl App {
                     self.toast(format!("Recording stopped: {e}"));
                 }
                 self.record = r;
+            }
+            ServerEvent::Storage(s) => {
+                if s.usb_present {
+                    self.save_locally = false;
+                }
+                self.storage = s;
             }
             ServerEvent::Cast(c) => {
                 if c.as_ref().map(|c| c.id) != self.cast.as_ref().map(|c| c.id) {
@@ -427,14 +443,18 @@ impl App {
         match a {
             Action::Snap => {
                 self.flash = Some(Instant::now());
-                self.client.send(Command::Capture);
+                self.client.send(Command::Capture { local: self.save_locally });
             }
             Action::Record => {
                 if self.record.active.is_some() {
                     self.client.send(Command::StopRecording);
                 } else {
-                    self.client.send(Command::StartRecording(None));
+                    self.client.send(Command::StartRecording { preset: None, local: self.save_locally });
                 }
+            }
+            Action::SaveLocally => {
+                self.save_locally = true;
+                self.toast("Saving on this device until a USB stick is inserted".into());
             }
             Action::CyclePreset => {
                 let cur = settings.map_or("smooth", |s| s.record.preset.as_str());
@@ -453,6 +473,12 @@ impl App {
                 self.client.send(Command::Patch(json!({ "autoExposure": on })));
             }
             Action::WhiteBalance => self.client.send(Command::WhiteBalance),
+            Action::Storage(m) => {
+                self.client.send(Command::Patch(json!({ "storage": { "usb": m } })));
+                if let Some(s) = self.state.as_mut() {
+                    s.settings.storage.usb = m.to_string();
+                }
+            }
             Action::ToggleSettings => self.settings_open = !self.settings_open,
             Action::Fit => self.view_mut().fit(),
             Action::Grid => self.grid = !self.grid,
@@ -605,12 +631,20 @@ impl App {
             _ => "No camera".to_string(),
         };
         self.fonts.draw_fit(pm, &status, x, y + 14.0, 13.0, false, gfx::muted(), Align::Left, w);
-        let top = y + 26.0;
+        let mut top = y + 26.0;
+        // Where captures go, when a USB stick is part of it.
+        if let Some((text, warn)) = self.storage_line(&settings.storage.usb) {
+            self.fonts.draw_fit(pm, &text, x, top + 12.0, 13.0, warn, if warn { gfx::red() } else { gfx::muted() }, Align::Left, w);
+            top += 18.0;
+        }
 
         // Snap.
+        // "USB stick only" with no stick: saving is blocked (but a recording already
+        // running can still be stopped).
+        let blocked = recording.is_none() && self.usb_required_missing(&settings.storage.usb);
         let snap = cell(0, top, if portrait { 56.0 } else { 80.0 });
-        self.button(pm, snap, "", Action::Snap, false, streaming);
-        gfx::camera_icon(pm, snap.x() + snap.width() / 2.0, snap.y() + snap.height() / 2.0 - 8.0, 30.0, if streaming { gfx::text() } else { gfx::muted() });
+        self.button(pm, snap, "", Action::Snap, false, streaming && !blocked);
+        gfx::camera_icon(pm, snap.x() + snap.width() / 2.0, snap.y() + snap.height() / 2.0 - 8.0, 30.0, if streaming && !blocked { gfx::text() } else { gfx::muted() });
         self.fonts.draw(pm, "Snap", snap.x() + snap.width() / 2.0, snap.bottom() - 10.0, 14.0, true, gfx::text(), Align::Center);
 
         // Record / stop.
@@ -620,7 +654,7 @@ impl App {
             Some(r) => duration_label(r.seconds),
             None => String::new(),
         };
-        self.button(pm, rec, "", Action::Record, recording.is_some(), streaming || recording.is_some());
+        self.button(pm, rec, "", Action::Record, recording.is_some(), (streaming && !blocked) || recording.is_some());
         let (cx, cy) = (rec.x() + rec.width() / 2.0, rec.y() + rec.height() / 2.0 - 8.0);
         if recording.is_some() {
             gfx::fill_rect(pm, cx - 11.0, cy - 11.0, 22.0, 22.0, gfx::red());
@@ -628,6 +662,20 @@ impl App {
         } else {
             gfx::fill_circle(pm, cx, cy, 13.0, gfx::red());
             self.fonts.draw(pm, "Record", cx, rec.bottom() - 10.0, 14.0, true, gfx::text(), Align::Center);
+        }
+
+        if blocked {
+            // Cover Snap and Record with the reason and the way out.
+            let (l, t) = (snap.left().min(rec.left()), snap.top().min(rec.top()));
+            let (r, b) = (snap.right().max(rec.right()), snap.bottom().max(rec.bottom()));
+            let cover = Rect::from_ltrb(l, t, r, b).unwrap();
+            gfx::fill_round_rect(pm, cover, 10.0, gfx::rgba(20, 22, 25, 255));
+            gfx::stroke_round_rect(pm, cover, 10.0, 1.5, gfx::red());
+            let cx = cover.x() + cover.width() / 2.0;
+            self.fonts.draw_fit(pm, "No USB stick", cx, cover.y() + 34.0, 18.0, true, gfx::red(), Align::Center, cover.width() - 16.0);
+            self.fonts.draw_fit(pm, "Insert one to save to it", cx, cover.y() + 56.0, 13.0, false, gfx::muted(), Align::Center, cover.width() - 16.0);
+            let b = Rect::from_xywh(cover.x() + 8.0, cover.bottom() - 60.0, cover.width() - 16.0, 52.0).unwrap();
+            self.button(pm, b, "Save on this device", Action::SaveLocally, false, true);
         }
 
         // Record mode.
@@ -683,6 +731,17 @@ impl App {
             y += 20.0;
         }
 
+        // Where captures go (when this server can use a USB stick).
+        if self.storage.usb_dir.is_some() {
+            self.fonts.draw(pm, "Save to", x, y + 26.0, 15.0, true, gfx::text(), Align::Left);
+            let seg_w = (w - 90.0) / 3.0;
+            for (i, (key, label)) in STORAGE.iter().enumerate() {
+                let b = Rect::from_xywh(x + 90.0 + seg_w * i as f32, y, seg_w - 4.0, 40.0).unwrap();
+                self.button(pm, b, label, Action::Storage(key), settings.storage.usb == *key, true);
+            }
+            y += 52.0;
+        }
+
         // Record mode.
         self.fonts.draw(pm, "Record", x, y + 26.0, 15.0, true, gfx::text(), Align::Left);
         let seg_x = x + 90.0;
@@ -705,6 +764,28 @@ impl App {
         if let Some(e) = self.record.encoders.is_empty().then_some("This server has no H.264 encoder: only timelapse stills can be recorded.") {
             self.fonts.draw_fit(pm, e, x, y + 10.0, 13.0, false, gfx::muted(), Align::Left, w);
         }
+    }
+
+    /// The side panel's storage line: (text, whether it's a problem). `None` when captures
+    /// simply go to internal storage.
+    fn storage_line(&self, mode: &str) -> Option<(String, bool)> {
+        self.storage.usb_dir.as_ref()?;
+        let present = self.storage.usb_present;
+        if self.save_locally && !present {
+            return Some(("No USB stick: saving here".into(), false));
+        }
+        match mode {
+            "always" if !present => Some(("No USB stick!".into(), true)),
+            "always" | "whenAvailable" if present => Some(("Saving to USB stick".into(), false)),
+            "whenAvailable" => Some(("No USB stick: saving here".into(), false)),
+            _ => None,
+        }
+    }
+
+    /// The setting requires a USB stick, there's none, and the user hasn't chosen to save
+    /// here instead.
+    fn usb_required_missing(&self, mode: &str) -> bool {
+        mode == "always" && self.storage.usb_dir.is_some() && !self.storage.usb_present && !self.save_locally
     }
 
     #[allow(clippy::too_many_arguments)]

@@ -144,6 +144,10 @@ pub fn paint(color: Color) -> Paint<'static> {
 }
 
 pub fn fill_round_rect(pm: &mut Pixmap, r: Rect, radius: f32, color: Color) {
+    // Nothing to fill (e.g. a slider at its minimum); tiny-skia would warn.
+    if r.width() < 0.5 || r.height() < 0.5 {
+        return;
+    }
     if let Some(path) = round_rect(r.x(), r.y(), r.width(), r.height(), radius) {
         pm.fill_path(&path, &paint(color), FillRule::Winding, Transform::identity(), None);
     }

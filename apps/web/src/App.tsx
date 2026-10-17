@@ -64,6 +64,14 @@ function CameraApp({ access }: { access: AccessState }) {
     window.setTimeout(() => setToast((t) => (t === m ? null : t)), 4000)
   }, [])
   const cam = useCamera(flash)
+  // "USB stick only" with no stick blocks saving, until a stick is inserted or the user
+  // chooses to save on this device for now (which lasts until the next stick).
+  const [localSince, setLocalSince] = useState<number | null>(null)
+  const usbPresent = cam.storage?.usbPresent ?? false
+  const saveLocally = localSince === cam.usbInsertions && !usbPresent
+  const usbBlocked = cam.state?.settings.storage.usb === 'always' && !!cam.storage?.usbDir && !usbPresent && !saveLocally
+  const saveTo = saveLocally ? ('internal' as const) : undefined
+
   // The gallery also refreshes when a recording finishes.
   const lastRecording = cam.record?.last?.started ?? ''
   // Calibrated scale presets (refreshed when a calibration step finishes).
@@ -76,18 +84,18 @@ function CameraApp({ access }: { access: AccessState }) {
   }, [calibAt, serial])
 
   const capture = useCallback(async () => {
-    if (busy) return
+    if (busy || usbBlocked) return
     setBusy(true)
     try {
-      const c = await api.capture()
-      flash(`Saved ${c.name} (${c.width}×${c.height}, ${formatExposure(c.exposureUs)})`)
+      const c = await api.capture(saveTo)
+      flash(`Saved ${c.name}${c.location === 'usb' ? ' to the USB stick' : ''} (${c.width}×${c.height}, ${formatExposure(c.exposureUs)})`)
       setGalleryVersion((v) => v + 1)
     } catch (e) {
       flash(`Capture failed: ${(e as Error).message}`)
     } finally {
       setBusy(false)
     }
-  }, [busy, flash])
+  }, [busy, usbBlocked, flash, saveTo])
 
   const onRegion = async (t: Tool, r: NormRect) => {
     try {
@@ -180,8 +188,16 @@ function CameraApp({ access }: { access: AccessState }) {
                 {k === 'scaleBar' ? 'Scale bar' : k[0].toUpperCase() + k.slice(1)}
               </button>
             ))}
-            <RecordButton status={cam.record} disabled={!dev} onError={flash} />
-            <button className="primary" disabled={busy || !dev} onClick={capture} title="Capture (Space)">
+            {usbBlocked && !cam.record?.active && (
+              <span className="usb-blocked">
+                No USB stick
+                <button onClick={() => setLocalSince(cam.usbInsertions)} title="Save captures and recordings on this device until a USB stick is inserted">
+                  Save on this device
+                </button>
+              </span>
+            )}
+            <RecordButton status={cam.record} disabled={!dev || usbBlocked} location={saveTo} onError={flash} />
+            <button className="primary" disabled={busy || !dev || usbBlocked} onClick={capture} title="Capture (Space)">
               {busy ? 'Capturing…' : 'Capture'}
             </button>
           </div>
@@ -196,7 +212,7 @@ function CameraApp({ access }: { access: AccessState }) {
           {s && <Controls s={s} device={dev} stats={cam.stats} patch={cam.patch} onWhiteBalanceOnce={() => api.whiteBalance(null).catch((e) => flash(e.message))} onClearRoi={() => api.roi(null).catch((e) => flash(e.message))} />}
           {s && (
             <Section title="Capture">
-              <CaptureSettingsPanel s={s} patch={cam.patch} />
+              <CaptureSettingsPanel s={s} storage={cam.storage} patch={cam.patch} admin={isAdmin} />
             </Section>
           )}
           {s && (

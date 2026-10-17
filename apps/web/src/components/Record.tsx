@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { formatBytes, formatDuration } from '../format'
-import type { DeviceSummary, Patch, RecordPreset, RecordSettings, RecordStatus, Settings } from '../types'
+import type { DeviceSummary, Location, Patch, RecordPreset, RecordSettings, RecordStatus, Settings } from '../types'
 import { Segmented, Select, Slider, Toggle } from './widgets'
 
 type Presets = Partial<Record<RecordPreset, RecordSettings>>
@@ -27,14 +27,14 @@ function sizeOptions(r: RecordSettings): [string, string][] {
 }
 
 /** The toolbar's record / stop button, with the elapsed time while recording. */
-export function RecordButton({ status, disabled, onError }: { status: RecordStatus | null; disabled: boolean; onError: (m: string) => void }) {
+export function RecordButton({ status, disabled, location, onError }: { status: RecordStatus | null; disabled: boolean; location?: Location; onError: (m: string) => void }) {
   const [busy, setBusy] = useState(false)
   const active = status?.active
   const toggle = async () => {
     setBusy(true)
     try {
       if (active) await api.stopRecording()
-      else await api.startRecording()
+      else await api.startRecording(undefined, location)
     } catch (e) {
       onError(`Recording: ${(e as Error).message}`)
     } finally {

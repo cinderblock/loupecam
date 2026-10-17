@@ -285,6 +285,29 @@ cargo run -p loupecam-cli -- serve --simulate-camera &
 cargo run -p loupecam-cli --features kiosk-window -- kiosk --window
 ```
 
+### Saving to a USB stick
+
+Captures and recordings can go to a USB stick instead of the server's own storage. The
+**Save to** setting (web UI → Capture, or the kiosk's Settings; `storage.usb` in the API)
+has three choices:
+
+| Choice | `storage.usb` | |
+| --- | --- | --- |
+| This device | `off` | The captures directory (the default) |
+| USB stick, when inserted | `whenAvailable` | The stick if one is in, else the captures directory |
+| USB stick only | `always` | Only the stick. Without one, Snap/Capture and Record are greyed out under a "No USB stick" notice, which offers **Save on this device** until a stick is inserted |
+
+API clients can override the setting per request: `POST /api/capture?location=internal`
+or `POST /api/record/start` with `{"location": "internal"}` (or `"usb"`). Files go in a
+`LoupeCam` folder on the stick. The gallery lists both places (USB files
+are marked) and can download from either. A recording keeps the place it started in.
+
+On Linux the service installer sets this up. A udev rule mounts FAT32 or exFAT sticks
+at `/media/loupecam/usb` when needed, and unmounts them again after 2 s idle, so pulling
+a stick out between captures is safe. Don't pull it during a recording. Elsewhere, point
+`--usb-dir` (or `LOUPECAM_USB_DIR`) at the folder where the stick appears, e.g.
+`E:\` on Windows. `--usb-dir none` turns the feature off.
+
 ### Finding cameras on the network
 
 A server listening beyond loopback announces itself over mDNS / DNS-SD as

@@ -18,6 +18,7 @@ pub mod preview;
 pub mod record;
 pub mod service;
 pub mod settings;
+pub mod storage;
 pub mod updates;
 
 use service::Service;
@@ -62,6 +63,8 @@ pub struct Config {
     pub display_token: Option<String>,
     pub web: WebUi,
     pub captures_dir: PathBuf,
+    /// Where a USB stick for captures appears, if anywhere (see [`storage`]).
+    pub usb_dir: Option<PathBuf>,
     /// Where settings are persisted (JSON). `None` = don't persist.
     pub settings_file: Option<PathBuf>,
     /// Check for and install updates of this executable. Off when something else (the
@@ -76,6 +79,11 @@ pub struct Config {
 impl Config {
     pub fn default_captures_dir() -> PathBuf {
         dirs::picture_dir().unwrap_or_else(|| PathBuf::from(".")).join("LoupeCam")
+    }
+
+    /// Where the Linux packaging automounts a USB stick.
+    pub fn default_usb_dir() -> Option<PathBuf> {
+        cfg!(target_os = "linux").then(|| PathBuf::from("/media/loupecam/usb"))
     }
 
     pub fn default_settings_file() -> Option<PathBuf> {
@@ -108,7 +116,7 @@ pub struct AppState {
     pub display_token: Option<Arc<str>>,
     pub casting: Arc<cast::Casting>,
     pub web: WebUi,
-    pub captures_dir: PathBuf,
+    pub storage: Arc<storage::Storage>,
     settings_file: Option<PathBuf>,
 }
 
@@ -164,7 +172,8 @@ impl Server {
         let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
         let auth = Arc::new(auth::Auth::new(cfg.auth_file, !cfg.listen.ip().is_loopback(), cfg.token, cfg.setup_code).with_kiosk_key(cfg.kiosk_key));
         let cast_token = cfg.display_token.is_some();
-        let recorder = record::Recorder::new(service.clone(), cfg.captures_dir.clone());
+        let storage = storage::Storage::spawn(cfg.captures_dir, cfg.usb_dir);
+        let recorder = record::Recorder::new(service.clone(), storage.clone());
         let state = AppState {
             calibration,
             recorder,
@@ -175,7 +184,7 @@ impl Server {
             display_token: cfg.display_token.map(Into::into),
             casting: Arc::default(),
             web: cfg.web,
-            captures_dir: cfg.captures_dir,
+            storage,
             settings_file: cfg.settings_file,
         };
         let app = http::router(state.clone())

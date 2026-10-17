@@ -22,6 +22,8 @@ RestartSec=2
 StateDirectory=loupecam
 # Self-update replaces the binary in place, then execs it (same PID).
 ReadWritePaths=/opt/loupecam
+# USB sticks for captures are automounted below here (99-loupecam-usb.rules).
+ReadWritePaths=-/media/loupecam
 
 # Port 80 without root.
 AmbientCapabilities=CAP_NET_BIND_SERVICE
