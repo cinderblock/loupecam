@@ -523,7 +523,7 @@ fn access(config_dir: Option<PathBuf>, cmd: AccessCmd) -> Result<()> {
                 return Ok(());
             }
             println!("access: {}", info.access);
-            println!("config: {:?}", info.config);
+            println!("config: {}", format!("{:?}", info.config).to_lowercase());
             print_keys(&a.keys());
         }
         AccessCmd::Reset { yes } => {

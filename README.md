@@ -110,12 +110,51 @@ Stream options: `--size` (0 = largest), `--mode raw8|raw12`, `-e/--exposure` µs
 ## Headless server
 
 ```sh
-loupecam serve --listen 0.0.0.0:8080 --token "$(openssl rand -hex 16)" --web-ui apps/web/dist
+loupecam serve --listen 0.0.0.0:8080 --web-ui apps/web/dist
 ```
 
-The server listens on `127.0.0.1` by default. When exposing it, set a token. Clients send
-it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`), as `?token=…` (for `<img>` and WebSocket), or in an
-`loupecam_token` cookie.
+The server listens on `127.0.0.1` by default, and then needs no protection. When it
+listens on the network, it starts **unconfigured**: the first browser to open it runs
+a short setup that chooses how it's secured. Until then the API answers
+`409 setup required`. To keep a stranger on the network from doing setup first, start
+it with `--setup-code` (a random code, printed at startup) or `--setup-code CODE`;
+setup then asks for the code.
+
+### Access levels
+
+| Level | Watch and use the camera | Change the configuration |
+| --- | --- | --- |
+| Open (not recommended) | anyone | anyone |
+| Configuration protected | anyone | admin password |
+| Configuration locked | anyone | only `loupecam access` on the server |
+| Passworded | access or admin password | admin password, or locked |
+
+"Configuration" covers access and security, updates, calibration and deleting captures.
+Everything else (exposure, white balance, ROI, captures) is "using the camera". Full
+accounts with passkeys (which need HTTPS) are planned.
+
+Browsers log in with a password and get a session cookie. Clients that can't log in
+(Home Assistant, OctoPrint, scripts) use **API keys**, created by an admin under
+*Access & security* (viewer, operator or admin). Send a key as
+`Authorization: Bearer …`, or as `?token=…` where headers are impossible (`<img>`, a
+stream URL, WebSocket). `--token` (or `LOUPECAM_TOKEN`) adds a full-access key from the
+command line; on its own, it replaces setup, as in earlier versions.
+
+On the server itself, `loupecam access` shows and changes all of this, even when the
+configuration is locked:
+
+```sh
+loupecam access show
+loupecam access set --access password --config locked   # asks for the password
+loupecam access create-key --name "Home Assistant" --role view
+loupecam access reset    # forget everything: the next browser runs setup again
+```
+
+They work on the current user's config directory; pass `--config-dir` (or set
+`LOUPECAM_CONFIG_DIR`) for a server running as another user. A running server picks up
+changes within a second. Passwords are stored as Argon2id hashes, and keys and sessions
+as SHA-256 hashes, in `auth.json` next to the settings (readable only by its owner).
+Over plain HTTP, passwords cross the network unencrypted; the setup page says so.
 
 | Endpoint | |
 | --- | --- |
@@ -131,6 +170,11 @@ it as `Authorization: Bearer …` (the token can also come from `LOUPECAM_TOKEN`
 | `WS /api/ws` | Pushes `state`, `stats` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
 | `PUT /api/display`, `DELETE /api/display` | Cast to the display / stop casting (see below) |
 | `GET /api/display`, `/api/display/content`, `/api/display/events` | What is being cast, its content, and server-sent `display` events on every change |
+| `GET /api/access` | Whether setup is needed, the access level, and your role (public) |
+| `POST /api/setup` `{access, config, accessPassword?, adminPassword?, code?}` | First-run setup (once) |
+| `POST /api/login` `{password}`, `POST /api/logout` | Log in (session cookie) / out |
+| `PATCH /api/access`, `POST /api/access/logout-all` | Change the level or passwords; end every session (admin) |
+| `GET`/`POST /api/keys`, `DELETE /api/keys/{id}` | API keys (admin) |
 
 ### Casting to the display
 
@@ -145,10 +189,10 @@ curl -X PUT -H 'Content-Type: application/json' -d '{"url": "https://example.com
 curl -X DELETE http://scope-pi.local/api/display
 ```
 
-Casting is open to anyone who can reach the server, even when `--token` is set. Casting
-grants nothing else: the camera, settings and captures stay behind the token. To
-restrict casting too, set `--display-token` (or `LOUPECAM_DISPLAY_TOKEN`); then casting
-needs either token. Cast HTML and SVG are served sandboxed, so their scripts can't use
+Casting is open to anyone who can reach the server, whatever the access level. Casting
+grants nothing else: the camera, settings and captures stay protected. To restrict
+casting too, set `--display-token` (or `LOUPECAM_DISPLAY_TOKEN`); then casting needs
+it, or an operator's login or key. Cast HTML and SVG are served sandboxed, so their scripts can't use
 the server's origin. `http://<server>/cast` shows the current cast in a browser.
 
 ### Running as a service (Raspberry Pi, Linux)
@@ -159,13 +203,16 @@ curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packagi
 
 This downloads the release binary for the machine (checked against `SHA256SUMS`) and
 installs it as the systemd service `loupecam`, running as its own `loupecam` user on
-port 80 with a generated token. The installer prints the token and the URL. Settings are
-in `/etc/loupecam/loupecam.env` (listen address, token, extra `serve` arguments; edit,
-then `sudo systemctl restart loupecam`). Captures and saved settings go to
-`/var/lib/loupecam`. Logs: `journalctl -u loupecam -f`. Re-running the installer
-upgrades the binary and keeps your settings; the server's own updater works under the
-service too. Options: `--version vX.Y.Z`, `--binary ./loupecam` (a local build), and
-`--listen ADDR:PORT` (used only on first install).
+port 80. It prints the URL: open it to run setup. To require a setup code, add
+`--setup-code` (`… | sudo sh -s -- --setup-code`); the installer prints the code.
+Settings are in `/etc/loupecam/loupecam.env` (listen address, setup code, extra `serve`
+arguments; edit, then `sudo systemctl restart loupecam`). Captures, settings and access
+settings go to `/var/lib/loupecam`. For `loupecam access`, use
+`sudo loupecam access … --config-dir /var/lib/loupecam/config/loupecam`. Logs:
+`journalctl -u loupecam -f`. Re-running the installer upgrades the binary and keeps your
+settings; the server's own updater works under the service too. Options:
+`--version vX.Y.Z`, `--binary ./loupecam` (a local build), and `--listen ADDR:PORT`
+(used only on first install).
 
 **Power:** the camera needs up to 800 mA from USB. A Raspberry Pi 5 allows only 600 mA
 across all its USB ports unless its supply is the official 27 W (5 A) USB-C one. With
@@ -183,14 +230,14 @@ generic Bonjour/Avahi browsers. It's reachable as `http://loupecam-<hostname>.lo
 ```sh
 loupecam discover
 # LoupeCam on scope-pi: MU1803-HS (serial TP2306…)
-#   version 0.1.2, token required
+#   version 0.1.2, password required
 #   http://loupecam-scope-pi.local:8080/
 #   http://192.168.1.40:8080/
 ```
 
-The TXT records carry `version`, `path`, `ui` (`1`/`0`), `auth` (`token`/`none`), `cast`
-(`open`/`token`), and the
-connected camera's `model` and `serial`. The token is never announced. Set the
+The TXT records carry `version`, `path`, `ui` (`1`/`0`), `auth` (what access needs: `none`,
+`password`, `token`, or `setup` before first-run setup), `cast` (`open`/`token`), and the
+connected camera's `model` and `serial`. No secret is ever announced. Set the
 announced name with `--mdns-name`, or turn announcing off with `--no-mdns`. The default
 name is "LoupeCam on <hostname>", so give each server a distinct name if one machine
 runs several.

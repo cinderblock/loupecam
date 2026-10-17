@@ -185,13 +185,78 @@ Phase 3: HTTPS and passkeys.
 
 ## Findings / gotchas
 
-(none yet)
+- Salted hashes can't be compared to check "access and admin passwords differ": compare
+  the plain texts, or `verify` a new password against the kept hash (a unit test caught
+  the first version comparing hashes).
+- `std::fs::read` failing for any reason other than NotFound (e.g. a root-owned 0600
+  file the service user can't read) must **deny** access, not fall back to setup:
+  falling back would let anyone on the network take the server over. `write_private`
+  also chowns the file to the directory's owner, so `sudo loupecam access …` leaves it
+  readable by the service.
+- SameSite=Strict doesn't separate ports (same *site*), so a page on another port of the
+  same Pi (e.g. odriver2's `motion` on :8080) counts as same-site. Hence the explicit
+  same-origin check (`Sec-Fetch-Site`, else `Origin` against `Host`) on changes made
+  with a session cookie.
+- The worktree checks out CRLF; Python edit scripts must normalise line endings
+  (`%TEMP%/lcedit/ed.py` does). Shell heredocs carrying Python with backslashes or
+  backticks mangle escapes; use the Edit tool or a script file instead.
+- `cargo fmt` isn't applied in this repo (wide lines everywhere); don't reformat.
+- **Don't build on odriver2.** A 4-core release build there browned the Pi out about 40 s
+  in: the journal of that boot just stops at 23:13:49 with no shutdown, and the Pi came
+  back on its own. Its supply can't carry full CPU load plus the camera and StreamCam
+  with `usb_max_current_enable=1`. (The temporary rustup / `musl-tools` install was
+  removed afterwards.)
+- **Cross-compile from Windows instead** (2 min clean, ~30 s incremental). `ring` needs
+  a C compiler, and LLVM's clang is installed:
+  ```sh
+  export CARGO_BUILD_BUILD_DIR="$PWD/target/build-dir" \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=rust-lld \
+    CC_aarch64_unknown_linux_musl=clang \
+    CFLAGS_aarch64_unknown_linux_musl="--target=aarch64-linux-musl" \
+    AR_aarch64_unknown_linux_musl=llvm-ar
+  (cd apps/web && bun run build)
+  cargo build --release --locked -p loupecam-cli --features embed-ui --target aarch64-unknown-linux-musl
+  scp target/aarch64-unknown-linux-musl/release/loupecam packaging/linux/* odriver2:/tmp/loupecam-pkg/
+  ssh odriver2 'sudo sh /tmp/loupecam-pkg/install.sh --binary /tmp/loupecam-pkg/loupecam'
+  ```
+- odriver2's env file came from the old installer: it has no `#LOUPECAM_SETUP_CODE=`
+  line (the installer's `--setup-code` appends one when missing). Its old
+  `LOUPECAM_TOKEN` line is commented out (backup: `loupecam.env.bak-token`).
+- Verified end to end on odriver2 (curl, and the wizard in a browser):
+  - setup required → 409 on the API;
+  - passworded setup logs the setter in as admin, and a second setup gets 409;
+  - anonymous access gets 401 (API and MJPEG);
+  - a wrong password gets 401; the access password → operator;
+  - an operator can't change updates or list keys (403);
+  - a cross-origin PATCH / `text/plain` POST with the cookie gets 403;
+  - a view key can see state and MJPEG (`?token=`) but can't capture;
+  - a key made by the CLI works within 2 s;
+  - `access set … --config locked` → anonymous users are operators and admin actions say "locked";
+  - `access reset` → setup again;
+  - setup code: missing or wrong → 401, the 6th attempt → 429 even with the right code;
+  - `discover` shows "password required";
+  - `auth.json` is 0600 `loupecam:loupecam` after `sudo loupecam access`.
 
 ## Progress log
 
 - [x] Levels and setup-code requirement from the user
 - [x] Plan written
-- [ ] Phase 1 steps 1–6
+- [x] Phase 1 step 1: `auth` module + unit tests (12 tests)
+- [x] Phase 1 step 2: HTTP guard, extractors, access/setup/login/keys endpoints, CSRF,
+      mDNS `auth` live
+- [x] Phase 1 step 3: CLI `--setup-code`, `loupecam access show|reset|set|keys|
+      create-key|delete-key`, `LOUPECAM_CONFIG_DIR` / `--config-dir`
+- [x] Phase 1 step 4: web UI wizard, login, AdminGate, Access panel, admin-only
+      Calibration / update settings / capture delete
+- [x] Phase 1 step 5: installer (`--setup-code`, no token) + README
+- [x] Committed `3af1eee` (branch `access-setup`)
+- [x] Phase 1 step 6: end-to-end on odriver2 (see Findings). Left **unconfigured**, so
+      the user runs the real setup. Not yet exercised: the logged-in UI (Access panel,
+      AdminGate, key creation in the browser), since the agent doesn't type passwords
+      into non-localhost pages.
+- [ ] Merge `access-setup` into master (after the kiosk thread commits its recording
+      work; expect conflicts in `http.rs`, `lib.rs`, `settings.rs`)
+- [ ] Phase 2: propose the settings split to the user first
 - [ ] Phase 2
 - [ ] Phase 3
 
@@ -199,6 +264,10 @@ Phase 3: HTTPS and passkeys.
 
 1. Which settings count as "configuration" (admin-only), and what should defaults and
    limits cover? I'll propose a split in phase 2; nothing is blocked before then.
+2. Run the real setup on odriver2 in a browser (the logged-in UI hasn't been seen by
+   anyone yet), and say whether the wizard's wording and choices are right.
+3. Merge to master now (resolving the conflicts with the kiosk thread's uncommitted
+   work once it lands), or keep the branch until phase 2?
 
 ## Things not to do
 

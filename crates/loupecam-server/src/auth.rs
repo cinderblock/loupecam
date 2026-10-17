@@ -187,6 +187,8 @@ pub struct Resolved {
     /// The role came from the session cookie (so the request needs a CSRF check).
     pub via_session: bool,
     pub setup_required: bool,
+    /// The configuration is locked: nobody is admin over the network.
+    pub locked: bool,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -345,7 +347,7 @@ impl Auth {
         self.refresh(&mut inner);
         let now = now();
         let tokens = || c.tokens.iter().flatten();
-        let mut resolved = Resolved { role: None, via_session: false, setup_required: false };
+        let mut resolved = Resolved { role: None, via_session: false, setup_required: false, locked: false };
         match &mut inner.mode {
             Mode::Local => resolved.role = Some(Role::Admin),
             Mode::Token => {}
@@ -381,6 +383,7 @@ impl Auth {
                     }
                 }
                 if s.config == ConfigLock::Locked {
+                    resolved.locked = true;
                     resolved.role = resolved.role.map(|r| r.min(Role::Operate));
                 }
                 inner.dirty |= used;
@@ -916,7 +919,7 @@ mod tests {
     #[test]
     fn token_only() {
         let a = Auth::new(None, true, Some("tok".into()), None);
-        assert_eq!(a.resolve(&Credentials::default()), Resolved { role: None, via_session: false, setup_required: false });
+        assert_eq!(a.resolve(&Credentials::default()), Resolved { role: None, via_session: false, setup_required: false, locked: false });
         assert_eq!(a.resolve(&creds(Some("tok"), None)).role, Some(Role::Admin));
     }
 

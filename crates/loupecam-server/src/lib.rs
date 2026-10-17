@@ -183,9 +183,14 @@ impl Server {
         });
         tracing::info!("listening on http://{addr}");
         if auth.info(&auth.resolve(&Default::default())).setup == auth::SetupState::Required {
+            let url = if addr.ip().is_unspecified() {
+                format!("http://{}:{}/", gethostname::gethostname().to_string_lossy(), addr.port())
+            } else {
+                format!("http://{addr}/")
+            };
             match auth.setup_code() {
-                Some(code) => tracing::warn!("first-run setup required: open http://{addr}/ and enter setup code {code}"),
-                None => tracing::warn!("first-run setup required: the first browser to open http://{addr}/ sets up access"),
+                Some(code) => tracing::warn!("first-run setup required: open {url} and enter setup code {code}"),
+                None => tracing::warn!("first-run setup required: the first browser to open {url} sets up access"),
             }
         }
         let web_ui = !matches!(state.web, WebUi::Disabled);

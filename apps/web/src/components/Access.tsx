@@ -56,6 +56,11 @@ function presetOf(access: AccessInfo['access'], config: ConfigLock): Preset | un
   return PRESETS.find((p) => p.access === access && p.config === config)
 }
 
+/** Text with `backticked` spans shown as code. */
+function withCode(text: string): ReactNode {
+  return text.split('`').map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part))
+}
+
 function LevelCards({ value, onChange }: { value: string; onChange: (p: Preset) => void }) {
   return (
     <div className="levels">
@@ -64,7 +69,7 @@ function LevelCards({ value, onChange }: { value: string; onChange: (p: Preset) 
           <input type="radio" name="level" checked={value === p.id} onChange={() => onChange(p)} />
           <span>
             <strong>{p.title}</strong>
-            <span className="hint">{p.text}</span>
+            <span className="hint">{withCode(p.text)}</span>
             {p.warning && <span className="warn">{p.warning}</span>}
           </span>
         </label>

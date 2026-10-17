@@ -87,13 +87,15 @@ pub fn router(state: AppState) -> Router {
 pub struct Caller(pub auth::Resolved);
 
 /// Rejects callers below `role`.
-fn require(parts: &axum::http::request::Parts, role: Role) -> Result<(), ApiError> {
-    let caller = parts.extensions.get::<Caller>().and_then(|c| c.0.role);
+fn require(resolved: Option<auth::Resolved>, role: Role) -> Result<(), ApiError> {
+    let caller = resolved.and_then(|c| c.role);
     if caller >= Some(role) {
         return Ok(());
     }
     let msg = match role {
+        Role::Admin if resolved.is_some_and(|c| c.locked) => "the configuration is locked; change it with `loupecam access` on the server",
         Role::Admin => "admin password required",
+        _ if caller.is_some() => "operator access required",
         _ => "login required",
     };
     Err(ApiError(if caller.is_some() { StatusCode::FORBIDDEN } else { StatusCode::UNAUTHORIZED }, msg.into()))
@@ -107,14 +109,14 @@ pub struct Admin;
 impl<S: Send + Sync> axum::extract::FromRequestParts<S> for Operator {
     type Rejection = ApiError;
     async fn from_request_parts(parts: &mut axum::http::request::Parts, _: &S) -> Result<Self, ApiError> {
-        require(parts, Role::Operate).map(|()| Operator)
+        require(parts.extensions.get::<Caller>().map(|c| c.0), Role::Operate).map(|()| Operator)
     }
 }
 
 impl<S: Send + Sync> axum::extract::FromRequestParts<S> for Admin {
     type Rejection = ApiError;
     async fn from_request_parts(parts: &mut axum::http::request::Parts, _: &S) -> Result<Self, ApiError> {
-        require(parts, Role::Admin).map(|()| Admin)
+        require(parts.extensions.get::<Caller>().map(|c| c.0), Role::Admin).map(|()| Admin)
     }
 }
 
@@ -211,7 +213,7 @@ fn session_cookie(value: &str, max_age: u64) -> HeaderValue {
 /// session cookie.
 fn access_response(s: &AppState, caller: auth::Resolved, session: Option<auth::NewSession>, clear: bool) -> Response {
     let (cookie, caller) = match &session {
-        Some(n) => (Some(session_cookie(&n.cookie, 400 * 24 * 3600)), auth::Resolved { role: Some(n.role), via_session: true, setup_required: false }),
+        Some(n) => (Some(session_cookie(&n.cookie, 400 * 24 * 3600)), auth::Resolved { role: Some(n.role), via_session: true, setup_required: false, locked: false }),
         None if clear => (Some(session_cookie("", 0)), s.auth.resolve(&Default::default())),
         None => (None, caller),
     };
@@ -330,8 +332,8 @@ async fn patch_settings(
     Json(patch): Json<serde_json::Value>,
 ) -> ApiResult<Json<serde_json::Value>> {
     // Updates and calibration are configuration: admins only.
-    if c.0.role < Some(Role::Admin) && ["updates", "calibration"].iter().any(|k| patch.get(k).is_some()) {
-        return Err(ApiError(StatusCode::FORBIDDEN, "admin password required".into()));
+    if ["updates", "calibration"].iter().any(|k| patch.get(k).is_some()) {
+        require(Some(c.0), Role::Admin)?;
     }
     let settings = s.service.patch(patch).await.map_err(bad)?;
     s.persist(&settings);
