@@ -145,7 +145,7 @@ renders arbitrary cast content.
 - `loupecam access reset` (on the host) deletes `auth.json`, so the next connection
   runs setup again: the "forgot the password" path.
 
-### Settings policy (phase 2)
+### Settings policy (phase 2, dropped; kept for the record)
 
 - Each setting is classified as **operational** (exposure, gain, white balance, ROI,
   orientation, tone, colour, size, capture format…) or **configuration** (updates,
@@ -184,7 +184,9 @@ Phase 1, access core and setup: **← current**
 5. Installer: no generated token; `--setup-code`; print the setup URL. README.
 6. Test on odriver2 (clear its env token; run setup in the browser).
 
-Phase 2: settings policy (classification, defaults, limits).
+Phase 2: settings policy. **Dropped**: the user doesn't think limits make sense for a
+microscope ("not much to secure"). "Reset to defaults" would be a convenience feature,
+not security; build it only if asked.
 
 Phase 3: HTTPS and passkeys. **On hold: the user said "wait" (2026-10-17).**
 
@@ -268,8 +270,7 @@ Phase 3: HTTPS and passkeys. **On hold: the user said "wait" (2026-10-17).**
 - [x] Merged master again (USB-stick storage; `storage` settings made admin-only) and
       fast-forwarded master to `f7255da` (user: "why not"). Deployed to odriver2. Not
       pushed.
-- [ ] Phase 2: propose the settings split to the user first
-- [ ] Phase 2
+- [x] Phase 2: dropped by the user
 - [ ] Phase 3
 
 ## Open questions for the user
@@ -278,8 +279,8 @@ Phase 3: HTTPS and passkeys. **On hold: the user said "wait" (2026-10-17).**
    limits cover? I'll propose a split in phase 2; nothing is blocked before then.
 2. ~~Wizard wording~~: the user hasn't noticed any issue (2026-10-17). Closed.
 3. ~~Fast-forward master~~: done.
-4. Phase 2 scope: proposal sent 2026-10-17 (see Settings policy); waiting on the
-   user's pick.
+4. ~~Phase 2 scope~~: dropped (user, 2026-10-17: "it's a microscope, not much to
+   secure").
 5. Push master (22 commits ahead, including the kiosk thread's)?
 
 ## Things not to do
