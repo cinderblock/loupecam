@@ -126,8 +126,8 @@ work in both the camera view and cast content.
 3. ✅ Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
 4. ✅ Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
-5. **← current** Chromium override (cage handoff).
-6. V4L2 M2M encoder (needs the Pi 4).
+5. ✅ Chromium override (cage handoff).
+6. **← current** V4L2 M2M encoder (needs the Pi 4 to test).
 7. Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
    `chromium`, the user, config.txt notes), README.
 8. Hardware test on the Pi 4 + display.
@@ -184,7 +184,9 @@ work in both the camera view and cast content.
       WM_* mouse messages to the window: doesn't move the user's cursor.)
 - [x] Native kiosk: DRM + evdev written; clippy-clean for aarch64-musl and x86_64-gnu.
       **Not yet run on hardware** (needs the Pi 4 + display).
-- [ ] Chromium override
+- [x] Chromium override: screen state machine in the KMS loop (native / cast browser /
+      home browser), throwaway profile without the camera token for casts, three-finger
+      tap back to the camera, `--home browser` for the full web UI. Untested on hardware.
 - [ ] V4L2 M2M encoder
 - [ ] Packaging + README
 - [ ] Tested on Pi 4 + display

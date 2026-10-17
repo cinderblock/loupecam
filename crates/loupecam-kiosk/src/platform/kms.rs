@@ -2,11 +2,12 @@
 //! vblank) and evdev for touch. No X server or Wayland compositor is involved, so the
 //! kiosk owns the whole screen from boot.
 
+use super::browser::Browser;
 use super::touch;
 use crate::client::Client;
 use crate::gfx;
 use crate::ui::{App, Input};
-use crate::{Event, Options};
+use crate::{Event, Home, Options};
 use anyhow::Context;
 use drm::buffer::DrmFourcc;
 use drm::control::{Device as ControlDevice, ModeTypeFlags, PageFlipFlags, connector, crtc, dumbbuffer::DumbBuffer, framebuffer};
@@ -209,9 +210,31 @@ impl Backlight {
     }
 }
 
+/// What the screen is showing.
+enum Screen {
+    Native { display: Display, _vt: Option<GraphicsVt> },
+    /// The browser; `cast` is the cast it shows (`None`: the home web UI).
+    Browser { browser: Browser, cast: Option<u64> },
+}
+
+/// What the screen should show.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Want {
+    Native,
+    HomeBrowser,
+    Cast(u64),
+}
+
+fn url_with(base: &str, path: &str, key: &str, value: Option<&str>) -> String {
+    let base = base.trim_end_matches('/');
+    match value {
+        Some(v) => format!("{base}{path}?{key}={}", crate::client::encode_query(v)),
+        None => format!("{base}{path}"),
+    }
+}
+
 pub fn run(opts: &Options) -> anyhow::Result<()> {
-    let mut display = Display::open()?;
-    let _vt = GraphicsVt::enter();
+    let display = Display::open()?;
     let (dw, dh) = display.size();
     let (uw, uh) = gfx::ui_size(dw, dh, opts.rotation);
     let (tx, rx) = mpsc::channel::<Event>();
@@ -221,18 +244,29 @@ pub fn run(opts: &Options) -> anyhow::Result<()> {
             let _ = tx.send(Event::Server(ev));
         })
     };
+    // Touch is read without grabbing the devices, so a browser on screen gets it too.
     touch::spawn(tx.clone(), (dw, dh), opts.rotation, (uw, uh));
     let mut app = App::new(client, uw, uh, crate::address(&opts.server));
     let mut pixmap = Pixmap::new(uw, uh).ok_or_else(|| anyhow::anyhow!("bad display size"))?;
     let backlight = Backlight::find();
     backlight.set(true);
+    let mut screen = Some(Screen::Native { display, _vt: GraphicsVt::enter() });
     let mut asleep = false;
     // Touches that woke the screen: swallowed until lifted.
     let mut waking: HashSet<u64> = HashSet::new();
+    // Fingers down while the browser shows a cast (three at once: back to the camera).
+    let mut fingers: HashSet<u64> = HashSet::new();
+    // A cast whose browser closed on its own: shown natively as a message instead of
+    // relaunching the browser in a loop.
+    let mut failed_cast: Option<u64> = None;
+    let mut home_retry = Instant::now();
     let min_frame = Duration::from_millis(16);
     let mut last_present = Instant::now() - min_frame;
     loop {
-        let wait = if app.needs_redraw() {
+        let native = matches!(screen, Some(Screen::Native { .. }));
+        let wait = if !native {
+            Duration::from_millis(250)
+        } else if app.needs_redraw() {
             min_frame.saturating_sub(last_present.elapsed())
         } else {
             app.next_wake().map_or(Duration::from_secs(1), |t| t.saturating_duration_since(Instant::now()))
@@ -242,9 +276,27 @@ pub fn run(opts: &Options) -> anyhow::Result<()> {
             Err(mpsc::RecvTimeoutError::Timeout) => None,
             Err(mpsc::RecvTimeoutError::Disconnected) => anyhow::bail!("event sources stopped"),
         };
+        let casting_in_browser = matches!(screen, Some(Screen::Browser { cast: Some(_), .. }));
         for ev in first.into_iter().chain(rx.try_iter()) {
             match ev {
                 Event::Server(e) => app.on_server(e),
+                Event::Input(i) if !native => {
+                    // The browser has the screen; only watch for the way back.
+                    app.poke();
+                    match i {
+                        Input::Down { id, .. } if casting_in_browser => {
+                            fingers.insert(id);
+                            if fingers.len() >= 3 {
+                                fingers.clear();
+                                app.stop_casting();
+                            }
+                        }
+                        Input::Up { id } | Input::Cancel { id } => {
+                            fingers.remove(&id);
+                        }
+                        _ => {}
+                    }
+                }
                 Event::Input(i) => {
                     let id = match i {
                         Input::Down { id, .. } | Input::Move { id, .. } | Input::Up { id } | Input::Cancel { id } => Some(id),
@@ -269,6 +321,89 @@ pub fn run(opts: &Options) -> anyhow::Result<()> {
                 }
             }
         }
+
+        // A browser that exited on its own.
+        if let Some(Screen::Browser { browser, cast }) = screen.as_mut()
+            && browser.exited()
+        {
+            let cast = *cast;
+            if let Some(Screen::Browser { browser, .. }) = screen.take() {
+                browser.stop();
+            }
+            match cast {
+                Some(id) => {
+                    failed_cast = Some(id);
+                    app.notify("The browser closed: tap ✕ Camera to go back".into());
+                }
+                None => home_retry = Instant::now() + Duration::from_secs(3),
+            }
+        }
+
+        // Switch what's on screen if needed.
+        let cast_id = app.browser_cast().map(|c| c.id);
+        if cast_id.is_none() {
+            failed_cast = None;
+        }
+        let want = match cast_id {
+            Some(id) if failed_cast != Some(id) => Want::Cast(id),
+            _ if opts.home == Home::Browser && Instant::now() >= home_retry => Want::HomeBrowser,
+            _ => Want::Native,
+        };
+        let have = match &screen {
+            Some(Screen::Native { .. }) => Some(Want::Native),
+            Some(Screen::Browser { cast: Some(id), .. }) => Some(Want::Cast(*id)),
+            Some(Screen::Browser { cast: None, .. }) => Some(Want::HomeBrowser),
+            None => None,
+        };
+        if have != Some(want) {
+            // Let go of the display first: only one program can drive it.
+            match screen.take() {
+                Some(Screen::Browser { browser, .. }) => browser.stop(),
+                Some(Screen::Native { display, _vt }) => drop((display, _vt)),
+                None => {}
+            }
+            fingers.clear();
+            let launch = match want {
+                Want::Native => None,
+                Want::HomeBrowser => Some((url_with(&opts.server, "/", "token", opts.token.as_deref()), None, opts.browser_profile.as_deref())),
+                Want::Cast(id) => Some((url_with(&opts.server, "/cast", "displayToken", opts.display_token.as_deref()), Some(id), None)),
+            };
+            if let Some((url, cast, profile)) = launch {
+                match Browser::launch(&url, opts.browser_command.as_deref(), profile) {
+                    Ok(browser) => screen = Some(Screen::Browser { browser, cast }),
+                    Err(e) => {
+                        tracing::warn!("{e:#}");
+                        app.notify(format!("Can't open the browser: {e}"));
+                        match cast {
+                            Some(id) => failed_cast = Some(id),
+                            None => home_retry = Instant::now() + Duration::from_secs(30),
+                        }
+                    }
+                }
+            }
+            if screen.is_none() {
+                // Back to the native UI. The browser may take a moment to let go of the
+                // display.
+                let mut tries = 0;
+                let display = loop {
+                    match Display::open() {
+                        Ok(d) => break d,
+                        Err(e) if tries < 20 => {
+                            tries += 1;
+                            tracing::debug!("waiting for the display: {e:#}");
+                            std::thread::sleep(Duration::from_millis(250));
+                        }
+                        Err(e) => return Err(e),
+                    }
+                };
+                screen = Some(Screen::Native { display, _vt: GraphicsVt::enter() });
+                app.redraw();
+                asleep = false;
+                backlight.set(true);
+            }
+        }
+
+        let Some(Screen::Native { display, .. }) = screen.as_mut() else { continue };
         if let Some(after) = opts.sleep_after
             && !asleep
             && app.idle() > after

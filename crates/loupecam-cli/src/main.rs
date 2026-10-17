@@ -72,6 +72,21 @@ struct KioskArgs {
     /// The server's token, if it requires one.
     #[arg(long, env = "LOUPECAM_TOKEN", hide_env_values = true)]
     token: Option<String>,
+    /// The server's display token, if casting needs one. The browser showing casts only
+    /// ever gets this one, never --token.
+    #[arg(long, env = "LOUPECAM_DISPLAY_TOKEN", hide_env_values = true)]
+    display_token: Option<String>,
+    /// What the screen shows when nothing is cast: the native UI, or the full web UI in
+    /// a browser (cage + Chromium).
+    #[arg(long, env = "LOUPECAM_KIOSK_HOME", value_enum, default_value_t = KioskHome::Native)]
+    home: KioskHome,
+    /// Command for the browser, instead of `cage -d -- chromium --kiosk …`. `{url}` and
+    /// `{profile}` are substituted.
+    #[arg(long, env = "LOUPECAM_KIOSK_BROWSER")]
+    browser_command: Option<String>,
+    /// Profile directory for the home browser (--home browser).
+    #[arg(long, env = "LOUPECAM_KIOSK_BROWSER_PROFILE")]
+    browser_profile: Option<PathBuf>,
     /// Rotate the UI clockwise (0, 90, 180 or 270) to match how the display is mounted.
     #[arg(long, env = "LOUPECAM_KIOSK_ROTATE", default_value_t = 0)]
     rotate: u16,
@@ -82,6 +97,13 @@ struct KioskArgs {
     /// display hardware. For development; needs a build with `kiosk-window`.
     #[arg(long, value_name = "WxH", value_parser = parse_size, num_args = 0..=1, default_missing_value = "800x480")]
     window: Option<(u32, u32)>,
+}
+
+#[cfg(feature = "kiosk")]
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum KioskHome {
+    Native,
+    Browser,
 }
 
 #[cfg(feature = "kiosk")]
@@ -338,6 +360,13 @@ fn main() -> Result<()> {
         Cmd::Kiosk(a) => loupecam_kiosk::run(loupecam_kiosk::Options {
             server: a.server,
             token: a.token,
+            display_token: a.display_token,
+            home: match a.home {
+                KioskHome::Native => loupecam_kiosk::Home::Native,
+                KioskHome::Browser => loupecam_kiosk::Home::Browser,
+            },
+            browser_command: a.browser_command,
+            browser_profile: a.browser_profile,
             rotation: a.rotate,
             window: a.window,
             sleep_after: (a.sleep_after > 0.0).then(|| Duration::from_secs_f64(a.sleep_after * 60.0)),

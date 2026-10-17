@@ -27,6 +27,16 @@ pub struct Options {
     pub server: String,
     /// The server's camera token, if it has one.
     pub token: Option<String>,
+    /// The server's display token, if casting needs one (for the cast page in the
+    /// browser, which never gets the camera token).
+    pub display_token: Option<String>,
+    /// What the screen shows when nothing is cast.
+    pub home: Home,
+    /// Browser command instead of `cage -d -- chromium --kiosk …` (`{url}` and
+    /// `{profile}` are substituted).
+    pub browser_command: Option<String>,
+    /// Where the home browser keeps its profile (`Home::Browser`).
+    pub browser_profile: Option<std::path::PathBuf>,
     /// Rotate the UI clockwise by 0, 90, 180 or 270 degrees (for how the display is
     /// mounted).
     pub rotation: u16,
@@ -34,6 +44,15 @@ pub struct Options {
     pub window: Option<(u32, u32)>,
     /// Turn the backlight off after this long without a touch.
     pub sleep_after: Option<Duration>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Home {
+    /// The native UI.
+    #[default]
+    Native,
+    /// The full web UI, in the browser (`cage` + Chromium).
+    Browser,
 }
 
 /// Everything the main loop reacts to.

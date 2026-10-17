@@ -151,6 +151,21 @@ impl App {
         self.client.send(Command::StopCasting);
     }
 
+    /// Show a message.
+    pub fn notify(&mut self, m: String) {
+        self.toast(m);
+    }
+
+    /// Count as activity (input the UI didn't handle itself), for sleep.
+    pub fn poke(&mut self) {
+        self.last_input = Instant::now();
+    }
+
+    /// Draw again even if nothing changed (the screen was lost).
+    pub fn redraw(&mut self) {
+        self.dirty = true;
+    }
+
     pub fn needs_redraw(&self) -> bool {
         self.dirty
     }

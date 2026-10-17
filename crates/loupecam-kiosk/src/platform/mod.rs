@@ -8,3 +8,5 @@ pub mod window;
 pub mod kms;
 #[cfg(target_os = "linux")]
 mod touch;
+#[cfg(target_os = "linux")]
+mod browser;

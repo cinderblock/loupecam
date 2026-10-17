@@ -170,7 +170,7 @@ impl Client {
     }
 }
 
-fn encode_query(s: &str) -> String {
+pub(crate) fn encode_query(s: &str) -> String {
     s.bytes()
         .map(|b| if b.is_ascii_alphanumeric() || b"-._~".contains(&b) { (b as char).to_string() } else { format!("%{b:02X}") })
         .collect()
