@@ -78,8 +78,9 @@ impl Recorder {
         Arc::new(Recorder { status: watch::Sender::new(status), service, storage, running: Mutex::new(Slot::Idle) })
     }
 
-    /// Start recording with the current `record` settings.
-    pub async fn start(self: &Arc<Self>) -> Result<Recording, String> {
+    /// Start recording with the current `record` settings, into `location` if given
+    /// (else where the `storage.usb` setting says).
+    pub async fn start(self: &Arc<Self>, location: Option<Location>) -> Result<Recording, String> {
         // Claim the slot first so concurrent starts can't both proceed.
         {
             let mut slot = self.running.lock().unwrap();
@@ -89,7 +90,7 @@ impl Recorder {
                 _ => *slot = Slot::Starting,
             }
         }
-        match self.prepare().await {
+        match self.prepare(location).await {
             Ok(job) => {
                 let rec = job.recording.clone();
                 self.status.send_modify(|s| {
@@ -129,12 +130,12 @@ impl Recorder {
         self.status.borrow().last.clone()
     }
 
-    async fn prepare(&self) -> Result<Job, String> {
+    async fn prepare(&self, location: Option<Location>) -> Result<Job, String> {
         let shared = &self.service.shared;
         let settings = shared.state.borrow().settings.clone();
         let rs = settings.record.clone();
         // Where it goes is decided once, up front.
-        let (dir, location) = self.storage.target(settings.storage.usb)?;
+        let (dir, location) = self.storage.target_for(settings.storage.usb, location)?;
         // Switch the stream size for the recording if asked.
         let mut restore_size = None;
         if let Some(i) = rs.stream_size_index
@@ -495,9 +496,9 @@ mod tests {
         let rec = Recorder::new(service.clone(), Storage::spawn(dir.clone(), None));
 
         // Smooth: the 1228×922 stream fits 1280×960, so it's recorded as is.
-        let r = rec.start().await.unwrap();
+        let r = rec.start(None).await.unwrap();
         assert_eq!((r.width, r.height, r.mode), (1228, 922, RecordMode::Video));
-        assert!(rec.start().await.is_err(), "a second start must fail");
+        assert!(rec.start(None).await.is_err(), "a second start must fail");
         tokio::time::sleep(Duration::from_millis(1500)).await;
         let done = rec.stop().await.unwrap();
         // Debug builds simulate and develop frames slowly.
@@ -509,7 +510,7 @@ mod tests {
         // Timelapse with stills, fast.
         let ts = RecordSettings { timelapse_interval_s: 0.25, timelapse_stills: true, ..RecordPreset::Timelapse.settings(&Default::default()) };
         service.patch(serde_json::json!({ "record": ts, "capture": { "format": "jpeg" } })).await.unwrap();
-        let r = rec.start().await.unwrap();
+        let r = rec.start(None).await.unwrap();
         assert_eq!(r.mode, RecordMode::Timelapse);
         tokio::time::sleep(Duration::from_millis(1100)).await;
         let done = rec.stop().await.unwrap();

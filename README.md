@@ -243,9 +243,11 @@ has three choices:
 | --- | --- | --- |
 | This device | `off` | The captures directory (the default) |
 | USB stick, when inserted | `whenAvailable` | The stick if one is in, else the captures directory |
-| USB stick only | `always` | Only the stick: capturing and recording fail, with an error saying so, when none is in |
+| USB stick only | `always` | Only the stick. Without one, Snap/Capture and Record are greyed out under a "No USB stick" notice, which offers **Save on this device** until a stick is inserted |
 
-Files go in a `LoupeCam` folder on the stick. The gallery lists both places (USB files
+API clients can override the setting per request: `POST /api/capture?location=internal`
+or `POST /api/record/start` with `{"location": "internal"}` (or `"usb"`). Files go in a
+`LoupeCam` folder on the stick. The gallery lists both places (USB files
 are marked) and can download from either. A recording keeps the place it started in.
 
 On Linux the service installer sets this up. A udev rule mounts FAT32 or exFAT sticks

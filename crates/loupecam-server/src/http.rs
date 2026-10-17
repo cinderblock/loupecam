@@ -137,6 +137,8 @@ async fn patch_settings(State(s): State<AppState>, Json(patch): Json<serde_json:
 #[serde(rename_all = "camelCase")]
 struct CaptureQuery {
     full_resolution: Option<bool>,
+    /// Save here regardless of the `storage.usb` setting.
+    location: Option<Location>,
 }
 
 async fn capture(State(s): State<AppState>, Query(q): Query<CaptureQuery>) -> ApiResult<Json<captures::CaptureInfo>> {
@@ -145,9 +147,9 @@ async fn capture(State(s): State<AppState>, Query(q): Query<CaptureQuery>) -> Ap
         (q.full_resolution.unwrap_or(st.settings.capture.full_resolution), st.settings.storage.usb)
     };
     // Check the destination before grabbing a frame.
-    s.storage.target(usb).map_err(unavailable)?;
+    s.storage.target_for(usb, q.location).map_err(unavailable)?;
     let c = s.service.capture(full).await.map_err(unavailable)?;
-    let (dir, location) = s.storage.target(usb).map_err(unavailable)?;
+    let (dir, location) = s.storage.target_for(usb, q.location).map_err(unavailable)?;
     let info = tokio::task::spawn_blocking(move || captures::save(&c, &dir, location))
         .await
         .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
@@ -329,16 +331,19 @@ async fn record_get(State(s): State<AppState>) -> Json<serde_json::Value> {
 struct RecordStart {
     /// Switch the record settings to this preset first.
     preset: Option<crate::settings::RecordPreset>,
+    /// Save here regardless of the `storage.usb` setting.
+    location: Option<Location>,
 }
 
 /// Start recording with the `record` settings (optionally switching to a preset first).
 async fn record_start(State(s): State<AppState>, body: Option<Json<RecordStart>>) -> ApiResult<Json<crate::record::Recording>> {
-    if let Some(p) = body.and_then(|Json(b)| b.preset) {
+    let body = body.map(|Json(b)| b).unwrap_or_default();
+    if let Some(p) = body.preset {
         let current = s.service.shared.state.borrow().settings.record.clone();
         let settings = s.service.patch(json!({ "record": p.settings(&current) })).await.map_err(bad)?;
         s.persist(&settings);
     }
-    s.recorder.start().await.map(Json).map_err(|e| ApiError(StatusCode::CONFLICT, e))
+    s.recorder.start(body.location).await.map(Json).map_err(|e| ApiError(StatusCode::CONFLICT, e))
 }
 
 /// Stop recording; returns the finished recording (204 if nothing was recording).

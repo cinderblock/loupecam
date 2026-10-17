@@ -128,6 +128,10 @@ work in both the camera view and cast content.
   Elsewhere (Windows dev) presence = the directory exists.
 - Captures list both locations with `location`; get/delete take `?location=`. A
   recording picks its location at start.
+- With `always` and no stick, the kiosk greys out Snap/Record under a "No USB stick" box
+  with **Save on this device**; the web UI does the same in its toolbar. That choice
+  sends `location=internal` per request (the setting isn't changed) and lasts until a
+  stick is inserted. A running recording is never covered (Stop stays reachable).
 - Packaging: `99-loupecam-usb.rules` runs `systemd-mount --automount=yes
   --timeout-idle-sec=2s --owner=loupecam` for FAT32/exFAT sticks;
   `loupecam.service` gets `ReadWritePaths=-/media/loupecam`.

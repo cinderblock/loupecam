@@ -130,9 +130,11 @@ pub enum ServerEvent {
 
 #[derive(Debug, Clone)]
 pub enum Command {
-    Capture,
-    /// Start recording, switching to a preset first if given.
-    StartRecording(Option<String>),
+    /// Take a still; `local` saves it on the server's own storage whatever the USB
+    /// setting says.
+    Capture { local: bool },
+    /// Start recording, switching to a preset first if given (`local` as for capture).
+    StartRecording { preset: Option<String>, local: bool },
     StopRecording,
     /// Make a record preset's settings the current record settings.
     ApplyPreset(String),
@@ -318,13 +320,19 @@ fn requests(base: &str, token: Option<&str>, rx: Receiver<Command>, notify: &(dy
     let json = |b: &[u8]| serde_json::from_slice::<Value>(b).unwrap_or(Value::Null);
     for cmd in rx {
         let result = match &cmd {
-            Command::Capture => call("POST", "/api/capture", None).map(|b| {
+            Command::Capture { local } => call("POST", if *local { "/api/capture?location=internal" } else { "/api/capture" }, None).map(|b| {
                 let v = json(&b);
                 let usb = if v["location"] == "usb" { " to the USB stick" } else { "" };
                 Some(format!("Saved {}{usb}", v["name"].as_str().unwrap_or("capture")))
             }),
-            Command::StartRecording(preset) => {
-                let body = preset.as_ref().map(|p| json!({ "preset": p })).unwrap_or(json!({}));
+            Command::StartRecording { preset, local } => {
+                let mut body = json!({});
+                if let Some(p) = preset {
+                    body["preset"] = json!(p);
+                }
+                if *local {
+                    body["location"] = json!("internal");
+                }
                 call("POST", "/api/record/start", Some(body)).map(|_| None)
             }
             Command::StopRecording => call("POST", "/api/record/stop", None).map(|b| {
@@ -360,8 +368,8 @@ fn requests(base: &str, token: Option<&str>, rx: Receiver<Command>, notify: &(dy
 
 fn describe(c: &Command) -> &'static str {
     match c {
-        Command::Capture => "Capture failed",
-        Command::StartRecording(_) => "Couldn't record",
+        Command::Capture { .. } => "Capture failed",
+        Command::StartRecording { .. } => "Couldn't record",
         Command::StopRecording => "Stopping the recording failed",
         Command::ApplyPreset(_) => "Couldn't change the record mode",
         Command::Patch(_) => "Setting failed",

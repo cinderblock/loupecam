@@ -36,6 +36,8 @@ enum Action {
     Crosshair,
     Preset(&'static str),
     Storage(&'static str),
+    /// Save on this device for now, though the setting says USB only.
+    SaveLocally,
     StopCast,
     Slider(SliderKind),
 }
@@ -77,6 +79,9 @@ pub struct App {
     stats: Stats,
     record: RecordStatus,
     storage: StorageStatus,
+    /// The user chose to save on this device while no stick is in ("USB only" setting).
+    /// Ends when a stick appears.
+    save_locally: bool,
     cast: Option<CastInfo>,
     /// The current cast, rendered (when the kiosk can show it natively).
     cast_image: Option<Pixmap>,
@@ -114,6 +119,7 @@ impl App {
             stats: Stats::default(),
             record: RecordStatus::default(),
             storage: StorageStatus::default(),
+            save_locally: false,
             cast: None,
             cast_image: None,
             frame: None,
@@ -209,7 +215,12 @@ impl App {
                 }
                 self.record = r;
             }
-            ServerEvent::Storage(s) => self.storage = s,
+            ServerEvent::Storage(s) => {
+                if s.usb_present {
+                    self.save_locally = false;
+                }
+                self.storage = s;
+            }
             ServerEvent::Cast(c) => {
                 if c.as_ref().map(|c| c.id) != self.cast.as_ref().map(|c| c.id) {
                     self.cast_image = None;
@@ -428,14 +439,18 @@ impl App {
         match a {
             Action::Snap => {
                 self.flash = Some(Instant::now());
-                self.client.send(Command::Capture);
+                self.client.send(Command::Capture { local: self.save_locally });
             }
             Action::Record => {
                 if self.record.active.is_some() {
                     self.client.send(Command::StopRecording);
                 } else {
-                    self.client.send(Command::StartRecording(None));
+                    self.client.send(Command::StartRecording { preset: None, local: self.save_locally });
                 }
+            }
+            Action::SaveLocally => {
+                self.save_locally = true;
+                self.toast("Saving on this device until a USB stick is inserted".into());
             }
             Action::CyclePreset => {
                 let cur = settings.map_or("smooth", |s| s.record.preset.as_str());
@@ -617,9 +632,12 @@ impl App {
         }
 
         // Snap.
+        // "USB stick only" with no stick: saving is blocked (but a recording already
+        // running can still be stopped).
+        let blocked = recording.is_none() && self.usb_required_missing(&settings.storage.usb);
         let snap = cell(0, top, if portrait { 56.0 } else { 80.0 });
-        self.button(pm, snap, "", Action::Snap, false, streaming);
-        gfx::camera_icon(pm, snap.x() + snap.width() / 2.0, snap.y() + snap.height() / 2.0 - 8.0, 30.0, if streaming { gfx::text() } else { gfx::muted() });
+        self.button(pm, snap, "", Action::Snap, false, streaming && !blocked);
+        gfx::camera_icon(pm, snap.x() + snap.width() / 2.0, snap.y() + snap.height() / 2.0 - 8.0, 30.0, if streaming && !blocked { gfx::text() } else { gfx::muted() });
         self.fonts.draw(pm, "Snap", snap.x() + snap.width() / 2.0, snap.bottom() - 10.0, 14.0, true, gfx::text(), Align::Center);
 
         // Record / stop.
@@ -629,7 +647,7 @@ impl App {
             Some(r) => duration_label(r.seconds),
             None => String::new(),
         };
-        self.button(pm, rec, "", Action::Record, recording.is_some(), streaming || recording.is_some());
+        self.button(pm, rec, "", Action::Record, recording.is_some(), (streaming && !blocked) || recording.is_some());
         let (cx, cy) = (rec.x() + rec.width() / 2.0, rec.y() + rec.height() / 2.0 - 8.0);
         if recording.is_some() {
             gfx::fill_rect(pm, cx - 11.0, cy - 11.0, 22.0, 22.0, gfx::red());
@@ -637,6 +655,20 @@ impl App {
         } else {
             gfx::fill_circle(pm, cx, cy, 13.0, gfx::red());
             self.fonts.draw(pm, "Record", cx, rec.bottom() - 10.0, 14.0, true, gfx::text(), Align::Center);
+        }
+
+        if blocked {
+            // Cover Snap and Record with the reason and the way out.
+            let (l, t) = (snap.left().min(rec.left()), snap.top().min(rec.top()));
+            let (r, b) = (snap.right().max(rec.right()), snap.bottom().max(rec.bottom()));
+            let cover = Rect::from_ltrb(l, t, r, b).unwrap();
+            gfx::fill_round_rect(pm, cover, 10.0, gfx::rgba(20, 22, 25, 255));
+            gfx::stroke_round_rect(pm, cover, 10.0, 1.5, gfx::red());
+            let cx = cover.x() + cover.width() / 2.0;
+            self.fonts.draw_fit(pm, "No USB stick", cx, cover.y() + 34.0, 18.0, true, gfx::red(), Align::Center, cover.width() - 16.0);
+            self.fonts.draw_fit(pm, "Insert one to save to it", cx, cover.y() + 56.0, 13.0, false, gfx::muted(), Align::Center, cover.width() - 16.0);
+            let b = Rect::from_xywh(cover.x() + 8.0, cover.bottom() - 60.0, cover.width() - 16.0, 52.0).unwrap();
+            self.button(pm, b, "Save on this device", Action::SaveLocally, false, true);
         }
 
         // Record mode.
@@ -732,12 +764,21 @@ impl App {
     fn storage_line(&self, mode: &str) -> Option<(String, bool)> {
         self.storage.usb_dir.as_ref()?;
         let present = self.storage.usb_present;
+        if self.save_locally && !present {
+            return Some(("No USB stick: saving here".into(), false));
+        }
         match mode {
             "always" if !present => Some(("No USB stick!".into(), true)),
             "always" | "whenAvailable" if present => Some(("Saving to USB stick".into(), false)),
             "whenAvailable" => Some(("No USB stick: saving here".into(), false)),
             _ => None,
         }
+    }
+
+    /// The setting requires a USB stick, there's none, and the user hasn't chosen to save
+    /// here instead.
+    fn usb_required_missing(&self, mode: &str) -> bool {
+        mode == "always" && self.storage.usb_dir.is_some() && !self.storage.usb_present && !self.save_locally
     }
 
     #[allow(clippy::too_many_arguments)]

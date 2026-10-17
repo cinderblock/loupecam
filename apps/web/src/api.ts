@@ -59,8 +59,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
 export const api = {
   patchSettings: (p: Patch<Settings>) => request<Settings>('PATCH', '/api/settings', p),
-  capture: (fullResolution?: boolean) =>
-    request<CaptureInfo>('POST', '/api/capture' + (fullResolution === undefined ? '' : `?fullResolution=${fullResolution}`)),
+  /** Take a still. `location` overrides where the `storage.usb` setting would save it. */
+  capture: (location?: Location) => request<CaptureInfo>('POST', '/api/capture' + (location ? `?location=${location}` : '')),
   captures: () => request<CaptureEntry[]>('GET', '/api/captures'),
   deleteCapture: (name: string, location: Location) => request<void>('DELETE', `/api/captures/${encodeURIComponent(name)}?location=${location}`),
   captureUrl: (name: string, location: Location) => withToken(`/api/captures/${encodeURIComponent(name)}?location=${location}`),
@@ -73,7 +73,7 @@ export const api = {
   cancelCalibration: () => request<void>('POST', '/api/calibration/cancel'),
   deleteCalibration: (section: string) => request<void>('DELETE', `/api/calibration/${encodeURIComponent(section)}`),
   record: () => request<{ status: RecordStatus; presets: Record<Exclude<RecordPreset, 'custom'>, RecordSettings> }>('GET', '/api/record'),
-  startRecording: (preset?: RecordPreset) => request<Recording>('POST', '/api/record/start', preset ? { preset } : {}),
+  startRecording: (preset?: RecordPreset, location?: Location) => request<Recording>('POST', '/api/record/start', { preset, location }),
   stopRecording: () => request<Recording | undefined>('POST', '/api/record/stop'),
   castFile: (file: File) => request<CastInfo>('PUT', `/api/display?name=${encodeURIComponent(file.name)}`, file),
   castUrl: (url: string) => request<CastInfo>('PUT', '/api/display', { url }),

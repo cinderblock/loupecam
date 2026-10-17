@@ -76,6 +76,16 @@ impl Storage {
         }
     }
 
+    /// Where to save a new capture or recording: `location` if the request names one,
+    /// else as `mode` says.
+    pub fn target_for(&self, mode: UsbMode, location: Option<Location>) -> Result<(PathBuf, Location), String> {
+        match location {
+            None => self.target(mode),
+            Some(Location::Internal) => self.target(UsbMode::Off),
+            Some(Location::Usb) => self.target(UsbMode::Always),
+        }
+    }
+
     /// Where to save a new capture or recording under `mode`.
     pub fn target(&self, mode: UsbMode) -> Result<(PathBuf, Location), String> {
         let usb = || self.dir(Location::Usb).map(|d| (d, Location::Usb));
@@ -166,5 +176,8 @@ mod tests {
         assert_eq!(missing.target(UsbMode::WhenAvailable).unwrap().1, Location::Internal);
         assert!(missing.target(UsbMode::Always).unwrap_err().contains("No USB stick"));
         assert_eq!(missing.locations().len(), 1);
+        // A request can override the setting.
+        assert_eq!(missing.target_for(UsbMode::Always, Some(Location::Internal)).unwrap().1, Location::Internal);
+        assert!(missing.target_for(UsbMode::Off, Some(Location::Usb)).is_err());
     }
 }
