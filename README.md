@@ -4,8 +4,9 @@ An open, cross-platform driver and app for AmScope / ToupTek USB3 microscope
 cameras. It needs **no vendor SDK and no driver installation**: it talks to the camera
 directly over USB, so it runs anywhere Rust and USB do, including ARM Linux boards.
 
-- **`loupecam` library** (Rust): open the camera, stream raw frames, and control every
-  setting.
+- **Libraries**: open the camera, stream raw frames, control every setting, and
+  develop images. The Rust crates are on crates.io, and there are packages for Python
+  and Node.js and a C API (see [Using it as a library](#using-it-as-a-library)).
 - **Image pipeline**: demosaic (superpixel, bilinear, Malvar-He-Cutler), white balance,
   colour correction, tone curves, auto exposure and white balance, and PNG/TIFF/JPEG
   output.
@@ -106,6 +107,29 @@ Stream options: `--size` (0 = largest), `--mode raw8|raw12`, `-e/--exposure` µs
 `-g/--gain` (multiplier), `--speed 0..3`, `--binning`, `--roi x,y,w,h`. Develop options:
 `--demosaic`, `--wb r,g,b` / `--awb`, `--sixteen`, `--no-ccm`. For experiments,
 `--sensor-reg ADDR=VAL` and `--fpga-reg ADDR=VAL`.
+
+## Using it as a library
+
+The same driver and image pipeline, from your own code. Each package also has a
+simulated camera, so code and tests can run without the hardware.
+
+| Language | Install | Docs |
+| --- | --- | --- |
+| Rust | `cargo add loupecam loupecam-isp` | [crates/loupecam](crates/loupecam/README.md), [crates/loupecam-isp](crates/loupecam-isp/README.md) |
+| Python 3.10+ | `pip install loupecam` | [bindings/python](bindings/python/README.md) (NumPy arrays, type stubs) |
+| Node.js 22+ | `npm install loupecam` | [bindings/node](bindings/node/README.md) (Promises, TypeScript typings) |
+| C, C++, C#, Go, … | `loupecam-c-<target>.zip` from [Releases](https://github.com/cinderblock/loupecam/releases/latest) | [bindings/c](bindings/c/README.md) (`loupecam.h`) |
+
+```python
+import loupecam
+
+with loupecam.open() as cam:
+    frame = cam.start(size=0, mode="raw12").read(timeout=2)
+    frame.save("photo.png", white_balance="auto")
+```
+
+The develop options (demosaic, white balance, colour matrix, tone, orientation, bit
+depth) have the same names and defaults in every language.
 
 ## Headless server
 
@@ -376,9 +400,10 @@ the API to a running `loupecam serve` (override with `LOUPECAM_SERVER=http://hos
 ## Releasing
 
 Push a tag: `git tag -a v1.2.3 -m "LoupeCam 1.2.3" && git push origin v1.2.3`. The
-version comes from the tag. Signing (update signatures, checksums, provenance, and
-Windows/macOS code signing once certificates are configured) is described in
-[docs/releasing.md](docs/releasing.md).
+version comes from the tag. The workflow also publishes the libraries to crates.io,
+PyPI and npm, once each registry is set up. [docs/releasing.md](docs/releasing.md)
+describes the registry setup and the signing: update signatures, checksums,
+provenance, and Windows/macOS code signing once certificates are configured.
 
 ## Layout
 
@@ -389,6 +414,11 @@ crates/loupecam-isp       image pipeline and encoders
 crates/loupecam-server    headless service: camera actor, preview, HTTP/WS API, calibration
 crates/loupecam-cli       the `loupecam` binary
 crates/loupecam-update    signed self-update from GitHub Releases
+crates/loupecam-kiosk     touchscreen kiosk for the Pi display (`loupecam kiosk`)
+bindings/python          Python package (PyO3, maturin)
+bindings/node            Node.js package (napi-rs)
+bindings/c               C API (cbindgen header, shared/static library)
+bindings/common          what the bindings share: develop options and conversions
 apps/web                 web UI (React, Vite, Bun)
 apps/desktop             Tauri desktop shell
 docs/protocol.md         the USB protocol, documented

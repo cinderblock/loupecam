@@ -9,7 +9,9 @@ git push origin v1.2.3
 
 That is the whole process. The [Release workflow](../.github/workflows/release.yml)
 takes the version from the tag, builds every platform, signs everything, publishes the
-GitHub release, and updates the manifest that installed copies check for updates.
+GitHub release, and updates the manifest that installed copies check for updates. Then
+it publishes the libraries to crates.io, PyPI and npm (see
+[Package registries](#package-registries)).
 
 - `vX.Y.Z-suffix` (e.g. `v1.3.0-rc.1`) publishes a **pre-release**. Installed apps
   ignore pre-releases.
@@ -17,6 +19,72 @@ GitHub release, and updates the manifest that installed copies check for updates
   convenient so local builds report something sensible.
 - To rebuild an existing tag with a fixed workflow: Actions → Release → *Run workflow*,
   with the tag.
+
+## Package registries
+
+Once the GitHub release is live, the workflow publishes the libraries:
+
+| Registry | Packages | Turned on by | Auth |
+| --- | --- | --- | --- |
+| crates.io | `loupecam-protocol`, `loupecam`, `loupecam-isp` | variable `PUBLISH_CRATES=true` | Trusted publishing; the first release needs the secret `CARGO_REGISTRY_TOKEN` |
+| PyPI | `loupecam` (abi3 wheels for 8 targets, and the sdist) | variable `PUBLISH_PYPI=true` | Trusted publishing (environment `pypi`) |
+| npm | `loupecam` and `loupecam-<platform>` (6 addon packages) | variable `PUBLISH_NPM=true` | Trusted publishing; the first release needs the secret `NPM_TOKEN` |
+
+The C API is a release asset rather than a registry package:
+`loupecam-c-<target>.zip`, for 6 targets.
+
+Each registry is off until its variable is set, so releases work without the accounts.
+Every step skips a version that's already published, so a re-run (*Run workflow* with
+the tag) finishes a release that failed part-way. Pre-release tags publish too: npm
+gets them under the `next` dist-tag, and crates.io and PyPI treat them as
+pre-releases.
+
+### One-time setup
+
+Trusted publishing ties each registry to this repository's `release.yml`, so no
+long-lived token stays in GitHub. crates.io and npm can only set that up for a package
+that already exists. Their first release uses a token, which you then delete.
+
+**crates.io**
+
+1. Sign in at [crates.io](https://crates.io) with GitHub and verify an email address.
+2. Account Settings → API Tokens → *New Token*, scope `publish-new` and
+   `publish-update`, short expiry:
+
+   ```sh
+   gh secret set CARGO_REGISTRY_TOKEN -R cinderblock/loupecam
+   gh variable set PUBLISH_CRATES -R cinderblock/loupecam --body true
+   ```
+
+3. After the first release, for each of the three crates: Settings → Trusted
+   Publishing → add GitHub, repository `cinderblock/loupecam`, workflow `release.yml`.
+   Then delete the secret (`gh secret delete CARGO_REGISTRY_TOKEN -R cinderblock/loupecam`)
+   and revoke the token. Later releases use OIDC.
+
+**PyPI**
+
+1. On [pypi.org](https://pypi.org): Account → Publishing → *Add a new pending
+   publisher*. Fill in project `loupecam`, owner `cinderblock`, repository `loupecam`,
+   workflow `release.yml`, environment `pypi`.
+2. `gh variable set PUBLISH_PYPI -R cinderblock/loupecam --body true`
+
+The first release creates the project. No secret is involved, before or after.
+
+**npm**
+
+1. On [npmjs.com](https://www.npmjs.com), create an *Automation*-type (or granular,
+   publish-scoped) access token:
+
+   ```sh
+   gh secret set NPM_TOKEN -R cinderblock/loupecam
+   gh variable set PUBLISH_NPM -R cinderblock/loupecam --body true
+   ```
+
+2. After the first release, for `loupecam` and each `loupecam-<platform>` package:
+   Settings → Trusted Publisher → GitHub Actions, `cinderblock/loupecam`,
+   `release.yml`. Then delete the secret and revoke the token.
+
+Every npm publish carries a provenance attestation.
 
 ## What gets signed
 
