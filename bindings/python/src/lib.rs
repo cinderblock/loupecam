@@ -4,11 +4,11 @@
 //! `_native.pyi` documents the API for type checkers and editors. Blocking calls (USB
 //! I/O, waiting for frames, developing) release the GIL.
 
-use loupecam::{AnyCamera, CameraDevice, ColorFilter, Gain, Model, PixelMode, RawFrame, RecvError, Roi, SampleFormat, StreamConfig};
-use loupecam_isp::encode::{self, Format};
-use loupecam_isp::stats;
-use loupecam_isp::tone::{ToneCurve, Transfer};
-use loupecam_isp::{Demosaic, DevelopParams, Rotation};
+use loupecam::{AnyCamera, CameraDevice, Gain, Model, RawFrame, RecvError, Roi, SampleFormat, StreamConfig};
+use loupecam_bindings::{self as common, ColorMatrix, Developed, DevelopOptions, WhiteBalance};
+use loupecam_isp::encode::Format;
+use loupecam_isp::stats::Rect;
+use loupecam_isp::tone::Transfer;
 use numpy::{IntoPyArray, PyArrayMethods};
 use pyo3::create_exception;
 use pyo3::exceptions::{PyException, PyTimeoutError, PyTypeError, PyValueError};
@@ -45,6 +45,13 @@ fn cam_err(e: loupecam::Error) -> PyErr {
 
 fn value_err(e: impl std::fmt::Display) -> PyErr {
     PyValueError::new_err(e.to_string())
+}
+
+fn bind_err(e: common::Error) -> PyErr {
+    match e {
+        common::Error::InvalidArgument(m) => PyValueError::new_err(m),
+        e => err(e),
+    }
 }
 
 /// A connected camera that isn't open yet.
@@ -115,10 +122,7 @@ impl PyModel {
     /// The Bayer mosaic's top-left 2×2 cell, e.g. `"RGGB"`; `None` for monochrome.
     #[getter]
     fn bayer_pattern(&self) -> Option<&'static str> {
-        match self.0.color {
-            ColorFilter::Bayer(p) => Some(p.name()),
-            ColorFilter::Mono => None,
-        }
+        common::pattern_name(self.0)
     }
     /// Significant bits per sample in the `raw12` mode.
     #[getter]
@@ -191,21 +195,8 @@ impl PyGeometry {
 }
 
 fn geometry(g: loupecam::StreamGeometry) -> PyGeometry {
-    let lines = loupecam::protocol::sensor::ar1820::exposure_lines(g.exposure_us.round() as u32, g.line_length_pck);
-    PyGeometry {
-        width: g.resolution.width,
-        height: g.resolution.height,
-        bits: bits(g.format),
-        exposure_us: g.exposure_us,
-        max_fps: g.max_fps(lines),
-    }
-}
-
-fn bits(f: SampleFormat) -> u8 {
-    match f {
-        SampleFormat::U8 => 8,
-        SampleFormat::U16 { bits } => bits,
-    }
+    let g = common::Geometry::from(g);
+    PyGeometry { width: g.width, height: g.height, bits: g.bits, exposure_us: g.exposure_us, max_fps: g.max_fps }
 }
 
 /// Counters for a running stream.
@@ -337,7 +328,7 @@ impl PyCamera {
         binning: bool,
         roi: Option<(u16, u16, u16, u16)>,
     ) -> PyResult<PyStream> {
-        let mode: PixelMode = mode.parse().map_err(value_err)?;
+        let mode = common::pixel_mode_named(mode).map_err(bind_err)?;
         let mut cfg = StreamConfig::new(size, mode);
         cfg.exposure_us = exposure_us;
         cfg.gain = Gain::for_multiplier(gain).map_err(value_err)?;
@@ -498,124 +489,66 @@ impl PyFrameStats {
     }
 }
 
-impl PyFrame {
-    fn pattern(&self) -> loupecam::BayerPattern {
-        match self.model.color {
-            ColorFilter::Bayer(p) => p,
-            ColorFilter::Mono => loupecam::BayerPattern::Rggb,
-        }
-    }
-
-    fn region(&self, r: Option<(u32, u32, u32, u32)>) -> Option<stats::Rect> {
-        r.map(|(x, y, width, height)| stats::Rect { x, y, width, height })
-    }
-
-    fn grey_world(&self, region: Option<stats::Rect>) -> [f32; 3] {
-        loupecam_isp::auto::grey_world(&stats::compute(&self.raw, self.pattern(), region, 2, [1.0; 3]))
-    }
-
-    /// Develop parameters (and output bit depth) from `develop()`'s keyword arguments.
-    fn params(&self, options: Option<&Bound<'_, PyDict>>) -> PyResult<(DevelopParams, u8)> {
-        let mut p = DevelopParams::for_model(self.model);
-        let mut depth = 8;
-        let (mut flip_h, mut flip_v, mut rotation) = (false, false, 0);
-        let Some(options) = options else { return Ok((p, depth)) };
-        for (k, v) in options.iter() {
-            let key: String = k.extract()?;
-            match key.as_str() {
-                "demosaic" => p.demosaic = v.extract::<String>()?.parse::<Demosaic>().map_err(value_err)?,
-                "white_balance" => {
-                    if let Ok(s) = v.extract::<String>() {
-                        match s.as_str() {
-                            "auto" => p.wb = self.grey_world(None),
-                            "daylight" => {}
-                            "none" => p.wb = [1.0; 3],
-                            _ => return Err(value_err(format!("white_balance {s:?}: use \"auto\", \"daylight\", \"none\" or (r, g, b)"))),
-                        }
-                    } else if !v.is_none() {
-                        let (r, g, b): (f32, f32, f32) = v.extract()?;
-                        p.wb = [r, g, b];
-                    }
-                }
-                "color_matrix" => {
-                    if let Ok(on) = v.extract::<bool>() {
-                        if !on {
-                            p.ccm = loupecam_isp::IDENTITY;
-                        }
-                    } else if !v.is_none() {
-                        let m: [[f32; 3]; 3] = v.extract()?;
-                        p.ccm = m;
-                    }
-                }
-                "tone" => {
-                    let transfer = if let Ok(g) = v.extract::<f32>() {
-                        Transfer::Gamma(g)
-                    } else {
-                        match v.extract::<String>()?.as_str() {
-                            "srgb" => Transfer::Srgb,
-                            "linear" => Transfer::Linear,
-                            s => return Err(value_err(format!("tone {s:?}: use \"srgb\", \"linear\" or a gamma value"))),
-                        }
-                    };
-                    p.tone = ToneCurve { transfer, ..p.tone };
-                }
-                "black_point" => p.tone.black_point = v.extract()?,
-                "white_point" => p.tone.white_point = v.extract()?,
-                "brightness" => p.tone.brightness = v.extract()?,
-                "contrast" => p.tone.contrast = v.extract()?,
-                "black_level" => {
-                    // In the frame's own sample units; the pipeline works at 16-bit scale.
-                    let level: u32 = v.extract()?;
-                    let shift = 16 - bits(self.raw.format) as u32;
-                    p.black_level = (level << shift).min(u16::MAX as u32) as u16;
-                }
-                "monochrome" => p.monochrome = v.extract()?,
-                "negative" => p.negative = v.extract()?,
-                "flip_horizontal" => flip_h = v.extract()?,
-                "flip_vertical" => flip_v = v.extract()?,
-                "rotation" => rotation = v.extract()?,
-                "depth" => {
-                    depth = v.extract()?;
-                    if depth != 8 && depth != 16 {
-                        return Err(value_err("depth must be 8 or 16"));
-                    }
-                }
-                _ => return Err(PyTypeError::new_err(format!("unexpected keyword argument {key:?}"))),
-            }
-        }
-        p.orientation.flip_h = flip_h;
-        p.orientation.flip_v = flip_v ^ self.model.rows_bottom_up;
-        p.orientation.rotation = match rotation {
-            0 => Rotation::None,
-            90 => Rotation::Cw90,
-            180 => Rotation::Cw180,
-            270 => Rotation::Cw270,
-            r => return Err(value_err(format!("rotation {r}: use 0, 90, 180 or 270"))),
-        };
-        Ok((p, depth))
-    }
-
-    fn encode_bytes(&self, py: Python<'_>, format: Format, raw: bool, options: Option<&Bound<'_, PyDict>>) -> PyResult<Vec<u8>> {
-        if raw {
-            if format != Format::Tiff {
-                return Err(value_err("raw frames are saved as TIFF"));
-            }
-            return py.detach(|| encode::raw_tiff(&self.raw)).map_err(err);
-        }
-        let (p, depth) = self.params(options)?;
-        py.detach(|| {
-            if depth == 16 {
-                encode::encode16(&loupecam_isp::develop16(&self.raw, &p), format)
-            } else {
-                encode::encode8(&loupecam_isp::develop(&self.raw, &p), format)
-            }
-        })
-        .map_err(err)
-    }
+fn region_rect(r: Option<(u32, u32, u32, u32)>) -> Option<Rect> {
+    r.map(|(x, y, width, height)| Rect { x, y, width, height })
 }
 
-fn format_named(name: &str, quality: u8) -> PyResult<Format> {
-    Format::from_extension(name, quality).ok_or_else(|| value_err(format!("format {name:?}: use \"png\", \"tiff\" or \"jpeg\"")))
+/// `develop()`'s keyword arguments as develop options.
+fn develop_options(options: Option<&Bound<'_, PyDict>>) -> PyResult<DevelopOptions> {
+    let mut o = DevelopOptions::default();
+    let Some(options) = options else { return Ok(o) };
+    for (k, v) in options.iter() {
+        let key: String = k.extract()?;
+        match key.as_str() {
+            "demosaic" => o.demosaic = common::demosaic_named(&v.extract::<String>()?).map_err(bind_err)?,
+            "white_balance" => {
+                o.white_balance = if v.is_none() {
+                    WhiteBalance::Daylight
+                } else if let Ok(s) = v.extract::<String>() {
+                    s.parse().map_err(bind_err)?
+                } else {
+                    let (r, g, b): (f32, f32, f32) = v.extract()?;
+                    WhiteBalance::Gains([r, g, b])
+                }
+            }
+            "color_matrix" => {
+                o.color_matrix = if v.is_none() {
+                    ColorMatrix::Model
+                } else if let Ok(on) = v.extract::<bool>() {
+                    if on { ColorMatrix::Model } else { ColorMatrix::Identity }
+                } else {
+                    ColorMatrix::Custom(v.extract()?)
+                }
+            }
+            "tone" => {
+                o.transfer = match v.extract::<f32>() {
+                    Ok(g) => Transfer::Gamma(g),
+                    Err(_) => common::transfer_named(&v.extract::<String>()?).map_err(bind_err)?,
+                }
+            }
+            "black_point" => o.black_point = v.extract()?,
+            "white_point" => o.white_point = v.extract()?,
+            "brightness" => o.brightness = v.extract()?,
+            "contrast" => o.contrast = v.extract()?,
+            "black_level" => o.black_level = v.extract()?,
+            "monochrome" => o.monochrome = v.extract()?,
+            "negative" => o.negative = v.extract()?,
+            "flip_horizontal" => o.flip_horizontal = v.extract()?,
+            "flip_vertical" => o.flip_vertical = v.extract()?,
+            "rotation" => o.rotation = v.extract()?,
+            "depth" => o.depth = v.extract()?,
+            _ => return Err(PyTypeError::new_err(format!("unexpected keyword argument {key:?}"))),
+        }
+    }
+    o.validate().map_err(bind_err)?;
+    Ok(o)
+}
+
+impl PyFrame {
+    fn encode_bytes(&self, py: Python<'_>, format: Format, raw: bool, options: Option<&Bound<'_, PyDict>>) -> PyResult<Vec<u8>> {
+        let o = develop_options(options)?;
+        py.detach(|| o.encode(&self.raw, self.model, format, raw)).map_err(bind_err)
+    }
 }
 
 #[pymethods]
@@ -631,7 +564,7 @@ impl PyFrame {
     /// Significant bits per sample: 8, or 12 in the `raw12` mode.
     #[getter]
     fn bits(&self) -> u8 {
-        bits(self.raw.format)
+        self.raw.format.bits()
     }
     /// The camera's frame counter.
     #[getter]
@@ -641,10 +574,7 @@ impl PyFrame {
     /// The Bayer mosaic's top-left 2×2 cell, e.g. `"RGGB"`.
     #[getter]
     fn bayer_pattern(&self) -> Option<&'static str> {
-        match self.model.color {
-            ColorFilter::Bayer(p) => Some(p.name()),
-            ColorFilter::Mono => None,
-        }
+        common::pattern_name(self.model)
     }
     #[getter]
     fn model(&self) -> PyModel {
@@ -659,10 +589,7 @@ impl PyFrame {
         let (w, h) = (self.raw.width as usize, self.raw.height as usize);
         Ok(match self.raw.format {
             SampleFormat::U8 => self.raw.data.clone().into_pyarray(py).reshape([h, w])?.into_any(),
-            SampleFormat::U16 { .. } => {
-                let v: Vec<u16> = self.raw.data.as_chunks::<2>().0.iter().map(|b| u16::from_le_bytes(*b)).collect();
-                v.into_pyarray(py).reshape([h, w])?.into_any()
-            }
+            SampleFormat::U16 { .. } => common::samples_u16(&self.raw).into_pyarray(py).reshape([h, w])?.into_any(),
         })
     }
 
@@ -686,14 +613,13 @@ impl PyFrame {
     /// demosaicing and the sRGB curve, upright. See the type stubs for every option.
     #[pyo3(signature = (**options))]
     fn develop<'py>(&self, py: Python<'py>, options: Option<&Bound<'py, PyDict>>) -> PyResult<Bound<'py, PyAny>> {
-        let (p, depth) = self.params(options)?;
-        let shape = |w: u32, h: u32, c: u8| if c == 1 { vec![h as usize, w as usize] } else { vec![h as usize, w as usize, c as usize] };
-        Ok(if depth == 16 {
-            let img = py.detach(|| loupecam_isp::develop16(&self.raw, &p));
-            img.data.into_pyarray(py).reshape(shape(img.width, img.height, img.channels))?.into_any()
-        } else {
-            let img = py.detach(|| loupecam_isp::develop(&self.raw, &p));
-            img.data.into_pyarray(py).reshape(shape(img.width, img.height, img.channels))?.into_any()
+        let o = develop_options(options)?;
+        let img = py.detach(|| o.develop(&self.raw, self.model)).map_err(bind_err)?;
+        let (w, h, c) = img.shape();
+        let shape = if c == 1 { vec![h as usize, w as usize] } else { vec![h as usize, w as usize, c as usize] };
+        Ok(match img {
+            Developed::Eight(i) => i.data.into_pyarray(py).reshape(shape)?.into_any(),
+            Developed::Sixteen(i) => i.data.into_pyarray(py).reshape(shape)?.into_any(),
         })
     }
 
@@ -701,7 +627,8 @@ impl PyFrame {
     /// only), the undeveloped mosaic, scaled to 16 bits.
     #[pyo3(signature = (format = "png", *, quality = 90, raw = false, **options))]
     fn encode<'py>(&self, py: Python<'py>, format: &str, quality: u8, raw: bool, options: Option<&Bound<'py, PyDict>>) -> PyResult<Bound<'py, PyBytes>> {
-        let bytes = self.encode_bytes(py, format_named(format, quality)?, raw, options)?;
+        let format = common::format_named(format, quality).map_err(bind_err)?;
+        let bytes = self.encode_bytes(py, format, raw, options)?;
         Ok(PyBytes::new(py, &bytes))
     }
 
@@ -709,8 +636,7 @@ impl PyFrame {
     /// `.jpg`/`.jpeg`). Takes the same options as `encode()`.
     #[pyo3(signature = (path, *, quality = 90, raw = false, **options))]
     fn save(&self, py: Python<'_>, path: std::path::PathBuf, quality: u8, raw: bool, options: Option<&Bound<'_, PyDict>>) -> PyResult<()> {
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-        let format = Format::from_extension(ext, quality).ok_or_else(|| value_err(format!("unknown image extension {ext:?} (use .png, .tif or .jpg)")))?;
+        let format = common::format_for_path(&path, quality).map_err(bind_err)?;
         let bytes = self.encode_bytes(py, format, raw, options)?;
         py.detach(|| std::fs::write(&path, bytes))?;
         Ok(())
@@ -720,8 +646,8 @@ impl PyFrame {
     /// `(x, y, width, height)`, this is "click to white balance".
     #[pyo3(signature = (region = None))]
     fn white_balance(&self, py: Python<'_>, region: Option<(u32, u32, u32, u32)>) -> (f32, f32, f32) {
-        let region = self.region(region);
-        let [r, g, b] = py.detach(|| self.grey_world(region));
+        let region = region_rect(region);
+        let [r, g, b] = py.detach(|| common::grey_world(&self.raw, self.model, region));
         (r, g, b)
     }
 
@@ -729,15 +655,14 @@ impl PyFrame {
     /// the luma estimate (default: the model's daylight balance).
     #[pyo3(signature = (region = None, white_balance = None))]
     fn stats(&self, py: Python<'_>, region: Option<(u32, u32, u32, u32)>, white_balance: Option<(f32, f32, f32)>) -> PyFrameStats {
-        let region = self.region(region);
-        let d = self.model.daylight_wb;
-        let wb = white_balance.map_or([d.r, d.g, d.b], |(r, g, b)| [r, g, b]);
-        let s = py.detach(|| stats::compute(&self.raw, self.pattern(), region, 1, wb));
+        let region = region_rect(region);
+        let wb = white_balance.map(|(r, g, b)| [r, g, b]);
+        let s = py.detach(|| common::frame_stats(&self.raw, self.model, region, wb));
         PyFrameStats { mean: (s.mean[0], s.mean[1], s.mean[2]), luma: s.luma, clipped: s.clipped, histogram: s.histogram }
     }
 
     fn __repr__(&self) -> String {
-        format!("<Frame #{} {}x{} {}-bit>", self.raw.trailer.sequence, self.raw.width, self.raw.height, bits(self.raw.format))
+        format!("<Frame #{} {}x{} {}-bit>", self.raw.trailer.sequence, self.raw.width, self.raw.height, self.raw.format.bits())
     }
 }
 

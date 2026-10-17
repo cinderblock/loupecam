@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "apps/desktop/src-tauri", "bindings/python"]
+members = ["crates/*", "apps/desktop/src-tauri", "bindings/common", "bindings/python"]
 
 [workspace.package]
 version = "0.1.2"
@@ -18,6 +18,7 @@ loupecam-isp = { path = "crates/loupecam-isp", version = "0.1.2" }
 loupecam-server = { path = "crates/loupecam-server" }
 loupecam-update = { path = "crates/loupecam-update" }
 loupecam-kiosk = { path = "crates/loupecam-kiosk" }
+loupecam-bindings = { path = "bindings/common" }
 nusb = "0.2.7"
 thiserror = "2"
 tracing = "0.1"

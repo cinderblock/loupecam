@@ -3025,6 +3025,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "loupecam-bindings"
+version = "0.1.2"
+dependencies = [
+ "loupecam",
+ "loupecam-isp",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "loupecam-cli"
 version = "0.1.2"
 dependencies = [
@@ -3111,6 +3120,7 @@ name = "loupecam-python"
 version = "0.1.2"
 dependencies = [
  "loupecam",
+ "loupecam-bindings",
  "loupecam-isp",
  "numpy",
  "pyo3",

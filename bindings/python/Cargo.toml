@@ -19,5 +19,6 @@ doctest = false
 [dependencies]
 loupecam.workspace = true
 loupecam-isp.workspace = true
+loupecam-bindings.workspace = true
 pyo3 = { workspace = true, features = ["abi3-py39"] }
 numpy.workspace = true
