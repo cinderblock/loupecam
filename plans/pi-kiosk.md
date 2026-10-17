@@ -128,9 +128,14 @@ work in both the camera view and cast content.
 4. ✅ Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
 5. ✅ Chromium override (cage handoff).
 6. ✅ V4L2 M2M encoder (written; needs the Pi 4 to test).
-7. **← current** Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
+7. ✅ Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
    `chromium`, the user, config.txt notes), README.
-8. Hardware test on the Pi 4 + display.
+8. **← current (blocked: needs the Pi 4 + display)** Hardware test on the Pi 4 + display:
+   build an aarch64 binary with `--features embed-ui,kiosk` (CI artifact or on the Pi),
+   `install.sh --binary ./loupecam --kiosk`, then check: KMS output and touch (incl.
+   pinch), rotation, backlight sleep/wake, hardware encoder (all three presets, file
+   plays in a browser), cage/Chromium hand-off and back (PDF, URL, three-finger tap),
+   `--home browser`, CPU load while recording + kiosk (see the develop-twice note).
 
 ## Findings / gotchas
 
@@ -193,14 +198,18 @@ work in both the camera view and cast content.
       tap back to the camera, `--home browser` for the full web UI. Untested on hardware.
 - [x] V4L2 M2M encoder: raw ioctls (no bindgen), struct sizes asserted at compile time
       for 64-bit; type-checks for aarch64-musl. Untested on hardware.
-- [ ] Packaging + README
+- [x] Packaging + README: `loupecam-kiosk.service`, backlight udev rule,
+      `install.sh --kiosk [--rotate N] [--no-browser]`, release/CI features, README
+      sections (kiosk, casting, recording).
 - [ ] Tested on Pi 4 + display
 
 ## Open questions for the user
 
 1. Is a Pi 4 with the display available to test on, and how is it reached (SSH host)?
-   Steps 6 and 8 need it. Until then everything is developed with the window backend on
-   Windows.
+   Step 8 needs it (odriver2 is a Pi 5: no hardware encoder, no display).
+2. Push the local commits to `origin/master`? The README's `curl | sh` install (with
+   `--kiosk`) only works once they're pushed and released (pi-deployment.md asks the
+   same). Recommendation: push, then cut a release so the Pi can install it.
 
 ## Things not to do
 
