@@ -20,6 +20,17 @@ pub enum Demosaic {
 }
 
 impl Demosaic {
+    pub const ALL: [Demosaic; 3] = [Demosaic::Superpixel, Demosaic::Bilinear, Demosaic::Mhc];
+
+    /// Lower-case name, as accepted by [`str::parse`].
+    pub fn name(self) -> &'static str {
+        match self {
+            Demosaic::Superpixel => "superpixel",
+            Demosaic::Bilinear => "bilinear",
+            Demosaic::Mhc => "mhc",
+        }
+    }
+
     pub fn output_size(self, w: u32, h: u32) -> (u32, u32) {
         match self {
             Demosaic::Superpixel => (w / 2, h / 2),
@@ -35,6 +46,27 @@ impl Demosaic {
             Demosaic::Mhc => interp_row(m, y as isize, out, mhc),
         }
     }
+}
+
+impl std::str::FromStr for Demosaic {
+    type Err = UnknownName;
+
+    fn from_str(s: &str) -> Result<Self, UnknownName> {
+        Demosaic::ALL.into_iter().find(|d| d.name().eq_ignore_ascii_case(s)).ok_or_else(|| UnknownName {
+            what: "demosaic",
+            name: s.into(),
+            expected: "superpixel, bilinear or mhc",
+        })
+    }
+}
+
+/// A name that [`str::parse`] didn't recognise.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[error("unknown {what} {name:?} (expected {expected})")]
+pub struct UnknownName {
+    pub what: &'static str,
+    pub name: String,
+    pub expected: &'static str,
 }
 
 const PAD: usize = 2;

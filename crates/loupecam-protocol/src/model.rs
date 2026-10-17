@@ -41,6 +41,18 @@ pub enum BayerPattern {
     Bggr,
 }
 
+impl BayerPattern {
+    /// The top-left 2×2 cell in reading order, e.g. `"RGGB"`.
+    pub fn name(self) -> &'static str {
+        match self {
+            BayerPattern::Rggb => "RGGB",
+            BayerPattern::Grbg => "GRBG",
+            BayerPattern::Gbrg => "GBRG",
+            BayerPattern::Bggr => "BGGR",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Model {
     pub name: &'static str,

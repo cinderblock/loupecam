@@ -26,6 +26,7 @@ pub use session::{Session, StreamConfig};
 
 /// Errors from a [`Transport`] or from protocol validation.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum Error {
     #[error("USB transfer failed: {0}")]
     Transfer(String),

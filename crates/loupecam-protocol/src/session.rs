@@ -40,6 +40,17 @@ pub enum PixelMode {
 }
 
 impl PixelMode {
+    pub const ALL: [PixelMode; 3] = [PixelMode::Raw8, PixelMode::Raw12, PixelMode::Processed8];
+
+    /// Lower-case name, as accepted by [`str::parse`].
+    pub fn name(self) -> &'static str {
+        match self {
+            PixelMode::Raw8 => "raw8",
+            PixelMode::Raw12 => "raw12",
+            PixelMode::Processed8 => "processed8",
+        }
+    }
+
     pub fn sample_format(self) -> SampleFormat {
         match self {
             PixelMode::Raw8 | PixelMode::Processed8 => SampleFormat::U8,
@@ -48,6 +59,17 @@ impl PixelMode {
     }
     fn sixteen_bit(self) -> bool {
         matches!(self, PixelMode::Raw12)
+    }
+}
+
+impl std::str::FromStr for PixelMode {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        PixelMode::ALL
+            .into_iter()
+            .find(|m| m.name().eq_ignore_ascii_case(s))
+            .ok_or_else(|| Error::OutOfRange(format!("pixel mode {s:?} (expected raw8, raw12 or processed8)")))
     }
 }
 

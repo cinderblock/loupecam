@@ -30,7 +30,7 @@ pub mod stats;
 pub mod tone;
 pub mod yuv;
 
-pub use demosaic::Demosaic;
+pub use demosaic::{Demosaic, UnknownName};
 pub use resize::resize;
 pub use tone::ToneCurve;
 

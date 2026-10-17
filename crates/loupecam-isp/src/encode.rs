@@ -26,6 +26,16 @@ pub enum Format {
 }
 
 impl Format {
+    /// The format for a file extension (`png`, `tif`/`tiff`, `jpg`/`jpeg`, any case).
+    pub fn from_extension(ext: &str, jpeg_quality: u8) -> Option<Format> {
+        match ext.to_ascii_lowercase().as_str() {
+            "png" => Some(Format::Png),
+            "tif" | "tiff" => Some(Format::Tiff),
+            "jpg" | "jpeg" => Some(Format::Jpeg { quality: jpeg_quality }),
+            _ => None,
+        }
+    }
+
     pub fn extension(self) -> &'static str {
         match self {
             Format::Png => "png",
