@@ -28,6 +28,9 @@ enum Cmd {
     },
     /// Run the network service: HTTP/WebSocket API, MJPEG stream, optional web UI.
     Serve(ServeArgs),
+    /// Fullscreen touch UI for a server, on a display attached to this machine.
+    #[cfg(feature = "kiosk")]
+    Kiosk(KioskArgs),
     /// Find LoupeCam servers on the local network (mDNS / DNS-SD).
     Discover {
         /// Seconds to listen for answers.
@@ -58,6 +61,33 @@ enum Cmd {
         #[command(flatten)]
         develop: DevelopOpts,
     },
+}
+
+#[cfg(feature = "kiosk")]
+#[derive(Args, Debug)]
+struct KioskArgs {
+    /// The server to show.
+    #[arg(long, env = "LOUPECAM_SERVER", default_value = "http://127.0.0.1:8080")]
+    server: String,
+    /// The server's token, if it requires one.
+    #[arg(long, env = "LOUPECAM_TOKEN", hide_env_values = true)]
+    token: Option<String>,
+    /// Rotate the UI clockwise (0, 90, 180 or 270) to match how the display is mounted.
+    #[arg(long, env = "LOUPECAM_KIOSK_ROTATE", default_value_t = 0)]
+    rotate: u16,
+    /// Turn the backlight off after this many minutes without a touch (0 = never).
+    #[arg(long, env = "LOUPECAM_KIOSK_SLEEP", default_value_t = 0.0)]
+    sleep_after: f64,
+    /// Show the UI in a desktop window of this size (WIDTHxHEIGHT) instead of on the
+    /// display hardware. For development; needs a build with `kiosk-window`.
+    #[arg(long, value_name = "WxH", value_parser = parse_size, num_args = 0..=1, default_missing_value = "800x480")]
+    window: Option<(u32, u32)>,
+}
+
+#[cfg(feature = "kiosk")]
+fn parse_size(s: &str) -> Result<(u32, u32), String> {
+    let (w, h) = s.split_once(['x', 'X']).ok_or("expected WIDTHxHEIGHT")?;
+    Ok((w.trim().parse().map_err(|_| "bad width")?, h.trim().parse().map_err(|_| "bad height")?))
 }
 
 #[derive(Args, Debug)]
@@ -229,7 +259,7 @@ impl StreamOpts {
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn,loupecam=info,loupecam_server=info".into()))
+        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn,loupecam=info,loupecam_server=info,loupecam_kiosk=info".into()))
         .with_writer(std::io::stderr)
         .init();
     match Cli::parse().cmd {
@@ -304,6 +334,14 @@ fn main() -> Result<()> {
             );
         }
         Cmd::Serve(args) => serve(args)?,
+        #[cfg(feature = "kiosk")]
+        Cmd::Kiosk(a) => loupecam_kiosk::run(loupecam_kiosk::Options {
+            server: a.server,
+            token: a.token,
+            rotation: a.rotate,
+            window: a.window,
+            sleep_after: (a.sleep_after > 0.0).then(|| Duration::from_secs_f64(a.sleep_after * 60.0)),
+        })?,
         Cmd::Discover { seconds } => discover(Duration::from_secs_f64(seconds))?,
         Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
