@@ -10,6 +10,12 @@ rust-version.workspace = true
 [features]
 # Embed the built web UI (apps/web/dist) in the binary.
 embed-ui = ["loupecam-server/embed-ui"]
+# Software H.264 encoding for recordings (see loupecam-server).
+openh264 = ["loupecam-server/openh264"]
+# The `kiosk` command: a fullscreen touch UI on the display (Linux DRM/KMS).
+kiosk = ["dep:loupecam-kiosk"]
+# ...and its desktop-window mode, for development (`kiosk --window`).
+kiosk-window = ["kiosk", "loupecam-kiosk/window"]
 
 [[bin]]
 name = "loupecam"
@@ -20,6 +26,7 @@ loupecam.workspace = true
 loupecam-isp.workspace = true
 loupecam-server.workspace = true
 loupecam-update.workspace = true
+loupecam-kiosk = { workspace = true, optional = true }
 tokio.workspace = true
 anyhow.workspace = true
 clap.workspace = true

@@ -12,17 +12,21 @@
 //! Steps 1–3 are fused per output row and parallelised with rayon, so a full 18 MP
 //! frame needs no full-size intermediate RGB buffer.
 //!
-//! [`stats`] computes channel statistics for auto exposure / white balance, and
-//! [`encode`] writes PNG, TIFF and JPEG.
+//! [`stats`] computes channel statistics for auto exposure / white balance,
+//! [`encode`] writes PNG, TIFF and JPEG, and [`resize`] and [`yuv`] prepare frames for
+//! video encoders.
 
 pub mod auto;
 pub mod correction;
 mod demosaic;
 pub mod encode;
+mod resize;
 pub mod stats;
 pub mod tone;
+pub mod yuv;
 
 pub use demosaic::Demosaic;
+pub use resize::resize;
 pub use tone::ToneCurve;
 
 use loupecam_protocol::frame::{RawFrame, SampleFormat};

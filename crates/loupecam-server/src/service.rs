@@ -8,7 +8,8 @@
 use crate::calibration::Calibration;
 use crate::calibration::analysis::Measurement;
 use crate::settings::{Settings, WbMode};
-use loupecam::{Camera, FrameReceiver, Gain, Model, RawFrame, RecvError};
+use loupecam::sim::SimCamera;
+use loupecam::{Camera, FrameReceiver, Gain, Model, RawFrame, RecvError, StreamConfig, StreamGeometry};
 use loupecam_isp::auto::{AutoExposure, Exposure, grey_world};
 use loupecam_isp::stats::{self, Rect};
 use serde::Serialize;
@@ -133,6 +134,11 @@ pub struct Service {
 
 impl Service {
     pub fn spawn(settings: Settings) -> Arc<Self> {
+        Self::spawn_with(settings, Source::Usb)
+    }
+
+    /// Run with a camera from `source` (a real one, or the simulator).
+    pub fn spawn_with(settings: Settings, source: Source) -> Arc<Self> {
         let (tx, rx) = mpsc::channel();
         let shared = Arc::new(Shared {
             state: watch::Sender::new(State { status: Status::Searching(None), device: None, settings: settings.clone() }),
@@ -140,7 +146,7 @@ impl Service {
             frame: watch::Sender::new(None),
             calibration: watch::Sender::new(Arc::new(Calibration::default())),
         });
-        let actor = Actor::new(shared.clone(), rx, settings);
+        let actor = Actor::new(shared.clone(), rx, settings, source);
         let thread = std::thread::Builder::new()
             .name("loupecam-camera".into())
             .spawn(move || actor.run())
@@ -189,8 +195,64 @@ impl Service {
     }
 }
 
+/// Where the camera comes from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Source {
+    /// The first supported USB camera.
+    Usb,
+    /// A simulated camera ([`loupecam::sim`]), for development without hardware.
+    Simulated,
+}
+
+/// A real or simulated camera.
+enum Cam {
+    Usb(Camera),
+    Sim(SimCamera),
+}
+
+macro_rules! delegate {
+    ($( fn $name:ident(&mut self $(, $arg:ident: $ty:ty)*) -> $ret:ty; )*) => {
+        $( fn $name(&mut self $(, $arg: $ty)*) -> $ret {
+            match self {
+                Cam::Usb(c) => c.$name($($arg),*),
+                Cam::Sim(c) => c.$name($($arg),*),
+            }
+        } )*
+    };
+}
+
+impl Cam {
+    delegate! {
+        fn start(&mut self, cfg: &StreamConfig) -> loupecam::Result<FrameReceiver>;
+        fn stop(&mut self) -> loupecam::Result<()>;
+        fn set_exposure(&mut self, us: u32) -> loupecam::Result<f64>;
+        fn set_gain(&mut self, gain: Gain) -> loupecam::Result<()>;
+        fn set_speed(&mut self, speed: u8) -> loupecam::Result<StreamGeometry>;
+        fn set_binning(&mut self, binning: bool) -> loupecam::Result<()>;
+        fn set_roi(&mut self, roi: Option<loupecam::Roi>) -> loupecam::Result<StreamGeometry>;
+    }
+
+    fn info(&self) -> &loupecam::DeviceInfo {
+        match self {
+            Cam::Usb(c) => c.info(),
+            Cam::Sim(c) => c.info(),
+        }
+    }
+
+    fn model(&self) -> &'static Model {
+        self.info().model
+    }
+
+    fn geometry(&self) -> Option<StreamGeometry> {
+        match self {
+            Cam::Usb(c) => c.geometry(),
+            Cam::Sim(c) => c.geometry(),
+        }
+    }
+}
+
 struct Live {
-    cam: Camera,
+    cam: Cam,
     frames: FrameReceiver,
     last_frame: Instant,
 }
@@ -198,6 +260,7 @@ struct Live {
 struct Actor {
     shared: Arc<Shared>,
     rx: mpsc::Receiver<Command>,
+    source: Source,
     settings: Settings,
     live: Option<Live>,
     status: Status,
@@ -216,10 +279,11 @@ const SETTLE_FRAMES: u32 = 4;
 const STALL: Duration = Duration::from_secs(5);
 
 impl Actor {
-    fn new(shared: Arc<Shared>, rx: mpsc::Receiver<Command>, settings: Settings) -> Self {
+    fn new(shared: Arc<Shared>, rx: mpsc::Receiver<Command>, settings: Settings, source: Source) -> Self {
         Actor {
             shared,
             rx,
+            source,
             settings,
             live: None,
             status: Status::Searching(None),
@@ -277,7 +341,10 @@ impl Actor {
     }
 
     fn connect(&mut self) -> Result<(), String> {
-        let mut cam = Camera::open_first().map_err(|e| e.to_string())?;
+        let mut cam = match self.source {
+            Source::Usb => Cam::Usb(Camera::open_first().map_err(|e| e.to_string())?),
+            Source::Simulated => Cam::Sim(SimCamera::open()),
+        };
         // Load this camera's calibration first: it can change gain register choices.
         let profile = crate::calibration::load(&cam.info().serial);
         self.shared.calibration.send_replace(Arc::new(Calibration::new(profile)));

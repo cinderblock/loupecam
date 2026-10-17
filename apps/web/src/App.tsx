@@ -10,6 +10,8 @@ import { UpdateBanner, UpdatesPanel } from './components/Updates'
 import { CalibrationPanel } from './components/Calibration'
 import { roleLabel, useAccess, type AccessState } from './access'
 import { AccessPanel, AdminGate, Login, SetupWizard } from './components/Access'
+import { RecordButton, RecordPanel } from './components/Record'
+import { CastPanel } from './components/Cast'
 import type { NormRect, ScalePreset } from './types'
 import { useCamera } from './useCamera'
 
@@ -62,6 +64,8 @@ function CameraApp({ access }: { access: AccessState }) {
     window.setTimeout(() => setToast((t) => (t === m ? null : t)), 4000)
   }, [])
   const cam = useCamera(flash)
+  // The gallery also refreshes when a recording finishes.
+  const lastRecording = cam.record?.last?.started ?? ''
   // Calibrated scale presets (refreshed when a calibration step finishes).
   const [scalePresets, setScalePresets] = useState<ScalePreset[]>([])
   const calibAt = cam.calibration?.last?.at
@@ -176,6 +180,7 @@ function CameraApp({ access }: { access: AccessState }) {
                 {k === 'scaleBar' ? 'Scale bar' : k[0].toUpperCase() + k.slice(1)}
               </button>
             ))}
+            <RecordButton status={cam.record} disabled={!dev} onError={flash} />
             <button className="primary" disabled={busy || !dev} onClick={capture} title="Capture (Space)">
               {busy ? 'Capturing…' : 'Capture'}
             </button>
@@ -194,6 +199,14 @@ function CameraApp({ access }: { access: AccessState }) {
               <CaptureSettingsPanel s={s} patch={cam.patch} />
             </Section>
           )}
+          {s && (
+            <Section title="Recording" defaultOpen={false}>
+              <RecordPanel s={s} device={dev} status={cam.record} patch={cam.patch} />
+            </Section>
+          )}
+          <Section title="Cast to display" defaultOpen={false}>
+            <CastPanel cast={cam.cast} onError={flash} />
+          </Section>
           <Section title="Scale" defaultOpen={false}>
             {s?.calibration.scalePreset ? (
               <p className="hint">Using the calibrated preset “{s.calibration.scalePreset}” (change it under Calibration).</p>
@@ -223,7 +236,7 @@ function CameraApp({ access }: { access: AccessState }) {
             </Section>
           )}
           <Section title="Captures">
-            <Gallery version={galleryVersion} canDelete={isAdmin} />
+            <Gallery version={`${galleryVersion}:${lastRecording}`} canDelete={isAdmin} />
           </Section>
           {s && (
             <Section title="About & updates" defaultOpen={false}>

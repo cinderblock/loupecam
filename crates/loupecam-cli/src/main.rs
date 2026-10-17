@@ -39,6 +39,9 @@ enum Cmd {
         #[command(subcommand)]
         cmd: AccessCmd,
     },
+    /// Fullscreen touch UI for a server, on a display attached to this machine.
+    #[cfg(feature = "kiosk")]
+    Kiosk(KioskArgs),
     /// Find LoupeCam servers on the local network (mDNS / DNS-SD).
     Discover {
         /// Seconds to listen for answers.
@@ -71,6 +74,56 @@ enum Cmd {
     },
 }
 
+#[cfg(feature = "kiosk")]
+#[derive(Args, Debug)]
+struct KioskArgs {
+    /// The server to show.
+    #[arg(long, env = "LOUPECAM_SERVER", default_value = "http://127.0.0.1:8080")]
+    server: String,
+    /// The key to use with the server: LOUPECAM_KIOSK_KEY (which `install.sh --kiosk`
+    /// sets up), else LOUPECAM_TOKEN.
+    #[arg(long, env = "LOUPECAM_KIOSK_KEY", hide_env_values = true)]
+    token: Option<String>,
+    /// The server's display token, if casting needs one. The browser showing casts only
+    /// ever gets this one, never --token.
+    #[arg(long, env = "LOUPECAM_DISPLAY_TOKEN", hide_env_values = true)]
+    display_token: Option<String>,
+    /// What the screen shows when nothing is cast: the native UI, or the full web UI in
+    /// a browser (cage + Chromium).
+    #[arg(long, env = "LOUPECAM_KIOSK_HOME", value_enum, default_value_t = KioskHome::Native)]
+    home: KioskHome,
+    /// Command for the browser, instead of `cage -d -- chromium --kiosk …`. `{url}` and
+    /// `{profile}` are substituted.
+    #[arg(long, env = "LOUPECAM_KIOSK_BROWSER")]
+    browser_command: Option<String>,
+    /// Profile directory for the home browser (--home browser).
+    #[arg(long, env = "LOUPECAM_KIOSK_BROWSER_PROFILE")]
+    browser_profile: Option<PathBuf>,
+    /// Rotate the UI clockwise (0, 90, 180 or 270) to match how the display is mounted.
+    #[arg(long, env = "LOUPECAM_KIOSK_ROTATE", default_value_t = 0)]
+    rotate: u16,
+    /// Turn the backlight off after this many minutes without a touch (0 = never).
+    #[arg(long, env = "LOUPECAM_KIOSK_SLEEP", default_value_t = 0.0)]
+    sleep_after: f64,
+    /// Show the UI in a desktop window of this size (WIDTHxHEIGHT) instead of on the
+    /// display hardware. For development; needs a build with `kiosk-window`.
+    #[arg(long, value_name = "WxH", value_parser = parse_size, num_args = 0..=1, default_missing_value = "800x480")]
+    window: Option<(u32, u32)>,
+}
+
+#[cfg(feature = "kiosk")]
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum KioskHome {
+    Native,
+    Browser,
+}
+
+#[cfg(feature = "kiosk")]
+fn parse_size(s: &str) -> Result<(u32, u32), String> {
+    let (w, h) = s.split_once(['x', 'X']).ok_or("expected WIDTHxHEIGHT")?;
+    Ok((w.trim().parse().map_err(|_| "bad width")?, h.trim().parse().map_err(|_| "bad height")?))
+}
+
 #[derive(Args, Debug)]
 struct ServeArgs {
     /// Address to listen on. Use 0.0.0.0:8080 to expose on the network.
@@ -86,6 +139,10 @@ struct ServeArgs {
     /// startup). Without this, the first browser to connect runs setup.
     #[arg(long, env = "LOUPECAM_SETUP_CODE", num_args = 0..=1, default_missing_value = "", value_name = "CODE")]
     setup_code: Option<String>,
+    /// An operator key for the kiosk on this machine's display. It works at every
+    /// access level, and doesn't replace setup the way --token does.
+    #[arg(long, env = "LOUPECAM_KIOSK_KEY", hide_env_values = true)]
+    kiosk_key: Option<String>,
     /// Require this token (or --token) to cast content to the display. Without it,
     /// anyone who can reach the server can cast (it grants nothing else).
     #[arg(long, env = "LOUPECAM_DISPLAY_TOKEN")]
@@ -111,6 +168,10 @@ struct ServeArgs {
     /// Name to announce on the network [default: "LoupeCam on <hostname>"].
     #[arg(long)]
     mdns_name: Option<String>,
+    /// Use a simulated camera (a synthetic moving specimen) instead of a USB one, for
+    /// development without hardware.
+    #[arg(long, hide = true)]
+    simulate_camera: bool,
 }
 
 /// How to turn the mosaic into an image (for .png/.jpg/.tif outputs).
@@ -243,7 +304,7 @@ impl StreamOpts {
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn,loupecam=info,loupecam_server=info".into()))
+        .with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "warn,loupecam=info,loupecam_server=info,loupecam_kiosk=info".into()))
         .with_writer(std::io::stderr)
         .init();
     match Cli::parse().cmd {
@@ -319,6 +380,21 @@ fn main() -> Result<()> {
         }
         Cmd::Serve(args) => serve(args)?,
         Cmd::Access { config_dir, cmd } => access(config_dir, cmd)?,
+        #[cfg(feature = "kiosk")]
+        Cmd::Kiosk(a) => loupecam_kiosk::run(loupecam_kiosk::Options {
+            server: a.server,
+            token: a.token.filter(|t| !t.is_empty()).or_else(|| std::env::var("LOUPECAM_TOKEN").ok().filter(|t| !t.is_empty())),
+            display_token: a.display_token,
+            home: match a.home {
+                KioskHome::Native => loupecam_kiosk::Home::Native,
+                KioskHome::Browser => loupecam_kiosk::Home::Browser,
+            },
+            browser_command: a.browser_command,
+            browser_profile: a.browser_profile,
+            rotation: a.rotate,
+            window: a.window,
+            sleep_after: (a.sleep_after > 0.0).then(|| Duration::from_secs_f64(a.sleep_after * 60.0)),
+        })?,
         Cmd::Discover { seconds } => discover(Duration::from_secs_f64(seconds))?,
         Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
@@ -422,12 +498,14 @@ fn serve(a: ServeArgs) -> Result<()> {
         token: a.token,
         auth_file: if a.no_persist { None } else { Config::default_auth_file() },
         setup_code,
+        kiosk_key: a.kiosk_key,
         display_token: a.display_token,
         web,
         captures_dir: a.captures.unwrap_or_else(Config::default_captures_dir),
         settings_file: if a.no_persist { None } else { Config::default_settings_file() },
         self_update: !a.no_update_check,
         announce: (!a.no_mdns).then_some(loupecam_server::mdns::Announce { name: a.mdns_name }),
+        simulate_camera: a.simulate_camera,
     };
     let rt = tokio::runtime::Runtime::new()?;
     let restart = rt.block_on(async move {

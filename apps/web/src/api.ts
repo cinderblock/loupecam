@@ -1,4 +1,23 @@
-import type { AccessInfo, CalibrationProfile, CalibrationStatus, CaptureEntry, CaptureInfo, KeyInfo, Levels, NormRect, Patch, Role, Settings, StepRequest, UpdateStatus } from './types'
+import type {
+  AccessInfo,
+  CalibrationProfile,
+  CalibrationStatus,
+  CaptureEntry,
+  CaptureInfo,
+  CastInfo,
+  KeyInfo,
+  Levels,
+  NormRect,
+  Patch,
+  RecordPreset,
+  RecordSettings,
+  RecordStatus,
+  Recording,
+  Role,
+  Settings,
+  StepRequest,
+  UpdateStatus,
+} from './types'
 
 // Browsers log in with a password (a session cookie, sent automatically). The server
 // may instead hand out a token (`--token` or an API key, e.g. in a `?token=` link): it
@@ -30,8 +49,10 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   const headers: Record<string, string> = {}
   const t = getToken()
   if (t) headers.Authorization = `Bearer ${t}`
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
-  const r = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) })
+  // Files go as they are (their type is detected by the server); anything else as JSON.
+  const raw = body instanceof Blob
+  if (body !== undefined && !raw) headers['Content-Type'] = 'application/json'
+  const r = await fetch(path, { method, headers, body: body === undefined ? undefined : raw ? body : JSON.stringify(body) })
   if (!r.ok) {
     const msg = await r.json().then((j) => j.error as string, () => r.statusText)
     throw r.status === 401 ? new AuthError(msg) : new Error(msg)
@@ -63,6 +84,12 @@ export const api = {
   runCalibration: (req: StepRequest) => request<void>('POST', '/api/calibration/run', req),
   cancelCalibration: () => request<void>('POST', '/api/calibration/cancel'),
   deleteCalibration: (section: string) => request<void>('DELETE', `/api/calibration/${encodeURIComponent(section)}`),
+  record: () => request<{ status: RecordStatus; presets: Record<Exclude<RecordPreset, 'custom'>, RecordSettings> }>('GET', '/api/record'),
+  startRecording: (preset?: RecordPreset) => request<Recording>('POST', '/api/record/start', preset ? { preset } : {}),
+  stopRecording: () => request<Recording | undefined>('POST', '/api/record/stop'),
+  castFile: (file: File) => request<CastInfo>('PUT', `/api/display?name=${encodeURIComponent(file.name)}`, file),
+  castUrl: (url: string) => request<CastInfo>('PUT', '/api/display', { url }),
+  stopCasting: () => request<void>('DELETE', '/api/display'),
 }
 
 export function wsUrl(): string {

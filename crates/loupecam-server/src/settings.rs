@@ -38,6 +38,7 @@ pub struct Settings {
     pub orientation: OrientationSettings,
     pub preview: PreviewSettings,
     pub capture: CaptureSettings,
+    pub record: RecordSettings,
     pub updates: UpdateSettings,
     pub calibration: CalibrationSettings,
 }
@@ -185,6 +186,94 @@ pub struct CaptureSettings {
     pub save_raw: bool,
 }
 
+/// How recordings are made. The presets fill these in; any field can be changed.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RecordSettings {
+    /// The preset these settings came from (informational; `custom` once edited).
+    pub preset: RecordPreset,
+    pub mode: RecordMode,
+    /// The video fits within this size (keeping the frame's aspect ratio).
+    pub max_width: u32,
+    pub max_height: u32,
+    /// Most frames per second to record (video mode).
+    pub max_fps: f32,
+    pub bitrate_kbps: u32,
+    /// Stream at this size index while recording (then switch back), e.g. a larger
+    /// size for detail. `None` = record the stream as it is.
+    pub stream_size_index: Option<usize>,
+    /// Timelapse: seconds between frames.
+    pub timelapse_interval_s: f32,
+    /// Timelapse: playback frame rate of the video.
+    pub timelapse_fps: f32,
+    /// Timelapse: also save every frame as a still (with the capture settings).
+    pub timelapse_stills: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum RecordPreset {
+    /// High frame rate: the stream as it is, up to 1280×960 at 30 fps.
+    Smooth,
+    /// High quality: a larger stream size, up to 1920×1080 (the Pi 4 encoder's limit) at
+    /// a lower frame rate.
+    Detailed,
+    /// One frame every 10 s, played back at 30 fps.
+    Timelapse,
+    Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum RecordMode {
+    /// Real time.
+    Video,
+    /// A frame every `timelapse_interval_s`.
+    Timelapse,
+}
+
+impl RecordPreset {
+    pub const ALL: [RecordPreset; 3] = [RecordPreset::Smooth, RecordPreset::Detailed, RecordPreset::Timelapse];
+
+    /// The settings for a preset (`Custom` keeps `current`).
+    pub fn settings(self, current: &RecordSettings) -> RecordSettings {
+        let base = RecordSettings { preset: self, ..RecordSettings::default() };
+        match self {
+            RecordPreset::Smooth => base,
+            RecordPreset::Detailed => RecordSettings {
+                max_width: 1920,
+                max_height: 1080,
+                max_fps: 15.0,
+                bitrate_kbps: 12_000,
+                stream_size_index: Some(1),
+                ..base
+            },
+            RecordPreset::Timelapse => {
+                RecordSettings { mode: RecordMode::Timelapse, max_width: 1920, max_height: 1080, bitrate_kbps: 12_000, ..base }
+            }
+            RecordPreset::Custom => RecordSettings { preset: self, ..current.clone() },
+        }
+    }
+}
+
+/// The `smooth` preset.
+impl Default for RecordSettings {
+    fn default() -> Self {
+        RecordSettings {
+            preset: RecordPreset::Smooth,
+            mode: RecordMode::Video,
+            max_width: 1280,
+            max_height: 960,
+            max_fps: 30.0,
+            bitrate_kbps: 8_000,
+            stream_size_index: None,
+            timelapse_interval_s: 10.0,
+            timelapse_fps: 30.0,
+            timelapse_stills: false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum CaptureFormat {
@@ -248,6 +337,7 @@ impl Default for Settings {
                 demosaic: DemosaicSetting::Mhc,
                 save_raw: false,
             },
+            record: RecordSettings::default(),
             updates: UpdateSettings { auto_install: false, check_interval_hours: 6.0 },
             calibration: CalibrationSettings::default(),
         }
@@ -289,6 +379,19 @@ impl Settings {
         }
         if self.white_balance.gains.iter().any(|g| !(0.05..=16.0).contains(g)) {
             return bad("white balance gains must be 0.05..=16".into());
+        }
+        let r = &self.record;
+        if !(16..=8192).contains(&r.max_width) || !(16..=8192).contains(&r.max_height) {
+            return bad("record maxWidth/maxHeight must be 16..=8192".into());
+        }
+        if !(0.1..=120.0).contains(&r.max_fps) || !(0.1..=120.0).contains(&r.timelapse_fps) {
+            return bad("record frame rates must be 0.1..=120".into());
+        }
+        if !(100..=100_000).contains(&r.bitrate_kbps) {
+            return bad("record bitrateKbps must be 100..=100000".into());
+        }
+        if !(0.1..=86_400.0).contains(&r.timelapse_interval_s) {
+            return bad("record timelapseIntervalS must be 0.1..=86400".into());
         }
         Ok(())
     }

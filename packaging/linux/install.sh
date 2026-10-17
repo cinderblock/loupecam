@@ -3,7 +3,7 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packaging/linux/install.sh | sudo sh
 #   sudo sh install.sh [--version v0.2.0] [--binary ./loupecam] [--listen 0.0.0.0:8080]
-#                      [--setup-code [CODE]]
+#                      [--setup-code [CODE]] [--kiosk [--rotate 180] [--no-browser]]
 #
 # Downloads the release binary for this machine (checked against the release's
 # SHA256SUMS), installs it to /opt/loupecam, adds the camera udev rule, a `loupecam`
@@ -11,19 +11,27 @@
 # connect then runs setup, choosing how the server is secured; with --setup-code,
 # setup asks for a code (random unless given). Re-running upgrades the binary and
 # unit; /etc/loupecam/loupecam.env (listen address and so on) is kept.
+#
+# --kiosk also runs the touchscreen UI on the attached display (loupecam-kiosk.service,
+# on tty1 instead of the console login), installing cage and Chromium for casts it
+# can't show natively unless --no-browser. Its settings: /etc/loupecam/kiosk.env.
 set -eu
 
 REPO=cinderblock/loupecam
 RAW="https://raw.githubusercontent.com/$REPO/master/packaging/linux"
 PREFIX=/opt/loupecam
 ENV_FILE=/etc/loupecam/loupecam.env
+KIOSK_ENV=/etc/loupecam/kiosk.env
 
 version=latest
 binary=
 listen=0.0.0.0:80
 setup_code=
+kiosk=0
+rotate=0
+browser=1
 
-usage() { sed -n '2,13s/^# \{0,1\}//p' "$0"; exit "${1:-0}"; }
+usage() { sed -n '2,17s/^# \{0,1\}//p' "$0"; exit "${1:-0}"; }
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -37,6 +45,9 @@ while [ $# -gt 0 ]; do
 		*) setup_code=$2; shift 2 ;;
 		esac
 		;;
+	--kiosk) kiosk=1; shift ;;
+	--rotate) rotate=$2; shift 2 ;;
+	--no-browser) browser=0; shift ;;
 	-h | --help) usage ;;
 	*) echo "unknown option: $1" >&2; usage 2 >&2 ;;
 	esac
@@ -66,6 +77,10 @@ packaged() {
 }
 packaged loupecam.service
 packaged 99-loupecam.rules
+if [ "$kiosk" = 1 ]; then
+	packaged loupecam-kiosk.service
+	packaged 99-loupecam-kiosk.rules
+fi
 
 if [ -n "$binary" ]; then
 	cp "$binary" "$tmp/loupecam"
@@ -142,6 +157,11 @@ if [ -n "$setup_code" ]; then
 		echo "LOUPECAM_SETUP_CODE=$setup_code" >>"$ENV_FILE"
 	fi
 fi
+# The kiosk reaches the server with its own operator key, which works at every access
+# level. Both services read this file.
+if [ "$kiosk" = 1 ] && ! grep -q '^LOUPECAM_KIOSK_KEY=' "$ENV_FILE"; then
+	echo "LOUPECAM_KIOSK_KEY=$(od -An -tx1 -N24 /dev/urandom | tr -d ' \n')" >>"$ENV_FILE"
+fi
 
 systemctl daemon-reload
 systemctl enable loupecam.service >/dev/null
@@ -149,6 +169,52 @@ systemctl restart loupecam.service
 
 . "$ENV_FILE"
 port=${LOUPECAM_LISTEN##*:}
+
+if [ "$kiosk" = 1 ]; then
+	if [ "$browser" = 1 ] && command -v apt-get >/dev/null; then
+		echo "Installing cage and Chromium (for casting PDFs and web pages to the display)"
+		apt-get install -y --no-install-recommends cage >/dev/null
+		apt-get install -y chromium-browser >/dev/null 2>&1 || apt-get install -y chromium >/dev/null
+	fi
+	# The display (video, render) and the touchscreen (input).
+	groups=
+	for g in video render input; do
+		getent group "$g" >/dev/null && groups="$groups${groups:+,}$g"
+	done
+	if ! id loupecam-kiosk >/dev/null 2>&1; then
+		useradd --system --user-group ${groups:+--groups "$groups"} --home-dir /var/lib/loupecam-kiosk \
+			--no-create-home --shell /usr/sbin/nologin --comment "LoupeCam kiosk" loupecam-kiosk
+	fi
+	install -m 644 "$tmp/99-loupecam-kiosk.rules" /etc/udev/rules.d/99-loupecam-kiosk.rules
+	udevadm control --reload
+	udevadm trigger --subsystem-match=backlight
+	install -m 644 "$tmp/loupecam-kiosk.service" /etc/systemd/system/loupecam-kiosk.service
+	if [ ! -f "$KIOSK_ENV" ]; then
+		cat >"$KIOSK_ENV" <<CONF
+# LoupeCam kiosk settings. Apply with: sudo systemctl restart loupecam-kiosk
+
+# The server to show (this machine's).
+LOUPECAM_SERVER=http://127.0.0.1:$port
+
+# Rotate the UI for how the display is mounted: 0, 90, 180 or 270 (clockwise).
+LOUPECAM_KIOSK_ROTATE=$rotate
+
+# Turn the backlight off after this many minutes without a touch (0 = never).
+LOUPECAM_KIOSK_SLEEP=0
+
+# The resting screen: native (the fast touch UI) or browser (the full web UI).
+LOUPECAM_KIOSK_HOME=native
+CONF
+		echo "Created $KIOSK_ENV"
+	fi
+	# The kiosk replaces the console login on tty1.
+	systemctl disable getty@tty1.service >/dev/null 2>&1 || true
+	systemctl daemon-reload
+	systemctl enable loupecam-kiosk.service >/dev/null
+	systemctl restart loupecam-kiosk.service
+	echo "Kiosk running on the attached display. Logs: journalctl -u loupecam-kiosk -f"
+fi
+
 suffix=$([ "$port" = 80 ] && echo "" || echo ":$port")
 url="http://$(hostname).local$suffix/"
 echo

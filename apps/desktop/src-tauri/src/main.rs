@@ -45,6 +45,7 @@ fn main() {
         // Localhost only: open, no setup.
         auth_file: None,
         setup_code: None,
+        kiosk_key: None,
         display_token: None,
         web: web_ui(),
         captures_dir: captures_dir.clone(),
@@ -53,6 +54,7 @@ fn main() {
         self_update: false,
         // Localhost only; nothing to announce.
         announce: None,
+        simulate_camera: false,
     };
 
     let app = tauri::Builder::default()

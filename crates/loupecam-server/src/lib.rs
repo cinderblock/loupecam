@@ -15,6 +15,7 @@ pub mod geometry;
 pub mod http;
 pub mod mdns;
 pub mod preview;
+pub mod record;
 pub mod service;
 pub mod settings;
 pub mod updates;
@@ -53,6 +54,9 @@ pub struct Config {
     pub auth_file: Option<PathBuf>,
     /// First-run setup asks for this code.
     pub setup_code: Option<String>,
+    /// An operator key for the kiosk on this machine's display (see
+    /// [`auth::Auth::with_kiosk_key`]).
+    pub kiosk_key: Option<String>,
     /// Require this token (or `token`) to cast to the display. `None` = casting is open
     /// to anyone who can reach the server.
     pub display_token: Option<String>,
@@ -65,6 +69,8 @@ pub struct Config {
     pub self_update: bool,
     /// Announce the server over mDNS / DNS-SD (only when listening beyond loopback).
     pub announce: Option<mdns::Announce>,
+    /// Use a simulated camera instead of a USB one (development without hardware).
+    pub simulate_camera: bool,
 }
 
 impl Config {
@@ -98,6 +104,7 @@ pub struct AppState {
     pub updates: Arc<updates::Updates>,
     pub calibration: Arc<calibration::runner::Runner>,
     pub auth: Arc<auth::Auth>,
+    pub recorder: Arc<record::Recorder>,
     pub display_token: Option<Arc<str>>,
     pub casting: Arc<cast::Casting>,
     pub web: WebUi,
@@ -149,15 +156,18 @@ impl Server {
     /// Bind and start serving. Must be called inside a tokio runtime.
     pub async fn start(cfg: Config) -> std::io::Result<Server> {
         let settings = load_settings(cfg.settings_file.as_ref());
-        let service = Service::spawn(settings);
+        let source = if cfg.simulate_camera { service::Source::Simulated } else { service::Source::Usb };
+        let service = Service::spawn_with(settings, source);
         let preview = preview::spawn(service.shared.clone());
         let shared = service.shared.clone();
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());
         let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
-        let auth = Arc::new(auth::Auth::new(cfg.auth_file, !cfg.listen.ip().is_loopback(), cfg.token, cfg.setup_code));
+        let auth = Arc::new(auth::Auth::new(cfg.auth_file, !cfg.listen.ip().is_loopback(), cfg.token, cfg.setup_code).with_kiosk_key(cfg.kiosk_key));
         let cast_token = cfg.display_token.is_some();
+        let recorder = record::Recorder::new(service.clone(), cfg.captures_dir.clone());
         let state = AppState {
             calibration,
+            recorder,
             service,
             preview,
             updates,
@@ -217,6 +227,8 @@ impl Server {
         if let Some(a) = self.announcer {
             a.stop().await;
         }
+        // Finish any recording before the camera goes away.
+        self.state.recorder.stop().await;
         let _ = self.shutdown.send(());
         let r = self.task.await.map_err(std::io::Error::other)?;
         self.state.auth.flush();

@@ -121,19 +121,46 @@ work in both the camera view and cast content.
 ## Plan / steps
 
 1. ✅ Casting API + display token (server) and the `/cast` page (web).
-2. **← current** Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
+2. ✅ Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
    dev backend, recorder actor, API, timelapse.
-3. Web UI: record button and mode picker, Gallery video playback, touch gestures in
+3. ✅ Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
-4. Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
-5. Chromium override (cage handoff).
-6. V4L2 M2M encoder (needs the Pi 4).
-7. Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
+4. ✅ Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
+5. ✅ Chromium override (cage handoff).
+6. ✅ V4L2 M2M encoder (written; needs the Pi 4 to test).
+7. ✅ Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
    `chromium`, the user, config.txt notes), README.
-8. Hardware test on the Pi 4 + display.
+8. **← current (blocked: needs the Pi 4 + display)** Hardware test on the Pi 4 + display:
+   build an aarch64 binary with `--features embed-ui,kiosk` (CI artifact or on the Pi),
+   `install.sh --binary ./loupecam --kiosk`, then check: KMS output and touch (incl.
+   pinch), rotation, backlight sleep/wake, hardware encoder (all three presets, file
+   plays in a browser), cage/Chromium hand-off and back (PDF, URL, three-finger tap),
+   `--home browser`, CPU load while recording + kiosk (see the develop-twice note).
 
 ## Findings / gotchas
 
+- `serve --simulate-camera` (hidden flag; `loupecam::sim::SimCamera`) streams a
+  synthetic specimen through the real pipeline, so the kiosk, recording and web UI can
+  be developed with no camera attached.
+- On a Pi 4 `/dev/dri/card0` may be V3D (render only): the kiosk scans `card*` for one
+  with a connected connector.
+- To cross-check everything for the Pi from Windows, use LLVM's clang as the C compiler
+  for `ring`: `CC_aarch64_unknown_linux_musl=clang
+  CFLAGS_aarch64_unknown_linux_musl="--target=aarch64-linux-musl -ffreestanding"
+  AR_aarch64_unknown_linux_musl=llvm-ar cargo clippy --target aarch64-unknown-linux-musl
+  -p loupecam-cli --features kiosk,embed-ui`. (Type-check only; linking needs a musl
+  sysroot.)
+- Slint was rejected (license); the kiosk draws with tiny-skia + fontdue (DejaVu Sans via
+  the `dejavu` crate), resvg for SVG casts.
+- The embedded test browser (T3 preview) has no PDF viewer: PDF casts show blank
+  there. Real Chrome renders them. Chromium on the Pi includes the viewer (verify).
+- Chrome's PDF viewer toolbar runs along the top, so the cast page's back button sits
+  bottom-right.
+- The recorder develops frames itself, independently of the preview, so recording and
+  watching both develop each frame. Fine on a desktop; on the Pi 4 measure it, and if
+  it's CPU-bound, share the preview's developed image when the sizes match.
+- Captures are now served with `tower_http::services::ServeFile` (range requests), so
+  `<video>` can seek and big files aren't read into memory.
 - Cast HTML/SVG is served with `Content-Security-Policy: sandbox allow-scripts`, so its
   scripts get an opaque origin and can't use the camera-token cookie. PDFs aren't
   sandboxed (Chromium's PDF viewer refuses to load under a CSP sandbox).
@@ -151,20 +178,38 @@ work in both the camera view and cast content.
 - [x] Casting API + display token + `/cast` page: `PUT/DELETE/GET /api/display`,
       `/content`, `/events` (SSE), WebSocket `display` message, mDNS `cast` TXT key,
       `--display-token`. Checked end to end with curl in both auth modes.
-- [ ] Recording: muxer, encoder trait, openh264, recorder, API, timelapse
-- [ ] Web UI: record, gallery video, touch viewer
-- [ ] Native kiosk: window backend
-- [ ] Native kiosk: DRM + evdev
-- [ ] Chromium override
-- [ ] V4L2 M2M encoder
-- [ ] Packaging + README
+- [x] Recording: muxer, encoder trait, openh264, recorder, API, timelapse. Tests: an
+      openh264 → fMP4 round trip checked by ffprobe/ffmpeg (including a file truncated
+      mid-way), and the full recorder fed synthetic raw frames (video, timelapse with
+      stills).
+- [x] Web UI: record button + Recording panel (presets and knobs), Cast panel, ▶ videos
+      in Gallery, pinch/two-finger pan/double-tap in Viewer. Checked in a browser: panels,
+      preset switch, `/cast` live-switching via SSE, PDF in real Chrome, our fMP4 plays and
+      seeks in Chromium. Pinch not yet tried on a real touchscreen (no frames without a
+      camera, and no multi-touch in the test browser).
+- [x] Native kiosk: window backend. Checked on Windows against `serve --simulate-camera`:
+      live view ~30 fps, snap, record/stop with timer, settings sheet, wheel zoom, drag
+      pan, SVG cast with text, PDF cast handed to the browser path. (Test by posting
+      WM_* mouse messages to the window: doesn't move the user's cursor.)
+- [x] Native kiosk: DRM + evdev written; clippy-clean for aarch64-musl and x86_64-gnu.
+      **Not yet run on hardware** (needs the Pi 4 + display).
+- [x] Chromium override: screen state machine in the KMS loop (native / cast browser /
+      home browser), throwaway profile without the camera token for casts, three-finger
+      tap back to the camera, `--home browser` for the full web UI. Untested on hardware.
+- [x] V4L2 M2M encoder: raw ioctls (no bindgen), struct sizes asserted at compile time
+      for 64-bit; type-checks for aarch64-musl. Untested on hardware.
+- [x] Packaging + README: `loupecam-kiosk.service`, backlight udev rule,
+      `install.sh --kiosk [--rotate N] [--no-browser]`, release/CI features, README
+      sections (kiosk, casting, recording).
 - [ ] Tested on Pi 4 + display
 
 ## Open questions for the user
 
 1. Is a Pi 4 with the display available to test on, and how is it reached (SSH host)?
-   Steps 6 and 8 need it. Until then everything is developed with the window backend on
-   Windows.
+   Step 8 needs it (odriver2 is a Pi 5: no hardware encoder, no display).
+2. Push the local commits to `origin/master`? The README's `curl | sh` install (with
+   `--kiosk`) only works once they're pushed and released (pi-deployment.md asks the
+   same). Recommendation: push, then cut a release so the Pi can install it.
 
 ## Things not to do
 

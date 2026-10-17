@@ -1,0 +1,36 @@
+[package]
+name = "loupecam-kiosk"
+description = "Fullscreen touch UI for a LoupeCam server: draws straight to the display (DRM/KMS) on Linux, no X or Wayland"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+default = []
+# A desktop window (winit + softbuffer) instead of the display hardware, for development.
+window = ["dep:winit", "dep:softbuffer"]
+
+[dependencies]
+loupecam-isp.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tiny-skia.workspace = true
+resvg.workspace = true
+fontdue.workspace = true
+dejavu.workspace = true
+zune-jpeg.workspace = true
+png.workspace = true
+ureq.workspace = true
+tungstenite.workspace = true
+gethostname.workspace = true
+winit = { workspace = true, optional = true }
+softbuffer = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+drm.workspace = true
+evdev.workspace = true
+libc.workspace = true

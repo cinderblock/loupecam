@@ -1,0 +1,3 @@
+# Let the video group switch the display backlight, so the LoupeCam kiosk can turn the
+# screen off when idle (`LOUPECAM_KIOSK_SLEEP`) without running as root.
+SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys%p/bl_power /sys%p/brightness", RUN+="/bin/chmod g+w /sys%p/bl_power /sys%p/brightness"

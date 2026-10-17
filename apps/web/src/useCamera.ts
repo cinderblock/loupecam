@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, AuthError, getToken, wsUrl } from './api'
-import type { CalibrationStatus, LiveStats, Patch, Settings, State, UpdateStatus } from './types'
+import type { CalibrationStatus, CastInfo, LiveStats, Patch, RecordStatus, Settings, State, UpdateStatus } from './types'
 
 export interface Camera {
   state: State | null
   stats: LiveStats | null
   update: UpdateStatus | null
   calibration: CalibrationStatus | null
+  record: RecordStatus | null
+  /** What is being cast to the display (null: nothing). */
+  cast: CastInfo | null
   /** Latest preview frame, decoded. */
   frame: ImageBitmap | null
   connected: boolean
@@ -37,6 +40,8 @@ export function useCamera(onError: (message: string) => void): Camera {
   const [stats, setStats] = useState<LiveStats | null>(null)
   const [update, setUpdate] = useState<UpdateStatus | null>(null)
   const [calibration, setCalibration] = useState<CalibrationStatus | null>(null)
+  const [record, setRecord] = useState<RecordStatus | null>(null)
+  const [cast, setCast] = useState<CastInfo | null>(null)
   const [frame, setFrame] = useState<ImageBitmap | null>(null)
   const [connected, setConnected] = useState(false)
   const [authNeeded, setAuthNeeded] = useState(false)
@@ -73,6 +78,8 @@ export function useCamera(onError: (message: string) => void): Camera {
           else if (msg.type === 'stats') setStats(msg as LiveStats)
           else if (msg.type === 'update') setUpdate(msg as UpdateStatus)
           else if (msg.type === 'calibration') setCalibration(msg as CalibrationStatus)
+          else if (msg.type === 'record') setRecord(msg as RecordStatus)
+          else if (msg.type === 'display') setCast((msg as { cast: CastInfo | null }).cast)
           return
         }
         // Skip frames while the previous one is still decoding.
@@ -134,5 +141,5 @@ export function useCamera(onError: (message: string) => void): Camera {
     [flush],
   )
 
-  return { state, stats, update, calibration, frame, connected, authNeeded, patch }
+  return { state, stats, update, calibration, record, cast, frame, connected, authNeeded, patch }
 }

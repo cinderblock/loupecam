@@ -39,8 +39,45 @@ export interface Settings {
     demosaic: DemosaicSetting
     saveRaw: boolean
   }
+  record: RecordSettings
   updates: { autoInstall: boolean; checkIntervalHours: number }
   calibration: CalibrationSettings
+}
+
+export type RecordPreset = 'smooth' | 'detailed' | 'timelapse' | 'custom'
+export type RecordMode = 'video' | 'timelapse'
+
+export interface RecordSettings {
+  preset: RecordPreset
+  mode: RecordMode
+  maxWidth: number
+  maxHeight: number
+  maxFps: number
+  bitrateKbps: number
+  streamSizeIndex: number | null
+  timelapseIntervalS: number
+  timelapseFps: number
+  timelapseStills: boolean
+}
+
+export interface Recording {
+  name: string | null
+  mode: RecordMode
+  encoder: string | null
+  width: number
+  height: number
+  started: string
+  seconds: number
+  frames: number
+  bytes: number
+  stills: number
+}
+
+export interface RecordStatus {
+  active: Recording | null
+  last: Recording | null
+  error: string | null
+  encoders: string[]
 }
 
 export interface CalibrationSettings {

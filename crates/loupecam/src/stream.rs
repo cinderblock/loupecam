@@ -42,16 +42,28 @@ pub enum RecvError {
     Timeout,
 }
 
-struct Shared {
+/// The frame queue between a producer (the bulk reader, or the simulator) and a
+/// [`FrameReceiver`].
+pub(crate) struct Shared {
     stop: AtomicBool,
     geometry: Mutex<Option<(Resolution, SampleFormat, bool)>>,
-    stats: Mutex<StreamStats>,
+    pub(crate) stats: Mutex<StreamStats>,
     queue: Mutex<(VecDeque<RawFrame>, bool)>,
     ready: Condvar,
 }
 
 impl Shared {
-    fn push(&self, frame: RawFrame) {
+    pub(crate) fn new() -> Self {
+        Shared {
+            stop: AtomicBool::new(false),
+            geometry: Mutex::new(None),
+            stats: Mutex::new(StreamStats::default()),
+            queue: Mutex::new((VecDeque::new(), false)),
+            ready: Condvar::new(),
+        }
+    }
+
+    pub(crate) fn push(&self, frame: RawFrame) {
         let mut q = self.queue.lock().unwrap();
         if q.0.len() >= QUEUE_DEPTH {
             q.0.pop_front();
@@ -62,7 +74,7 @@ impl Shared {
         self.ready.notify_one();
     }
 
-    fn close(&self) {
+    pub(crate) fn close(&self) {
         self.queue.lock().unwrap().1 = true;
         self.ready.notify_all();
     }
@@ -70,7 +82,7 @@ impl Shared {
 
 /// Receives frames from a running stream. Dropping it does not stop the camera.
 pub struct FrameReceiver {
-    shared: Arc<Shared>,
+    pub(crate) shared: Arc<Shared>,
 }
 
 impl FrameReceiver {
@@ -140,13 +152,7 @@ impl Reader {
             let buf = ep.allocate(TRANSFER_SIZE);
             ep.submit(buf);
         }
-        let shared = Arc::new(Shared {
-            stop: AtomicBool::new(false),
-            geometry: Mutex::new(Some((res, format, false))),
-            stats: Mutex::new(StreamStats::default()),
-            queue: Mutex::new((VecDeque::new(), false)),
-            ready: Condvar::new(),
-        });
+        let shared = Arc::new(Shared { geometry: Mutex::new(Some((res, format, false))), ..Shared::new() });
         let s = shared.clone();
         let thread = std::thread::Builder::new()
             .name("loupecam-bulk".into())

@@ -164,10 +164,12 @@ Over plain HTTP, passwords cross the network unencrypted; the setup page says so
 | `GET /api/stats` | fps, exposure, gain, channel means, histogram |
 | `GET`/`PATCH /api/settings` | Read / change settings (JSON merge patch, e.g. `{"exposureUs": 50000, "autoExposure": false}`) |
 | `POST /api/capture[?fullResolution=bool]` | Develop and save a still; returns its name |
-| `GET /api/captures`, `GET`/`DELETE /api/captures/{name}` | Saved captures |
+| `GET /api/captures`, `GET`/`DELETE /api/captures/{name}` | Saved captures and recordings (range requests supported) |
+| `GET /api/record` | Recording status, available encoders, and the presets |
+| `POST /api/record/start` `[{"preset": "smooth" \| "detailed" \| "timelapse"}]`, `POST /api/record/stop` | Record video or a timelapse (below) |
 | `POST /api/white-balance` `{"region": {x,y,width,height} \| null}` | One-shot white balance over a region of the displayed image (normalised 0..1) |
 | `POST /api/roi` `{"region": … \| null}` | Set or clear the sensor ROI from a region of the displayed image |
-| `WS /api/ws` | Pushes `state`, `stats` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
+| `WS /api/ws` | Pushes `state`, `stats`, `record` and `display` messages; send `{"type":"preview","enabled":true}` to also receive JPEG frames as binary messages |
 | `PUT /api/display`, `DELETE /api/display` | Cast to the display / stop casting (see below) |
 | `GET /api/display`, `/api/display/content`, `/api/display/events` | What is being cast, its content, and server-sent `display` events on every change |
 | `GET /api/access` | Whether setup is needed, the access level, and your role (public) |
@@ -175,6 +177,25 @@ Over plain HTTP, passwords cross the network unencrypted; the setup page says so
 | `POST /api/login` `{password}`, `POST /api/logout` | Log in (session cookie) / out |
 | `PATCH /api/access`, `POST /api/access/logout-all` | Change the level or passwords; end every session (admin) |
 | `GET`/`POST /api/keys`, `DELETE /api/keys/{id}` | API keys (admin) |
+
+### Recording
+
+Recordings are H.264 MP4 files saved with the captures, so any browser can play them
+from the web UI. The `record` settings say how; three presets fill them in:
+
+| Preset | |
+| --- | --- |
+| `smooth` | The stream as it is, up to 1280×960 at 30 fps |
+| `detailed` | Switches to the next larger stream size while recording, up to 1920×1080 at 15 fps |
+| `timelapse` | One frame every 10 s, played back at 30 fps; optionally every frame saved as a still too (`timelapseStills`) |
+
+Files are written as fragmented MP4, so a recording cut short by a crash or power loss
+still plays up to its last second or so.
+
+Encoding needs an H.264 encoder. The Raspberry Pi 4's hardware encoder is used where
+present (V4L2 memory-to-memory, `/dev/video11` on a Pi 4; the Pi 5 has none). Builds with the `openh264` feature (`cargo build --features
+openh264`) encode in software anywhere; the release binaries don't include it. Without
+an encoder, timelapses can still save stills.
 
 ### Casting to the display
 
@@ -220,6 +241,49 @@ a lesser supply the camera trips over-current protection when it starts streamin
 every USB device on the Pi resets (`dmesg`: `over-current change`). Use the 27 W supply
 or a powered USB 3 hub. Alternatively, if the supply can genuinely deliver the current,
 set `usb_max_current_enable=1` in `/boot/firmware/config.txt`.
+
+### Touchscreen kiosk (Raspberry Pi display)
+
+With a display attached (e.g. the official Raspberry Pi 7" touch display), the machine
+running the server can show a fullscreen touch UI: the live view (drag to pan, pinch to
+zoom, double-tap to fit), big **Snap** and **Record** buttons, the record mode
+(Smooth / Detailed / Timelapse), auto exposure, white balance, and exposure and gain
+sliders. Snapshots and recordings are saved with the server's captures, so they can be
+fetched from the web UI on another device later.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packaging/linux/install.sh | sudo sh -s -- --kiosk
+```
+
+The kiosk draws straight to the display through DRM/KMS and reads the touchscreen
+through evdev. There's no X server, Wayland compositor or desktop, so use Raspberry Pi
+OS **Lite**. It starts at boot on tty1 in place of the console login. Settings are in
+`/etc/loupecam/kiosk.env`:
+
+| Variable | |
+| --- | --- |
+| `LOUPECAM_KIOSK_ROTATE` | `0`, `90`, `180` or `270`, for how the display is mounted (installer: `--rotate`) |
+| `LOUPECAM_KIOSK_SLEEP` | Minutes without a touch before the backlight turns off (`0` = never); a touch wakes it |
+| `LOUPECAM_KIOSK_HOME` | `native` (the touch UI), or `browser` to show the full web UI instead |
+
+Images and SVGs cast to the display are shown natively, with pan and zoom. PDFs, HTML
+and web pages open in Chromium under `cage`. The installer adds both unless you pass
+`--no-browser`. The kiosk hands the screen over and takes it back when the cast ends;
+**✕ Camera** on the page, or a three-finger tap, returns to the camera. That browser
+never gets the kiosk's key, only the display token if one is set.
+
+The kiosk talks to the server with its own operator key, `LOUPECAM_KIOSK_KEY` in
+`/etc/loupecam/loupecam.env` (the installer generates it). It works at every access
+level, so the touchscreen keeps working whichever level setup picks. Until setup is
+done, the display says to finish it in a browser.
+
+To develop the kiosk on a desktop, run it in a window. `--simulate-camera` gives the
+server a synthetic moving specimen when no camera is attached:
+
+```sh
+cargo run -p loupecam-cli -- serve --simulate-camera &
+cargo run -p loupecam-cli --features kiosk-window -- kiosk --window
+```
 
 ### Finding cameras on the network
 

@@ -251,6 +251,7 @@ pub struct Auth {
     file: Option<PathBuf>,
     network: bool,
     token: Option<String>,
+    kiosk_key: Option<String>,
     setup_code: Option<String>,
     inner: Mutex<Inner>,
 }
@@ -263,6 +264,7 @@ impl Auth {
             file,
             network,
             token,
+            kiosk_key: None,
             setup_code,
             inner: Mutex::new(Inner {
                 mode: Mode::Unconfigured,
@@ -277,6 +279,13 @@ impl Auth {
         auth.load(&mut inner);
         drop(inner);
         auth
+    }
+
+    /// Also accept `key` as an operator key, whatever the levels (for the kiosk on the
+    /// server's own display). Unlike `--token`, it doesn't replace setup.
+    pub fn with_kiosk_key(mut self, key: Option<String>) -> Auth {
+        self.kiosk_key = key.filter(|k| !k.is_empty());
+        self
     }
 
     /// The setup code, if setup needs one.
@@ -393,6 +402,13 @@ impl Auth {
             && tokens().any(|x| eq(x, t))
         {
             resolved.role = Some(Role::Admin);
+            resolved.via_session = false;
+        }
+        if let Some(k) = &self.kiosk_key
+            && resolved.role < Some(Role::Operate)
+            && tokens().any(|x| eq(x, k))
+        {
+            resolved.role = Some(Role::Operate);
             resolved.via_session = false;
         }
         resolved
@@ -914,6 +930,17 @@ mod tests {
         assert_eq!(a.resolve(&creds(None, Some(&s2.cookie))).role, Some(Role::Admin));
         assert_eq!(a.login(IP, "access-pass").unwrap().role, Role::Operate);
         assert!(a.login(IP, "admin-pass").is_err());
+    }
+
+    #[test]
+    fn kiosk_key_operates_at_every_level() {
+        let a = Auth::new(None, true, None, None).with_kiosk_key(Some("kiosk".into()));
+        let k = creds(Some("kiosk"), None);
+        // Setup still comes first.
+        assert!(a.resolve(&k).setup_required);
+        a.setup(IP, None, levels(Access::Password, ConfigLock::Password, Some("access-pass"), Some("admin-pass"))).unwrap();
+        assert_eq!(a.resolve(&k).role, Some(Role::Operate));
+        assert_eq!(a.resolve(&Credentials::default()).role, None);
     }
 
     #[test]

@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../api'
+import { formatBytes } from '../format'
 import type { CastInfo } from '../types'
 
 // The display page the kiosk opens in a browser for casts it can't render itself
@@ -9,6 +11,52 @@ const displayToken = new URLSearchParams(location.search).get('displayToken')
 
 function withDisplayToken(url: string): string {
   return displayToken ? url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(displayToken) : url
+}
+
+/** Cast a file or web page to the server's display (the kiosk), from the web UI. */
+export function CastPanel({ cast, onError }: { cast: CastInfo | null; onError: (m: string) => void }) {
+  const file = useRef<HTMLInputElement>(null)
+  const [url, setUrl] = useState('')
+  const run = (p: Promise<unknown>) => p.catch((e) => onError(`Cast: ${(e as Error).message}`))
+  return (
+    <>
+      <p className="hint">
+        {cast ? (
+          <>
+            Showing {cast.kind === 'url' ? cast.url : (cast.name ?? `a ${cast.kind}`)}
+            {cast.bytes ? ` (${formatBytes(cast.bytes)})` : ''}.
+          </>
+        ) : (
+          'The display shows the camera.'
+        )}
+      </p>
+      <div className="row">
+        <input ref={file} type="file" accept="image/*,.svg,.pdf,.html,.htm" hidden onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) run(api.castFile(f))
+          e.target.value = ''
+        }} />
+        <button onClick={() => file.current?.click()} title="Image, SVG, PDF or HTML file">
+          Cast a file…
+        </button>
+        <button disabled={!cast} onClick={() => run(api.stopCasting())}>
+          Show camera
+        </button>
+      </div>
+      <form
+        className="row"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (url.trim()) run(api.castUrl(url.trim()))
+        }}
+      >
+        <input className="grow" type="url" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <button type="submit" disabled={!url.trim()}>
+          Cast page
+        </button>
+      </form>
+    </>
+  )
 }
 
 export function CastPage() {

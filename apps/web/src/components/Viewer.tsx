@@ -40,6 +40,11 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
   const [view, setView] = useState<View>({ zoom: null, cx: 0, cy: 0 })
   const [size, setSize] = useState({ w: 1, h: 1 })
   const drag = useRef<{ x: number; y: number; cx: number; cy: number } | null>(null)
+  // Touch: active pointers (device px), the pinch in progress, and the last tap (for
+  // double-tap to fit).
+  const pointers = useRef(new Map<number, { x: number; y: number }>())
+  const pinch = useRef<{ dist: number; zoom: number; at: { x: number; y: number } } | null>(null)
+  const lastTap = useRef<{ t: number; x: number; y: number } | null>(null)
   const [sel, setSel] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null)
 
   // Track canvas size (in device pixels).
@@ -132,6 +137,23 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
     const dpr = window.devicePixelRatio || 1
     return { x: (e.clientX - r.left) * dpr, y: (e.clientY - r.top) * dpr }
   }
+  const fit = () => setView({ zoom: null, cx: 0, cy: 0 })
+  const minZoom = fitZoom / 4
+  const twoFingers = () => {
+    const [a, b] = [...pointers.current.values()]
+    return { dist: Math.hypot(a.x - b.x, a.y - b.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } }
+  }
+  const endPointer = (e: React.PointerEvent) => {
+    pointers.current.delete(e.pointerId)
+    if (pinch.current) {
+      if (pointers.current.size < 2) pinch.current = null
+      // Carry on panning with the remaining finger, from where it is now.
+      const rest = [...pointers.current.values()][0]
+      drag.current = rest ? { x: rest.x, y: rest.y, cx, cy } : null
+      return false
+    }
+    return true
+  }
 
   return (
     <div className="viewer">
@@ -142,13 +164,33 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
           if (!frame) return
           const p = dev(e)
           const before = toImage(p.x, p.y)
-          const nz = Math.min(32, Math.max(fitZoom / 4, zoom * Math.pow(1.0015, -e.deltaY)))
+          const nz = Math.min(32, Math.max(minZoom, zoom * Math.pow(1.0015, -e.deltaY)))
           // Keep the point under the cursor fixed.
           setView({ zoom: nz, cx: before.x - (p.x - size.w / 2) / nz, cy: before.y - (p.y - size.h / 2) / nz })
         }}
         onPointerDown={(e) => {
           ;(e.target as Element).setPointerCapture(e.pointerId)
           const p = dev(e)
+          pointers.current.set(e.pointerId, p)
+          if (pointers.current.size === 2) {
+            // A second finger: pinch-zoom (and pan) instead of dragging or selecting.
+            const f = twoFingers()
+            pinch.current = { dist: Math.max(1, f.dist), zoom, at: toImage(f.mid.x, f.mid.y) }
+            drag.current = null
+            setSel(null)
+            return
+          }
+          if (pointers.current.size > 2) return
+          if (e.pointerType === 'touch') {
+            const t = lastTap.current
+            const now = performance.now()
+            if (t && now - t.t < 300 && Math.hypot(p.x - t.x, p.y - t.y) < 40 * (window.devicePixelRatio || 1)) {
+              lastTap.current = null
+              fit()
+              return
+            }
+            lastTap.current = { t: now, x: p.x, y: p.y }
+          }
           if (tool === 'pan' || e.button === 1) {
             drag.current = { x: p.x, y: p.y, cx, cy }
           } else {
@@ -158,6 +200,15 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
         }}
         onPointerMove={(e) => {
           const p = dev(e)
+          if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, p)
+          if (pinch.current && pointers.current.size === 2) {
+            // Keep the image point first under the fingers' midpoint under it.
+            const f = twoFingers()
+            const pc = pinch.current
+            const nz = Math.min(32, Math.max(minZoom, (pc.zoom * f.dist) / pc.dist))
+            setView({ zoom: nz, cx: pc.at.x - (f.mid.x - size.w / 2) / nz, cy: pc.at.y - (f.mid.y - size.h / 2) / nz })
+            return
+          }
           if (drag.current) {
             const d = drag.current
             setView({ zoom, cx: d.cx - (p.x - d.x) / zoom, cy: d.cy - (p.y - d.y) / zoom })
@@ -166,7 +217,13 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
             setSel({ ...sel, x1: i.x, y1: i.y })
           }
         }}
-        onPointerUp={() => {
+        onPointerCancel={(e) => {
+          endPointer(e)
+          drag.current = null
+          setSel(null)
+        }}
+        onPointerUp={(e) => {
+          if (!endPointer(e)) return
           drag.current = null
           if (sel && frame) {
             const clamp = (v: number, m: number) => Math.min(1, Math.max(0, v / m))
@@ -182,11 +239,11 @@ export function Viewer({ frame, tool, overlays, umPerPixel, onRegion, message }:
             setSel(null)
           }
         }}
-        onDoubleClick={() => setView({ zoom: null, cx: 0, cy: 0 })}
+        onDoubleClick={fit}
       />
       {message && <div className="viewer-message">{message}</div>}
       <div className="viewer-zoom">
-        <button onClick={() => setView({ zoom: null, cx: 0, cy: 0 })} title="Fit (F)">
+        <button onClick={fit} title="Fit (F)">
           Fit
         </button>
         <button onClick={() => setView({ zoom: 1, cx, cy })} title="Actual pixels (1)">
