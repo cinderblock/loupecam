@@ -120,7 +120,7 @@ The bindings shouldn't each reinvent this, so it goes in the library crates:
    C99, linked dynamically and statically, runs both on the simulator, and checks the
    header as C++17. A Rust test fails if `include/loupecam.h` is stale.
 7. [x] CI (`6f24b5e`): Python (3.10, 3.14), Node (22, 24) and the C API on Windows,
-   Linux x64/arm64 and macOS. **Not run yet: CI runs on push, and nothing is pushed.**
+   Linux x64/arm64 and macOS. All 27 jobs green on run 39070379638 (after the fix in `4ca3d80`).
 8. [x] Release workflow (`6f24b5e`):
    - C API zips for 6 targets
    - wheels for 8 targets plus the sdist
@@ -130,15 +130,17 @@ The bindings shouldn't each reinvent this, so it goes in the library crates:
    actionlint is clean. **Not run yet.**
 9. [x] Docs (`09b3bbd`): the README library section and layout;
    `docs/releasing.md` covers the registries and the one-time setup.
-10. [ ] **(current) Hand over**: the user pushes (CI then runs everything on all
-    OSes), sets up the registries per `docs/releasing.md`, and tags a release.
+10. [ ] **(current) Hand over**: pushed 2026-10-17 with the user's OK. The first CI
+    run failed the C API on every OS and the header test on Windows; fixed in the next
+    commit (see Findings), and CI is green. Left for the user: the registry setup in
+    `docs/releasing.md`, then a release tag (the release jobs haven't run yet).
 
 ## Findings / gotchas
 
 - crates.io rejects OIDC publishes that would create a new crate (403). The first
   version needs a token.
 - npm trusted publishing can only be configured on an existing package.
-- PyO3 0.30 + rust-numpy 0.30 work with `abi3-py39`, so one wheel per platform.
+- PyO3 0.30 + rust-numpy 0.30 work with `abi3-py310`, so one wheel per platform.
 - `uv venv` picked a 32-bit CPython 3.13 on this machine and maturin refused it
   ("platform win32 i686"). Pass `--python` the x64 3.12 explicitly.
 - stubtest needs `@final` on PyO3 classes (they can't be subclassed), and an
@@ -159,6 +161,22 @@ The bindings shouldn't each reinvent this, so it goes in the library crates:
   - `await using` is a syntax error on Node 22, so the test calls
     `[Symbol.asyncDispose]()` directly.
 
+- WSL has no `/sys/bus/usb`, so `loupecam::list()` errors there
+  (`USB: /sys/bus/usb/devices/ not found`) instead of returning nothing. The
+  tests treat that as "no camera".
+- `cargo rustc --crate-type cdylib,staticlib -- --print native-static-libs` gives
+  the system libraries for a static link. On Windows they're `x.lib` names: for
+  clang, pass them as `-lx` and drop the `/defaultlib:` options.
+- `napi artifacts` and `napi pre-publish` refuse to run unless every configured
+  target's `.node` is present. A local dry run needs stand-ins for the other platforms.
+- CI sets `CARGO_TERM_COLOR=always`, which colours even the `native-static-libs`
+  note: the parsed list ended in an escape code (`cannot find -lc\e[0m`). Pass
+  `--color never` wherever that line is parsed (`test.sh` and `release.yml`).
+- Git Bash on the Windows runner has no `/dev/stderr` (`tee: /dev/stderr: No such
+  file`). Tee to a log file instead.
+- With a CRLF checkout of `bindings/c/src/lib.rs`, cbindgen copies the CRs into
+  the header's doc comments, so the header test strips carriage returns from both sides.
+
 ## Progress log
 
 - [x] Steps 1–9 (see the plan).
@@ -171,28 +189,16 @@ The bindings shouldn't each reinvent this, so it goes in the library crates:
   - the Python sdist builds and works in a fresh venv
   - the npm flow (`create-npm-dirs` → `artifacts` → `pre-publish --dry-run` →
     `npm pack --dry-run`) produces the right package contents
-- [ ] CI on all OSes (needs a push).
+- [x] CI on all OSes: green after the C API fix.
 - [ ] First publish to each registry (needs the user's accounts and a release tag).
 
 ## Open questions for the user
 
-1. Push `master`? CI then builds and tests every binding on Windows, Linux and macOS.
-   That's the first run on macOS, and the first run of the Node tests on Linux.
-2. Registry accounts. `docs/releasing.md` → "Package registries" lists the steps:
+1. Registry accounts. `docs/releasing.md` → "Package registries" lists the steps:
    - crates.io: a token secret for the first publish, then trusted publishing
    - PyPI: a pending publisher, with no secret
    - npm: a token secret for the first publish, then trusted publishing
-   Then set the `PUBLISH_*` variables and tag a release. My recommendation: push
-   first, let CI go green, then do the accounts and tag.
-
-- WSL has no `/sys/bus/usb`, so `loupecam::list()` errors there
-  (`USB: /sys/bus/usb/devices/ not found`) instead of returning nothing. The
-  tests treat that as "no camera".
-- `cargo rustc --crate-type cdylib,staticlib -- --print native-static-libs` gives
-  the system libraries for a static link. On Windows they're `x.lib` names: for
-  clang, pass them as `-lx` and drop the `/defaultlib:` options.
-- `napi artifacts` and `napi pre-publish` refuse to run unless every configured
-  target's `.node` is present. A local dry run needs stand-ins for the other platforms.
+   Then set the `PUBLISH_*` variables and tag a release.
 
 ## Things not to do
 
