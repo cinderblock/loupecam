@@ -65,12 +65,17 @@ impl ColorMatrix {
 
     /// The vendor's default matrix for the MU1803-HS (hue 0, saturation 128).
     pub fn mu1803_default() -> Self {
-        Self::from_registers([1219, -242, 46, -461, 1533, -49, -164, -527, 1714])
+        crate::model::MU1803_HS.ccm
     }
 
-    pub fn from_registers(r: [i16; 9]) -> Self {
-        let f = |i: usize| r[i] as f32 / CCM_ONE;
-        ColorMatrix([[f(0), f(1), f(2)], [f(3), f(4), f(5)], [f(6), f(7), f(8)]])
+    pub const fn from_registers(r: [i16; 9]) -> Self {
+        let mut m = [[0.0; 3]; 3];
+        let mut i = 0;
+        while i < 9 {
+            m[i / 3][i % 3] = r[i] as f32 / CCM_ONE;
+            i += 1;
+        }
+        ColorMatrix(m)
     }
 
     /// Signed 16-bit register values, row-major.

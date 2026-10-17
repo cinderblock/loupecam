@@ -8,8 +8,7 @@
 use crate::calibration::Calibration;
 use crate::calibration::analysis::Measurement;
 use crate::settings::{Settings, WbMode};
-use loupecam::sim::SimCamera;
-use loupecam::{Camera, FrameReceiver, Gain, Model, RawFrame, RecvError, StreamConfig, StreamGeometry};
+use loupecam::{AnyCamera, FrameReceiver, Gain, Model, RawFrame, RecvError};
 use loupecam_isp::auto::{AutoExposure, Exposure, grey_world};
 use loupecam_isp::stats::{self, Rect};
 use serde::Serialize;
@@ -204,55 +203,8 @@ pub enum Source {
     Simulated,
 }
 
-/// A real or simulated camera.
-enum Cam {
-    Usb(Camera),
-    Sim(SimCamera),
-}
-
-macro_rules! delegate {
-    ($( fn $name:ident(&mut self $(, $arg:ident: $ty:ty)*) -> $ret:ty; )*) => {
-        $( fn $name(&mut self $(, $arg: $ty)*) -> $ret {
-            match self {
-                Cam::Usb(c) => c.$name($($arg),*),
-                Cam::Sim(c) => c.$name($($arg),*),
-            }
-        } )*
-    };
-}
-
-impl Cam {
-    delegate! {
-        fn start(&mut self, cfg: &StreamConfig) -> loupecam::Result<FrameReceiver>;
-        fn stop(&mut self) -> loupecam::Result<()>;
-        fn set_exposure(&mut self, us: u32) -> loupecam::Result<f64>;
-        fn set_gain(&mut self, gain: Gain) -> loupecam::Result<()>;
-        fn set_speed(&mut self, speed: u8) -> loupecam::Result<StreamGeometry>;
-        fn set_binning(&mut self, binning: bool) -> loupecam::Result<()>;
-        fn set_roi(&mut self, roi: Option<loupecam::Roi>) -> loupecam::Result<StreamGeometry>;
-    }
-
-    fn info(&self) -> &loupecam::DeviceInfo {
-        match self {
-            Cam::Usb(c) => c.info(),
-            Cam::Sim(c) => c.info(),
-        }
-    }
-
-    fn model(&self) -> &'static Model {
-        self.info().model
-    }
-
-    fn geometry(&self) -> Option<StreamGeometry> {
-        match self {
-            Cam::Usb(c) => c.geometry(),
-            Cam::Sim(c) => c.geometry(),
-        }
-    }
-}
-
 struct Live {
-    cam: Cam,
+    cam: AnyCamera,
     frames: FrameReceiver,
     last_frame: Instant,
 }
@@ -342,8 +294,8 @@ impl Actor {
 
     fn connect(&mut self) -> Result<(), String> {
         let mut cam = match self.source {
-            Source::Usb => Cam::Usb(Camera::open_first().map_err(|e| e.to_string())?),
-            Source::Simulated => Cam::Sim(SimCamera::open()),
+            Source::Usb => AnyCamera::open_first().map_err(|e| e.to_string())?,
+            Source::Simulated => AnyCamera::simulated(),
         };
         // Load this camera's calibration first: it can change gain register choices.
         let profile = crate::calibration::load(&cam.info().serial);

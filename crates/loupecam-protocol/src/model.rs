@@ -4,6 +4,7 @@
 //! FPGA. Adding a model means capturing its traffic (see `re/` in the repository) and,
 //! if it uses a new sensor, adding a module under [`crate::sensor`].
 
+use crate::isp::{ColorMatrix, WbGains};
 use crate::sensor::SensorKind;
 
 /// An output size the camera can stream.
@@ -59,6 +60,10 @@ pub struct Model {
     /// Size indices whose last row is corrupt (the vendor SDK's frames show it too).
     /// The driver replaces it with the same-colour row two above.
     pub bad_last_row: &'static [usize],
+    /// The vendor's colour matrix for this sensor (camera RGB to sRGB primaries).
+    pub ccm: ColorMatrix,
+    /// The vendor's default (daylight) white-balance gains.
+    pub daylight_wb: WbGains,
 }
 
 /// AmScope MU1803-HS: 18 MP, onsemi AR1820HS, USB 3.0.
@@ -81,6 +86,9 @@ pub const MU1803_HS: Model = Model {
     // flipped (correlation 0.999).
     rows_bottom_up: true,
     bad_last_row: &[2],
+    // The vendor's defaults (hue 0, saturation 128; its daylight preset).
+    ccm: ColorMatrix::from_registers([1219, -242, 46, -461, 1533, -49, -164, -527, 1714]),
+    daylight_wb: WbGains { r: 1.53, g: 1.0, b: 1.71 },
 };
 
 /// All models this crate knows how to drive.

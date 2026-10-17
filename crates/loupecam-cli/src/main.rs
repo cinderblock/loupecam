@@ -696,8 +696,6 @@ fn confirm(question: &str) -> Result<bool> {
 }
 
 /// The vendor software's default white balance (colour temperature 6503 K, tint 1000).
-const DAYLIGHT_WB: [f32; 3] = [1.53, 1.0, 1.71];
-
 fn save(path: &std::path::Path, f: &RawFrame, model: &loupecam::Model, d: &DevelopOpts) -> Result<()> {
     use loupecam_isp::encode::{self, Format};
     let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
@@ -715,20 +713,19 @@ fn save(path: &std::path::Path, f: &RawFrame, model: &loupecam::Model, d: &Devel
         _ => bail!("unknown output extension {ext:?} (use .pgm, .png, .tif or .jpg)"),
     };
     let loupecam::ColorFilter::Bayer(pattern) = model.color else { bail!("monochrome sensors not supported yet") };
-    let mut p = loupecam_isp::DevelopParams::new(pattern);
+    let mut p = loupecam_isp::DevelopParams::for_model(model);
     p.demosaic = match d.demosaic {
         DemosaicArg::Superpixel => loupecam_isp::Demosaic::Superpixel,
         DemosaicArg::Bilinear => loupecam_isp::Demosaic::Bilinear,
         DemosaicArg::Mhc => loupecam_isp::Demosaic::Mhc,
     };
-    p.wb = if d.awb {
-        loupecam_isp::auto::grey_world(&loupecam_isp::stats::compute(f, pattern, None, 4, [1.0; 3]))
-    } else {
-        d.wb.unwrap_or(DAYLIGHT_WB)
-    };
-    p.orientation.flip_v = model.rows_bottom_up;
-    if !d.no_ccm {
-        p.ccm = loupecam::ColorMatrix::mu1803_default().0;
+    if d.awb {
+        p.wb = loupecam_isp::auto::grey_world(&loupecam_isp::stats::compute(f, pattern, None, 4, [1.0; 3]));
+    } else if let Some(wb) = d.wb {
+        p.wb = wb;
+    }
+    if d.no_ccm {
+        p.ccm = loupecam_isp::IDENTITY;
     }
     let t = Instant::now();
     let bytes = if d.sixteen {

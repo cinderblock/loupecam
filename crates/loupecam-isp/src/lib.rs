@@ -30,7 +30,7 @@ pub use resize::resize;
 pub use tone::ToneCurve;
 
 use loupecam_protocol::frame::{RawFrame, SampleFormat};
-use loupecam_protocol::model::BayerPattern;
+use loupecam_protocol::model::{BayerPattern, ColorFilter, Model};
 use rayon::prelude::*;
 
 /// Interleaved RGB image (or single-channel when `channels == 1`).
@@ -112,6 +112,22 @@ impl DevelopParams {
             orientation: Orientation::default(),
             corrections: correction::Corrections::default(),
         }
+    }
+
+    /// Defaults for frames from `model`: its Bayer pattern, colour matrix and daylight
+    /// white balance, with rows flipped upright when the sensor reads out bottom-up.
+    /// Monochrome sensors aren't supported yet (none of the known models is one).
+    pub fn for_model(model: &Model) -> Self {
+        let pattern = match model.color {
+            ColorFilter::Bayer(p) => p,
+            ColorFilter::Mono => BayerPattern::Rggb,
+        };
+        let mut p = Self::new(pattern);
+        let wb = model.daylight_wb;
+        p.wb = [wb.r, wb.g, wb.b];
+        p.ccm = model.ccm.0;
+        p.orientation.flip_v = model.rows_bottom_up;
+        p
     }
 }
 
@@ -266,6 +282,19 @@ pub(crate) fn scale_shift(f: SampleFormat) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn model_defaults() {
+        let m = &loupecam_protocol::model::MU1803_HS;
+        let p = DevelopParams::for_model(m);
+        assert_eq!(p.pattern, BayerPattern::Rggb);
+        assert_eq!(p.wb, [1.53, 1.0, 1.71]);
+        assert!(p.orientation.flip_v);
+        // Rows of the vendor matrix sum to one (white stays white).
+        for row in p.ccm {
+            assert!((row.iter().sum::<f32>() - 1.0).abs() < 1e-3);
+        }
+    }
 
     #[test]
     fn rotations_compose() {

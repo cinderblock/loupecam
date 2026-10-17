@@ -31,6 +31,7 @@ use std::time::Duration;
 use usb::UsbTransport;
 
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum Error {
     #[error(transparent)]
     Protocol(#[from] loupecam_protocol::Error),
@@ -40,6 +41,9 @@ pub enum Error {
     NotFound,
     #[error(transparent)]
     Recv(#[from] RecvError),
+    /// The operation isn't available on this camera (e.g. the simulator has no FPGA).
+    #[error("{0} isn't supported by the simulated camera")]
+    Unsupported(&'static str),
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
@@ -228,6 +232,123 @@ impl Drop for Camera {
     fn drop(&mut self) {
         if let Err(e) = self.stop() {
             tracing::warn!("stopping camera on drop: {e}");
+        }
+    }
+}
+
+/// A real camera or the simulator, behind one type, for code that works with either.
+pub enum AnyCamera {
+    Usb(Camera),
+    Simulated(sim::SimCamera),
+}
+
+macro_rules! delegate {
+    ($( $(#[$m:meta])* fn $name:ident(&mut self $(, $arg:ident: $ty:ty)*) -> $ret:ty; )*) => {
+        $( $(#[$m])* pub fn $name(&mut self $(, $arg: $ty)*) -> $ret {
+            match self {
+                AnyCamera::Usb(c) => c.$name($($arg),*),
+                AnyCamera::Simulated(c) => c.$name($($arg),*),
+            }
+        } )*
+    };
+}
+
+/// Methods only the real camera has: the simulator reports [`Error::Unsupported`].
+macro_rules! usb_only {
+    ($( $(#[$m:meta])* fn $name:ident(&mut self $(, $arg:ident: $ty:ty)*) -> $ret:ty; )*) => {
+        $( $(#[$m])* pub fn $name(&mut self $(, $arg: $ty)*) -> $ret {
+            match self {
+                AnyCamera::Usb(c) => c.$name($($arg),*),
+                AnyCamera::Simulated(_) => Err(Error::Unsupported(stringify!($name))),
+            }
+        } )*
+    };
+}
+
+impl AnyCamera {
+    pub fn open(device: &CameraDevice) -> Result<Self> {
+        Camera::open(device).map(AnyCamera::Usb)
+    }
+
+    /// Open the first supported camera found.
+    pub fn open_first() -> Result<Self> {
+        Camera::open_first().map(AnyCamera::Usb)
+    }
+
+    /// A simulated camera: synthetic frames, no hardware needed.
+    pub fn simulated() -> Self {
+        AnyCamera::Simulated(sim::SimCamera::open())
+    }
+
+    pub fn is_simulated(&self) -> bool {
+        matches!(self, AnyCamera::Simulated(_))
+    }
+
+    pub fn info(&self) -> &DeviceInfo {
+        match self {
+            AnyCamera::Usb(c) => c.info(),
+            AnyCamera::Simulated(c) => c.info(),
+        }
+    }
+
+    pub fn model(&self) -> &'static Model {
+        self.info().model
+    }
+
+    /// Current stream configuration, if streaming.
+    pub fn config(&self) -> Option<&StreamConfig> {
+        match self {
+            AnyCamera::Usb(c) => c.config(),
+            AnyCamera::Simulated(c) => c.config(),
+        }
+    }
+
+    pub fn geometry(&self) -> Option<StreamGeometry> {
+        match self {
+            AnyCamera::Usb(c) => c.geometry(),
+            AnyCamera::Simulated(c) => c.geometry(),
+        }
+    }
+
+    pub fn is_streaming(&self) -> bool {
+        match self {
+            AnyCamera::Usb(c) => c.is_streaming(),
+            AnyCamera::Simulated(c) => c.is_streaming(),
+        }
+    }
+
+    pub fn stats(&self) -> Option<StreamStats> {
+        match self {
+            AnyCamera::Usb(c) => c.stats(),
+            AnyCamera::Simulated(c) => c.stats(),
+        }
+    }
+
+    delegate! {
+        /// See [`Camera::start`].
+        fn start(&mut self, cfg: &StreamConfig) -> Result<FrameReceiver>;
+        fn stop(&mut self) -> Result<()>;
+        /// Exposure in µs. Returns the exposure actually programmed.
+        fn set_exposure(&mut self, exposure_us: u32) -> Result<f64>;
+        fn set_gain(&mut self, gain: Gain) -> Result<()>;
+        fn set_speed(&mut self, speed: u8) -> Result<StreamGeometry>;
+        fn set_binning(&mut self, binning: bool) -> Result<()>;
+        fn set_roi(&mut self, roi: Option<Roi>) -> Result<StreamGeometry>;
+    }
+
+    usb_only! {
+        fn set_test_pattern(&mut self, pattern: u8) -> Result<()>;
+        /// The camera's own (FPGA) white balance, used in [`PixelMode::Processed8`].
+        fn set_wb(&mut self, wb: WbGains) -> Result<()>;
+        /// The camera's own (FPGA) colour matrix, used in [`PixelMode::Processed8`].
+        fn set_ccm(&mut self, ccm: ColorMatrix) -> Result<()>;
+    }
+
+    /// The camera's own (FPGA) tone curve, used in [`PixelMode::Processed8`].
+    pub fn set_lut(&mut self, lut: &ToneLut) -> Result<()> {
+        match self {
+            AnyCamera::Usb(c) => c.set_lut(lut),
+            AnyCamera::Simulated(_) => Err(Error::Unsupported("set_lut")),
         }
     }
 }
