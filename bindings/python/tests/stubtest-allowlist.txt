@@ -1,0 +1,8 @@
+# Type-only names in the stubs (aliases and the TypedDict for develop options).
+loupecam._native.Demosaic
+loupecam._native.DevelopOptions
+loupecam._native.ImageFormat
+loupecam._native.PixelMode
+loupecam._native.Region
+# PyO3 adds __all__ to the module; the stubs list the names directly.
+loupecam._native.__all__

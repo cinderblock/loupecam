@@ -1,0 +1,23 @@
+[package]
+name = "loupecam-python"
+description = "Python bindings for the LoupeCam microscope camera driver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+# Published to PyPI (as `loupecam`), not crates.io.
+publish = false
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+# A test binary can't link against libpython; the tests are pytest's (tests/).
+test = false
+doctest = false
+
+[dependencies]
+loupecam.workspace = true
+loupecam-isp.workspace = true
+pyo3 = { workspace = true, features = ["abi3-py39"] }
+numpy.workspace = true

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "apps/desktop/src-tauri"]
+members = ["crates/*", "apps/desktop/src-tauri", "bindings/python"]
 
 [workspace.package]
 version = "0.1.2"
@@ -62,3 +62,5 @@ getrandom = "0.3"
 sha2 = "0.10"
 rpassword = "7"
 windows = "0.61"
+pyo3 = "0.30"
+numpy = "0.30"

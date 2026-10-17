@@ -1,0 +1,39 @@
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "loupecam"
+description = "Driver for AmScope / ToupTek USB3 microscope cameras: no vendor SDK, no kernel driver"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT OR Apache-2.0"
+authors = [{ name = "Cameron Tacklind" }]
+keywords = ["microscope", "camera", "amscope", "touptek", "usb", "bayer"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Rust",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Topic :: System :: Hardware :: Hardware Drivers",
+  "Typing :: Typed",
+]
+dependencies = ["numpy>=1.21"]
+# From the Rust crate, which takes the workspace version (set from the release tag).
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/cinderblock/loupecam"
+Source = "https://github.com/cinderblock/loupecam/tree/master/bindings/python"
+Issues = "https://github.com/cinderblock/loupecam/issues"
+
+[tool.maturin]
+python-source = "python"
+module-name = "loupecam._native"

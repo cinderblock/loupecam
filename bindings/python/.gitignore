@@ -1,0 +1,6 @@
+/.venv/
+/.pytest_cache/
+/.mypy_cache/
+# `maturin develop` builds the extension in place.
+/python/loupecam/_native.*
+!/python/loupecam/_native.pyi
