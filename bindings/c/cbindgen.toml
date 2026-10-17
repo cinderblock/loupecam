@@ -1,0 +1,33 @@
+# Generates include/loupecam.h (tests/header.rs checks it's current; regenerate with
+# `LOUPECAM_BLESS=1 cargo test -p loupecam-capi --test header`).
+language = "C"
+include_guard = "LOUPECAM_H"
+cpp_compat = true
+usize_is_size_t = true
+documentation_style = "c99"
+sys_includes = ["stdbool.h", "stddef.h", "stdint.h"]
+no_includes = true
+header = """/*
+ * LoupeCam C API: a driver for AmScope / ToupTek USB3 microscope cameras.
+ * https://github.com/cinderblock/loupecam
+ *
+ * Generated from bindings/c/src/lib.rs by cbindgen; don't edit by hand.
+ *
+ * Every function returns a LoupecamStatus (LOUPECAM_STATUS_OK = 0) unless noted; on failure,
+ * loupecam_last_error() describes it. Handles are opaque and freed with their
+ * loupecam_*_free function. Functions may be called from any thread.
+ *
+ * The ABI may change before 1.0: rebuild against the header that ships with the
+ * library.
+ */"""
+
+[export]
+# Option enums: fields hold them as plain integers, so no signature names them.
+include = ["LoupecamPixelMode", "LoupecamDemosaic", "LoupecamWhiteBalance", "LoupecamColorMatrix", "LoupecamTone", "LoupecamFormat"]
+
+[enum]
+rename_variants = "ScreamingSnakeCase"
+prefix_with_name = true
+
+[fn]
+args = "Horizontal"

@@ -1,0 +1,24 @@
+[package]
+name = "loupecam-capi"
+description = "C API for the LoupeCam microscope camera driver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+# Shipped as a shared/static library with a header (release assets), not on crates.io.
+publish = false
+
+[lib]
+# loupecam_c.dll / libloupecam_c.so / libloupecam_c.dylib (and the static libraries).
+# Not plain `loupecam`: that would collide with the CLI binary's outputs (loupecam.pdb).
+name = "loupecam_c"
+crate-type = ["cdylib", "staticlib", "lib"]
+
+[dependencies]
+loupecam.workspace = true
+loupecam-isp.workspace = true
+loupecam-bindings.workspace = true
+
+[dev-dependencies]
+cbindgen.workspace = true
