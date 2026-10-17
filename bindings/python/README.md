@@ -9,7 +9,7 @@ NumPy arrays.
 pip install loupecam
 ```
 
-The wheels need CPython 3.9 or later, and are built for Windows (x64), Linux (x64,
+The wheels need CPython 3.10 or later, and are built for Windows (x64), Linux (x64,
 arm64) and macOS (arm64, x64).
 
 ## Example

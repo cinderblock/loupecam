@@ -42,7 +42,6 @@
     "test": "node --test \"test/*.test.mjs\"",
     "typecheck": "tsc --noEmit -p test",
     "artifacts": "napi artifacts",
-    "prepublishOnly": "napi prepublish -t npm --no-gh-release",
     "version": "napi version"
   },
   "devDependencies": {
