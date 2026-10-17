@@ -103,28 +103,54 @@ The bindings shouldn't each reinvent this, so it goes in the library crates:
 
 ## Plan / steps
 
-1. [ ] Shared layer: `AnyCamera`, `DevelopParams::for_model`, model `ccm`/`daylight_wb`;
-   the server and CLI use them.
-2. [ ] crates.io readiness: metadata (readme, keywords, categories), versioned path
-   dependencies, `set-version.sh` updating them, `publish = false` elsewhere,
-   `cargo publish --dry-run` (package + verify) passing.
-3. [ ] Python binding + tests + README.
-4. [ ] Node binding + tests + README.
-5. [ ] C API + header + C example + README.
-6. [ ] CI: build and test every binding on Windows, Linux and macOS.
-7. [ ] Release workflow: crates, wheels to PyPI, npm, C API zips, all gated.
-8. [ ] Root README "Using LoupeCam as a library" section.
-9. [ ] Hand over: what the user must set up on each registry.
+1. [x] Shared layer: `AnyCamera`, `DevelopParams::for_model`, model `ccm`/`daylight_wb`;
+   the server and CLI use them (`14ba3ea`). Names and parsing for pixel modes,
+   demosaics, Bayer patterns and formats (`42d6767`), `SampleFormat::bits` (`0e15fe8`).
+2. [x] crates.io readiness (`128c15b`): READMEs (their examples are doctests), keywords
+   and categories, versioned path deps kept in step by `set-version.sh` (tried with a
+   fake tag, then restored), `publish = false` elsewhere. `cargo package` packages
+   and verifies all three.
+3. [x] Python binding (`b36668a`): 14 pytest tests on the simulator, `stubtest` clean,
+   and `mypy --strict` on an example.
+4. [x] Shared develop options crate `bindings/common` (`loupecam-bindings`,
+   unpublished, `143c4c0`). The Python binding uses it.
+5. [x] Node binding (`be1d803`): 14 `node --test` tests on the simulator, plus a
+   TypeScript usage file type-checked with tsc 7.
+6. [ ] **(current)** C API + header + C example + README.
+7. [ ] CI: build and test every binding on Windows, Linux and macOS.
+8. [ ] Release workflow: crates, wheels to PyPI, npm, C API zips, all gated.
+9. [ ] Root README "Using LoupeCam as a library" section.
+10. [ ] Hand over: what the user must set up on each registry.
 
 ## Findings / gotchas
 
 - crates.io rejects OIDC publishes that would create a new crate (403). The first
   version needs a token.
 - npm trusted publishing can only be configured on an existing package.
+- PyO3 0.30 + rust-numpy 0.30 work with `abi3-py39`, so one wheel per platform.
+- `uv venv` picked a 32-bit CPython 3.13 on this machine and maturin refused it
+  ("platform win32 i686"). Pass `--python` the x64 3.12 explicitly.
+- stubtest needs `@final` on PyO3 classes (they can't be subclassed), and an
+  allowlist for type-only aliases (`tests/stubtest-allowlist.txt`).
+- napi-rs v3:
+  - Custom error codes work for synchronous calls as `Result<T, Code>` with
+    `Code: AsRef<str>`, but only spelled literally as `Result<…>`: the macro
+    doesn't see through a type alias.
+  - `Task` errors are always `Status`, so a rejection with a custom `code` is built
+    as a JS error object (`env.create_error` + `code`) and wrapped with
+    `Error::from(unknown)`.
+  - Doc comments and `Option<…>` passed into a `macro_rules!` as `$m:meta` or `$t:ty`
+    are opaque to napi-derive: docs render as `r"…` and the fields become
+    required. Pass docs as string literals, and spell out `Option<$ty>`.
+  - Node's CJS lexer only sees named exports through
+    `module.exports = require('./native.js')`. Assigning a variable hides them from
+    `import { … }`.
+  - `await using` is a syntax error on Node 22, so the test calls
+    `[Symbol.asyncDispose]()` directly.
 
 ## Progress log
 
-- [ ] (nothing yet)
+- [x] Steps 1–5 (see the plan). Every test passes locally on Windows.
 
 ## Open questions for the user
 
