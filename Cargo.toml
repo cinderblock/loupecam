@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "apps/desktop/src-tauri", "bindings/common", "bindings/python"]
+members = ["crates/*", "apps/desktop/src-tauri", "bindings/common", "bindings/node", "bindings/python"]
 
 [workspace.package]
 version = "0.1.2"
@@ -65,3 +65,7 @@ rpassword = "7"
 windows = "0.61"
 pyo3 = "0.30"
 numpy = "0.30"
+# The defaults: N-API 4 (Node 10+), symbols resolved at load time (no node.lib).
+napi = "3"
+napi-derive = "3"
+napi-build = "2"

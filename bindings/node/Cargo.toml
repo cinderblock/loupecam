@@ -1,0 +1,26 @@
+[package]
+name = "loupecam-node"
+description = "Node.js bindings for the LoupeCam microscope camera driver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+# Published to npm (as `loupecam`), not crates.io.
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+# A test binary can't link against Node's symbols; the tests are Node's (test/).
+test = false
+doctest = false
+
+[dependencies]
+loupecam.workspace = true
+loupecam-isp.workspace = true
+loupecam-bindings.workspace = true
+napi.workspace = true
+napi-derive.workspace = true
+
+[build-dependencies]
+napi-build.workspace = true

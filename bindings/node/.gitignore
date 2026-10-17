@@ -1,0 +1,3 @@
+/*.node
+# Platform packages, made by `napi create-npm-dirs` when publishing.
+/npm/

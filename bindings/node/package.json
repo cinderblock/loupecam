@@ -1,0 +1,53 @@
+{
+  "name": "loupecam",
+  "version": "0.1.2",
+  "description": "Driver for AmScope / ToupTek USB3 microscope cameras: no vendor SDK, no kernel driver",
+  "keywords": ["microscope", "camera", "amscope", "touptek", "usb", "bayer", "napi-rs"],
+  "license": "MIT OR Apache-2.0",
+  "author": "Cameron Tacklind",
+  "homepage": "https://github.com/cinderblock/loupecam/tree/master/bindings/node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cinderblock/loupecam.git",
+    "directory": "bindings/node"
+  },
+  "bugs": "https://github.com/cinderblock/loupecam/issues",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["index.js", "index.d.ts", "native.js", "native.d.ts"],
+  "engines": {
+    "node": ">=22"
+  },
+  "napi": {
+    "binaryName": "loupecam",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --platform --release --js native.js --dts native.d.ts",
+    "build:debug": "napi build --platform --js native.js --dts native.d.ts",
+    "test": "node --test \"test/*.test.mjs\"",
+    "typecheck": "tsc --noEmit -p test",
+    "artifacts": "napi artifacts",
+    "prepublishOnly": "napi prepublish -t npm --no-gh-release",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.4.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2"
+  }
+}
