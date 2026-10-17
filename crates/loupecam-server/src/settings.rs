@@ -39,6 +39,7 @@ pub struct Settings {
     pub preview: PreviewSettings,
     pub capture: CaptureSettings,
     pub record: RecordSettings,
+    pub storage: StorageSettings,
     pub updates: UpdateSettings,
     pub calibration: CalibrationSettings,
 }
@@ -184,6 +185,26 @@ pub struct CaptureSettings {
     pub demosaic: DemosaicSetting,
     /// Also save the undeveloped mosaic as a 16-bit TIFF.
     pub save_raw: bool,
+}
+
+/// Where captures and recordings are saved.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct StorageSettings {
+    pub usb: UsbMode,
+}
+
+/// Whether to save to a USB stick (see [`crate::storage`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum UsbMode {
+    /// Always the internal captures directory.
+    #[default]
+    Off,
+    /// The stick when one is inserted, else internal.
+    WhenAvailable,
+    /// Only the stick: capturing and recording fail without one.
+    Always,
 }
 
 /// How recordings are made. The presets fill these in; any field can be changed.
@@ -338,6 +359,7 @@ impl Default for Settings {
                 save_raw: false,
             },
             record: RecordSettings::default(),
+            storage: StorageSettings::default(),
             updates: UpdateSettings { auto_install: false, check_interval_hours: 6.0 },
             calibration: CalibrationSettings::default(),
         }

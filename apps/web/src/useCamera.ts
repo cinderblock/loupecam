@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, AuthError, getToken, wsUrl } from './api'
-import type { CalibrationStatus, CastInfo, LiveStats, Patch, RecordStatus, Settings, State, UpdateStatus } from './types'
+import type { CalibrationStatus, CastInfo, LiveStats, Patch, RecordStatus, Settings, State, StorageStatus, UpdateStatus } from './types'
 
 export interface Camera {
   state: State | null
@@ -8,6 +8,7 @@ export interface Camera {
   update: UpdateStatus | null
   calibration: CalibrationStatus | null
   record: RecordStatus | null
+  storage: StorageStatus | null
   /** What is being cast to the display (null: nothing). */
   cast: CastInfo | null
   /** Latest preview frame, decoded. */
@@ -41,6 +42,7 @@ export function useCamera(onError: (message: string) => void): Camera {
   const [update, setUpdate] = useState<UpdateStatus | null>(null)
   const [calibration, setCalibration] = useState<CalibrationStatus | null>(null)
   const [record, setRecord] = useState<RecordStatus | null>(null)
+  const [storage, setStorage] = useState<StorageStatus | null>(null)
   const [cast, setCast] = useState<CastInfo | null>(null)
   const [frame, setFrame] = useState<ImageBitmap | null>(null)
   const [connected, setConnected] = useState(false)
@@ -79,6 +81,7 @@ export function useCamera(onError: (message: string) => void): Camera {
           else if (msg.type === 'update') setUpdate(msg as UpdateStatus)
           else if (msg.type === 'calibration') setCalibration(msg as CalibrationStatus)
           else if (msg.type === 'record') setRecord(msg as RecordStatus)
+          else if (msg.type === 'storage') setStorage(msg as StorageStatus)
           else if (msg.type === 'display') setCast((msg as { cast: CastInfo | null }).cast)
           return
         }
@@ -141,5 +144,5 @@ export function useCamera(onError: (message: string) => void): Camera {
     [flush],
   )
 
-  return { state, stats, update, calibration, record, cast, frame, connected, authNeeded, patch }
+  return { state, stats, update, calibration, record, storage, cast, frame, connected, authNeeded, patch }
 }

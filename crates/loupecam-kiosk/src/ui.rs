@@ -4,7 +4,7 @@
 //! Immediate mode: [`App::draw`] paints everything and records each control's hit
 //! rectangle; touches are routed against the rectangles from the last draw.
 
-use crate::client::{CamState, CastInfo, Client, Command, RecordStatus, ServerEvent, Stats};
+use crate::client::{CamState, CastInfo, Client, Command, RecordStatus, ServerEvent, Stats, StorageStatus};
 use crate::gfx::{self, Align, Fonts};
 use crate::view::ZoomView;
 use serde_json::json;
@@ -35,6 +35,7 @@ enum Action {
     Grid,
     Crosshair,
     Preset(&'static str),
+    Storage(&'static str),
     StopCast,
     Slider(SliderKind),
 }
@@ -46,6 +47,7 @@ enum SliderKind {
 }
 
 const PRESETS: [(&str, &str); 3] = [("smooth", "Smooth"), ("detailed", "Detailed"), ("timelapse", "Timelapse")];
+const STORAGE: [(&str, &str); 3] = [("off", "This device"), ("whenAvailable", "USB if inserted"), ("always", "USB only")];
 const EXPOSURE_RANGE: (f32, f32) = (50.0, 2_000_000.0);
 
 /// A finger on the screen, and what it's doing.
@@ -74,6 +76,7 @@ pub struct App {
     state: Option<CamState>,
     stats: Stats,
     record: RecordStatus,
+    storage: StorageStatus,
     cast: Option<CastInfo>,
     /// The current cast, rendered (when the kiosk can show it natively).
     cast_image: Option<Pixmap>,
@@ -110,6 +113,7 @@ impl App {
             state: None,
             stats: Stats::default(),
             record: RecordStatus::default(),
+            storage: StorageStatus::default(),
             cast: None,
             cast_image: None,
             frame: None,
@@ -205,6 +209,7 @@ impl App {
                 }
                 self.record = r;
             }
+            ServerEvent::Storage(s) => self.storage = s,
             ServerEvent::Cast(c) => {
                 if c.as_ref().map(|c| c.id) != self.cast.as_ref().map(|c| c.id) {
                     self.cast_image = None;
@@ -449,6 +454,12 @@ impl App {
                 self.client.send(Command::Patch(json!({ "autoExposure": on })));
             }
             Action::WhiteBalance => self.client.send(Command::WhiteBalance),
+            Action::Storage(m) => {
+                self.client.send(Command::Patch(json!({ "storage": { "usb": m } })));
+                if let Some(s) = self.state.as_mut() {
+                    s.settings.storage.usb = m.to_string();
+                }
+            }
             Action::ToggleSettings => self.settings_open = !self.settings_open,
             Action::Fit => self.view_mut().fit(),
             Action::Grid => self.grid = !self.grid,
@@ -598,7 +609,12 @@ impl App {
             _ => "No camera".to_string(),
         };
         self.fonts.draw_fit(pm, &status, x, y + 14.0, 13.0, false, gfx::muted(), Align::Left, w);
-        let top = y + 26.0;
+        let mut top = y + 26.0;
+        // Where captures go, when a USB stick is part of it.
+        if let Some((text, warn)) = self.storage_line(&settings.storage.usb) {
+            self.fonts.draw_fit(pm, &text, x, top + 12.0, 13.0, warn, if warn { gfx::red() } else { gfx::muted() }, Align::Left, w);
+            top += 18.0;
+        }
 
         // Snap.
         let snap = cell(0, top, if portrait { 56.0 } else { 80.0 });
@@ -676,6 +692,17 @@ impl App {
             y += 20.0;
         }
 
+        // Where captures go (when this server can use a USB stick).
+        if self.storage.usb_dir.is_some() {
+            self.fonts.draw(pm, "Save to", x, y + 26.0, 15.0, true, gfx::text(), Align::Left);
+            let seg_w = (w - 90.0) / 3.0;
+            for (i, (key, label)) in STORAGE.iter().enumerate() {
+                let b = Rect::from_xywh(x + 90.0 + seg_w * i as f32, y, seg_w - 4.0, 40.0).unwrap();
+                self.button(pm, b, label, Action::Storage(key), settings.storage.usb == *key, true);
+            }
+            y += 52.0;
+        }
+
         // Record mode.
         self.fonts.draw(pm, "Record", x, y + 26.0, 15.0, true, gfx::text(), Align::Left);
         let seg_x = x + 90.0;
@@ -697,6 +724,19 @@ impl App {
         y += 56.0;
         if let Some(e) = self.record.encoders.is_empty().then_some("This server has no H.264 encoder: only timelapse stills can be recorded.") {
             self.fonts.draw_fit(pm, e, x, y + 10.0, 13.0, false, gfx::muted(), Align::Left, w);
+        }
+    }
+
+    /// The side panel's storage line: (text, whether it's a problem). `None` when captures
+    /// simply go to internal storage.
+    fn storage_line(&self, mode: &str) -> Option<(String, bool)> {
+        self.storage.usb_dir.as_ref()?;
+        let present = self.storage.usb_present;
+        match mode {
+            "always" if !present => Some(("No USB stick!".into(), true)),
+            "always" | "whenAvailable" if present => Some(("Saving to USB stick".into(), false)),
+            "whenAvailable" => Some(("No USB stick: saving here".into(), false)),
+            _ => None,
         }
     }
 

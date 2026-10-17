@@ -1,4 +1,4 @@
-import type { DeviceSummary, LiveStats, Patch, Settings } from '../types'
+import type { DeviceSummary, LiveStats, Patch, Settings, StorageStatus } from '../types'
 import { formatExposure } from '../format'
 import { Section, Segmented, Select, Slider, Toggle } from './widgets'
 
@@ -200,10 +200,31 @@ export function Controls({ s, device, stats, patch, onWhiteBalanceOnce, onClearR
   )
 }
 
-export function CaptureSettingsPanel({ s, patch }: { s: Settings; patch: (p: Patch<Settings>) => void }) {
+export function CaptureSettingsPanel({ s, storage, patch }: { s: Settings; storage: StorageStatus | null; patch: (p: Patch<Settings>) => void }) {
   const c = s.capture
   return (
     <>
+      {storage?.usbDir && (
+        <>
+          <Select
+            label="Save to"
+            value={s.storage.usb}
+            options={[
+              ['off', 'This device'],
+              ['whenAvailable', 'USB stick, when inserted'],
+              ['always', 'USB stick only'],
+            ]}
+            onChange={(v) => patch({ storage: { usb: v } })}
+          />
+          <p className={!storage.usbPresent && s.storage.usb === 'always' ? 'hint warn' : 'hint'}>
+            {storage.usbPresent
+              ? 'USB stick inserted: captures and recordings go to its LoupeCam folder.'
+              : s.storage.usb === 'always'
+                ? 'No USB stick: capturing and recording will fail until one is inserted.'
+                : 'No USB stick inserted.'}
+          </p>
+        </>
+      )}
       <Segmented
         value={c.format}
         options={[

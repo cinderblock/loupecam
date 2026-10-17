@@ -45,6 +45,7 @@ fn main() {
         display_token: None,
         web: web_ui(),
         captures_dir: captures_dir.clone(),
+        usb_dir: None,
         settings_file: Config::default_settings_file(),
         // The Tauri updater owns updates for the desktop app.
         self_update: false,

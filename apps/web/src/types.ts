@@ -40,8 +40,19 @@ export interface Settings {
     saveRaw: boolean
   }
   record: RecordSettings
+  storage: { usb: UsbMode }
   updates: { autoInstall: boolean; checkIntervalHours: number }
   calibration: CalibrationSettings
+}
+
+/** Whether captures go to a USB stick: never, when one is inserted, or only there. */
+export type UsbMode = 'off' | 'whenAvailable' | 'always'
+export type Location = 'internal' | 'usb'
+
+export interface StorageStatus {
+  /** Where the server looks for a stick (null: USB storage isn't set up). */
+  usbDir: string | null
+  usbPresent: boolean
 }
 
 export type RecordPreset = 'smooth' | 'detailed' | 'timelapse' | 'custom'
@@ -63,6 +74,7 @@ export interface RecordSettings {
 export interface Recording {
   name: string | null
   mode: RecordMode
+  location: Location
   encoder: string | null
   width: number
   height: number
@@ -193,12 +205,14 @@ export interface CaptureInfo {
   exposureUs: number
   gain: number
   taken: string
+  location: Location
 }
 
 export interface CaptureEntry {
   name: string
   bytes: number
   modified: string
+  location: Location
 }
 
 export type CastKind = 'image' | 'svg' | 'pdf' | 'html' | 'url'

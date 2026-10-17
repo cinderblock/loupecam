@@ -2,6 +2,7 @@
 
 use crate::service::Captured;
 use crate::settings::CaptureFormat;
+use crate::storage::Location;
 use loupecam_isp::encode::{self, Format};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
@@ -19,10 +20,12 @@ pub struct CaptureInfo {
     pub exposure_us: f64,
     pub gain: f32,
     pub taken: String,
+    pub location: Location,
 }
 
-/// Develop, encode and write a capture into `dir`. Runs on a blocking thread.
-pub fn save(c: &Captured, dir: &Path) -> anyhow::Result<CaptureInfo> {
+/// Develop, encode and write a capture into `dir` (which is at `location`). Runs on a
+/// blocking thread.
+pub fn save(c: &Captured, dir: &Path, location: Location) -> anyhow::Result<CaptureInfo> {
     std::fs::create_dir_all(dir)?;
     let s = &c.settings.capture;
     let p = c.settings.develop_params(&c.frame, s.demosaic, &c.calibration);
@@ -60,6 +63,7 @@ pub fn save(c: &Captured, dir: &Path) -> anyhow::Result<CaptureInfo> {
         exposure_us: c.exposure_us,
         gain: c.gain,
         taken: now.timestamp().to_string(),
+        location,
     })
 }
 
@@ -78,10 +82,11 @@ pub struct CaptureEntry {
     pub name: String,
     pub bytes: u64,
     pub modified: String,
+    pub location: Location,
 }
 
-/// Image and video files in `dir`, newest first.
-pub fn list(dir: &Path) -> std::io::Result<Vec<CaptureEntry>> {
+/// Image and video files in `dir` (at `location`), newest first.
+pub fn list(dir: &Path, location: Location) -> std::io::Result<Vec<CaptureEntry>> {
     let mut v = Vec::new();
     let rd = match std::fs::read_dir(dir) {
         Ok(rd) => rd,
@@ -101,7 +106,7 @@ pub fn list(dir: &Path) -> std::io::Result<Vec<CaptureEntry>> {
             .and_then(|t| jiff::Timestamp::try_from(t).ok())
             .map(|t| t.to_string())
             .unwrap_or_default();
-        v.push(CaptureEntry { name, bytes: md.len(), modified });
+        v.push(CaptureEntry { name, bytes: md.len(), modified, location });
     }
     v.sort_by(|a, b| b.modified.cmp(&a.modified));
     Ok(v)

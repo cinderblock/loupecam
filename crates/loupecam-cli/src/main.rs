@@ -131,6 +131,11 @@ struct ServeArgs {
     /// Directory for saved captures.
     #[arg(long)]
     captures: Option<PathBuf>,
+    /// Where a USB stick for captures appears (the `storage.usb` setting chooses whether
+    /// to use it) [default on Linux: /media/loupecam/usb, where the packaging automounts
+    /// sticks]. `none` to disable.
+    #[arg(long, env = "LOUPECAM_USB_DIR")]
+    usb_dir: Option<String>,
     /// Don't load or save settings.
     #[arg(long)]
     no_persist: bool,
@@ -471,6 +476,11 @@ fn serve(a: ServeArgs) -> Result<()> {
         display_token: a.display_token,
         web,
         captures_dir: a.captures.unwrap_or_else(Config::default_captures_dir),
+        usb_dir: match a.usb_dir.as_deref() {
+            None => Config::default_usb_dir(),
+            Some("" | "none") => None,
+            Some(d) => Some(PathBuf::from(d)),
+        },
         settings_file: if a.no_persist { None } else { Config::default_settings_file() },
         self_update: !a.no_update_check,
         announce: (!a.no_mdns).then_some(loupecam_server::mdns::Announce { name: a.mdns_name }),

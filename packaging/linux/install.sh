@@ -67,6 +67,7 @@ packaged() {
 }
 packaged loupecam.service
 packaged 99-loupecam.rules
+packaged 99-loupecam-usb.rules
 if [ "$kiosk" = 1 ]; then
 	packaged loupecam-kiosk.service
 	packaged 99-loupecam-kiosk.rules
@@ -107,8 +108,12 @@ mv -f "$PREFIX/loupecam.new" "$PREFIX/loupecam"
 ln -sf "$PREFIX/loupecam" /usr/local/bin/loupecam
 
 install -m 644 "$tmp/99-loupecam.rules" /etc/udev/rules.d/99-loupecam.rules
+# USB sticks for captures (see 99-loupecam-usb.rules).
+install -d -m 755 /media/loupecam /media/loupecam/usb
+install -m 644 "$tmp/99-loupecam-usb.rules" /etc/udev/rules.d/99-loupecam-usb.rules
 udevadm control --reload
 udevadm trigger --subsystem-match=usb --attr-match=idVendor=0547
+udevadm trigger --subsystem-match=block --property-match=ID_BUS=usb --action=add
 
 install -m 644 "$tmp/loupecam.service" /etc/systemd/system/loupecam.service
 

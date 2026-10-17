@@ -4,6 +4,7 @@ import type {
   CaptureEntry,
   CaptureInfo,
   CastInfo,
+  Location,
   NormRect,
   Patch,
   RecordPreset,
@@ -61,8 +62,8 @@ export const api = {
   capture: (fullResolution?: boolean) =>
     request<CaptureInfo>('POST', '/api/capture' + (fullResolution === undefined ? '' : `?fullResolution=${fullResolution}`)),
   captures: () => request<CaptureEntry[]>('GET', '/api/captures'),
-  deleteCapture: (name: string) => request<void>('DELETE', `/api/captures/${encodeURIComponent(name)}`),
-  captureUrl: (name: string) => withToken(`/api/captures/${encodeURIComponent(name)}`),
+  deleteCapture: (name: string, location: Location) => request<void>('DELETE', `/api/captures/${encodeURIComponent(name)}?location=${location}`),
+  captureUrl: (name: string, location: Location) => withToken(`/api/captures/${encodeURIComponent(name)}?location=${location}`),
   whiteBalance: (region: NormRect | null) => request<{ gains: [number, number, number] }>('POST', '/api/white-balance', { region }),
   roi: (region: NormRect | null) => request<Settings>('POST', '/api/roi', { region }),
   checkUpdate: () => request<UpdateStatus>('POST', '/api/update/check'),

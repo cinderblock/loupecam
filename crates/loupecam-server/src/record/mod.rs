@@ -13,6 +13,7 @@ use crate::calibration::Calibration;
 use crate::captures;
 use crate::service::{Captured, FrameEnvelope, Service};
 use crate::settings::{DemosaicSetting, RecordMode, RecordSettings, Settings};
+use crate::storage::{Location, Storage};
 use encoder::{EncoderConfig, VideoEncoder};
 use loupecam_isp::{Image8, develop, resize, yuv};
 use mp4::Fmp4Writer;
@@ -32,6 +33,8 @@ pub struct Recording {
     /// when no encoder is available).
     pub name: Option<String>,
     pub mode: RecordMode,
+    /// Where the files are going (internal storage or the USB stick).
+    pub location: Location,
     pub encoder: Option<&'static str>,
     pub width: u32,
     pub height: u32,
@@ -65,14 +68,14 @@ enum Slot {
 pub struct Recorder {
     pub status: watch::Sender<RecordStatus>,
     service: Arc<Service>,
-    captures_dir: PathBuf,
+    storage: Arc<Storage>,
     running: Mutex<Slot>,
 }
 
 impl Recorder {
-    pub fn new(service: Arc<Service>, captures_dir: PathBuf) -> Arc<Self> {
+    pub fn new(service: Arc<Service>, storage: Arc<Storage>) -> Arc<Self> {
         let status = RecordStatus { encoders: encoder::backends(), ..Default::default() };
-        Arc::new(Recorder { status: watch::Sender::new(status), service, captures_dir, running: Mutex::new(Slot::Idle) })
+        Arc::new(Recorder { status: watch::Sender::new(status), service, storage, running: Mutex::new(Slot::Idle) })
     }
 
     /// Start recording with the current `record` settings.
@@ -130,6 +133,8 @@ impl Recorder {
         let shared = &self.service.shared;
         let settings = shared.state.borrow().settings.clone();
         let rs = settings.record.clone();
+        // Where it goes is decided once, up front.
+        let (dir, location) = self.storage.target(settings.storage.usb)?;
         // Switch the stream size for the recording if asked.
         let mut restore_size = None;
         if let Some(i) = rs.stream_size_index
@@ -168,7 +173,7 @@ impl Recorder {
         let (name, writer) = match &enc {
             None => (None, None),
             Some(_) => {
-                let dir = self.captures_dir.clone();
+                let dir = dir.clone();
                 let made = tokio::task::spawn_blocking(move || -> std::io::Result<(String, File)> {
                     std::fs::create_dir_all(&dir)?;
                     let stem = captures::unique_stem(&dir, &now.strftime("%Y%m%d-%H%M%S").to_string(), "mp4");
@@ -186,6 +191,7 @@ impl Recorder {
         let recording = Recording {
             name,
             mode: rs.mode,
+            location,
             encoder: enc.as_ref().map(|e| e.name()),
             width: w,
             height: h,
@@ -195,7 +201,7 @@ impl Recorder {
             bytes: 0,
             stills: 0,
         };
-        Ok(Job { recording, settings: rs, enc, writer, restore_size })
+        Ok(Job { recording, settings: rs, enc, writer, restore_size, dir })
     }
 
     /// The next frame (at stream size `size`, if given), waiting up to 10 s.
@@ -264,7 +270,7 @@ impl Recorder {
             let settings = shared.state.borrow().settings.clone();
             let calibration = shared.calibration.borrow().clone();
             let exposure_us = shared.stats.borrow().exposure_us;
-            let dir = self.captures_dir.clone();
+            let (dir, location) = (job.dir.clone(), job.recording.location);
             let sync = last_sync.elapsed() > Duration::from_secs(5);
             let (enc, writer) = (job.enc.take(), job.writer.take());
             let (w, h) = (job.recording.width, job.recording.height);
@@ -283,7 +289,7 @@ impl Recorder {
                     if rs.mode == RecordMode::Timelapse && rs.timelapse_stills {
                         let gain = settings.gain;
                         let c = Captured { frame: env, calibration, settings, exposure_us, gain };
-                        captures::save(&c, &dir)?;
+                        captures::save(&c, &dir, location)?;
                         return Ok(true);
                     }
                     Ok(false)
@@ -358,6 +364,8 @@ struct Job {
     writer: Option<Fmp4Writer<BufWriter<File>>>,
     /// (previous, recording) stream size index, when recording switched it.
     restore_size: Option<(usize, usize)>,
+    /// Where the files go.
+    dir: PathBuf,
 }
 
 /// Mux encoder output. Timelapse frames each get their own fragment, so little is lost
@@ -484,7 +492,7 @@ mod tests {
         use crate::settings::RecordPreset;
         let dir = std::env::temp_dir().join(format!("loupecam-rec-{}", std::process::id()));
         let service = Service::spawn_with(Settings::default(), crate::service::Source::Simulated);
-        let rec = Recorder::new(service.clone(), dir.clone());
+        let rec = Recorder::new(service.clone(), Storage::spawn(dir.clone(), None));
 
         // Smooth: the 1228×922 stream fits 1280×960, so it's recorded as is.
         let r = rec.start().await.unwrap();

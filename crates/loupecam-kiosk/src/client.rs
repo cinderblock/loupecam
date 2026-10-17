@@ -41,6 +41,21 @@ pub struct Settings {
     pub gain: f32,
     pub white_balance: WhiteBalance,
     pub record: RecordSettings,
+    pub storage: StorageSettings,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct StorageSettings {
+    /// `off`, `whenAvailable` or `always`.
+    pub usb: String,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct StorageStatus {
+    pub usb_dir: Option<String>,
+    pub usb_present: bool,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -103,6 +118,7 @@ pub enum ServerEvent {
     State(CamState),
     Stats(Stats),
     Record(RecordStatus),
+    Storage(StorageStatus),
     Cast(Option<CastInfo>),
     /// A new preview frame is in [`Client::frame`].
     Frame,
@@ -231,6 +247,7 @@ fn handle_text(t: &str, notify: &(dyn Fn(ServerEvent) + Send + Sync)) {
         Some("state") => serde_json::from_value(v).map(ServerEvent::State),
         Some("stats") => serde_json::from_value(v).map(ServerEvent::Stats),
         Some("record") => serde_json::from_value(v).map(ServerEvent::Record),
+        Some("storage") => serde_json::from_value(v).map(ServerEvent::Storage),
         Some("display") => serde_json::from_value(v["cast"].clone()).map(ServerEvent::Cast),
         _ => return,
     };
@@ -303,7 +320,8 @@ fn requests(base: &str, token: Option<&str>, rx: Receiver<Command>, notify: &(dy
         let result = match &cmd {
             Command::Capture => call("POST", "/api/capture", None).map(|b| {
                 let v = json(&b);
-                Some(format!("Saved {}", v["name"].as_str().unwrap_or("capture")))
+                let usb = if v["location"] == "usb" { " to the USB stick" } else { "" };
+                Some(format!("Saved {}{usb}", v["name"].as_str().unwrap_or("capture")))
             }),
             Command::StartRecording(preset) => {
                 let body = preset.as_ref().map(|p| json!({ "preset": p })).unwrap_or(json!({}));
@@ -311,7 +329,8 @@ fn requests(base: &str, token: Option<&str>, rx: Receiver<Command>, notify: &(dy
             }
             Command::StopRecording => call("POST", "/api/record/stop", None).map(|b| {
                 let v = json(&b);
-                v["name"].as_str().map(|n| format!("Saved {n}"))
+                let usb = if v["location"] == "usb" { " to the USB stick" } else { "" };
+                v["name"].as_str().map(|n| format!("Saved {n}{usb}"))
             }),
             Command::ApplyPreset(p) => call("GET", "/api/record", None).and_then(|b| {
                 let preset = json(&b)["presets"][p].clone();

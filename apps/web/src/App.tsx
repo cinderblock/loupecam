@@ -59,7 +59,7 @@ export default function App() {
     setBusy(true)
     try {
       const c = await api.capture()
-      flash(`Saved ${c.name} (${c.width}×${c.height}, ${formatExposure(c.exposureUs)})`)
+      flash(`Saved ${c.name}${c.location === 'usb' ? ' to the USB stick' : ''} (${c.width}×${c.height}, ${formatExposure(c.exposureUs)})`)
       setGalleryVersion((v) => v + 1)
     } catch (e) {
       flash(`Capture failed: ${(e as Error).message}`)
@@ -186,7 +186,7 @@ export default function App() {
           {s && <Controls s={s} device={dev} stats={cam.stats} patch={cam.patch} onWhiteBalanceOnce={() => api.whiteBalance(null).catch((e) => flash(e.message))} onClearRoi={() => api.roi(null).catch((e) => flash(e.message))} />}
           {s && (
             <Section title="Capture">
-              <CaptureSettingsPanel s={s} patch={cam.patch} />
+              <CaptureSettingsPanel s={s} storage={cam.storage} patch={cam.patch} />
             </Section>
           )}
           {s && (

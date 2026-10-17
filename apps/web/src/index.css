@@ -486,3 +486,12 @@ button.record.active .record-dot {
     visibility: hidden;
   }
 }
+
+.badge {
+  margin-left: 6px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--muted);
+}

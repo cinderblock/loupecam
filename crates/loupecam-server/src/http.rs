@@ -2,6 +2,7 @@
 
 use crate::captures;
 use crate::cast;
+use crate::storage::Location;
 use crate::geometry::{NormRect, display_to_frame};
 use crate::{AppState, WebUi};
 use axum::body::Body;
@@ -46,6 +47,7 @@ pub fn router(state: AppState) -> Router {
         .route("/capture", post(capture))
         .route("/captures", get(list_captures))
         .route("/captures/{name}", get(get_capture).delete(delete_capture))
+        .route("/storage", get(storage_get))
         .route("/record", get(record_get))
         .route("/record/start", post(record_start))
         .route("/record/stop", post(record_stop))
@@ -138,35 +140,68 @@ struct CaptureQuery {
 }
 
 async fn capture(State(s): State<AppState>, Query(q): Query<CaptureQuery>) -> ApiResult<Json<captures::CaptureInfo>> {
-    let full = q.full_resolution.unwrap_or_else(|| s.service.shared.state.borrow().settings.capture.full_resolution);
+    let (full, usb) = {
+        let st = s.service.shared.state.borrow();
+        (q.full_resolution.unwrap_or(st.settings.capture.full_resolution), st.settings.storage.usb)
+    };
+    // Check the destination before grabbing a frame.
+    s.storage.target(usb).map_err(unavailable)?;
     let c = s.service.capture(full).await.map_err(unavailable)?;
-    let dir = s.captures_dir.clone();
-    let info = tokio::task::spawn_blocking(move || captures::save(&c, &dir))
+    let (dir, location) = s.storage.target(usb).map_err(unavailable)?;
+    let info = tokio::task::spawn_blocking(move || captures::save(&c, &dir, location))
         .await
         .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
         .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     Ok(Json(info))
 }
 
+/// Captures in every location (internal, and the USB stick when present), newest first.
 async fn list_captures(State(s): State<AppState>) -> ApiResult<Json<Vec<captures::CaptureEntry>>> {
-    let dir = s.captures_dir.clone();
-    tokio::task::spawn_blocking(move || captures::list(&dir))
-        .await
-        .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
-        .map(Json)
-        .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))
+    let locations = s.storage.locations();
+    tokio::task::spawn_blocking(move || {
+        let mut all = Vec::new();
+        for (loc, dir) in locations {
+            match captures::list(&dir, loc) {
+                Ok(v) => all.extend(v),
+                // A stick pulled mid-listing shouldn't hide the internal captures.
+                Err(e) if loc == Location::Usb => tracing::warn!("listing {}: {e}", dir.display()),
+                Err(e) => return Err(e),
+            }
+        }
+        all.sort_by(|a, b| b.modified.cmp(&a.modified));
+        Ok(all)
+    })
+    .await
+    .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+    .map(Json)
+    .map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))
+}
+
+#[derive(Deserialize)]
+struct LocationQuery {
+    location: Option<Location>,
+}
+
+/// Find a capture by name, in `loc` or (when not given) internal, then USB.
+fn find_capture(s: &AppState, name: &str, loc: Option<Location>) -> ApiResult<std::path::PathBuf> {
+    s.storage
+        .locations()
+        .into_iter()
+        .filter(|(l, _)| loc.is_none_or(|want| want == *l))
+        .find_map(|(_, dir)| captures::resolve(&dir, name))
+        .ok_or(ApiError(StatusCode::NOT_FOUND, "no such capture".into()))
 }
 
 /// A saved capture, with range requests (so videos can be seeked while streaming).
-async fn get_capture(State(s): State<AppState>, Path(name): Path<String>, req: Request) -> ApiResult<Response> {
+async fn get_capture(State(s): State<AppState>, Path(name): Path<String>, Query(q): Query<LocationQuery>, req: Request) -> ApiResult<Response> {
     use tower::ServiceExt;
-    let path = captures::resolve(&s.captures_dir, &name).ok_or(ApiError(StatusCode::NOT_FOUND, "no such capture".into()))?;
+    let path = find_capture(&s, &name, q.location)?;
     let r = tower_http::services::ServeFile::new(path).oneshot(req).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     Ok(r.map(Body::new))
 }
 
-async fn delete_capture(State(s): State<AppState>, Path(name): Path<String>) -> ApiResult<StatusCode> {
-    let path = captures::resolve(&s.captures_dir, &name).ok_or(ApiError(StatusCode::NOT_FOUND, "no such capture".into()))?;
+async fn delete_capture(State(s): State<AppState>, Path(name): Path<String>, Query(q): Query<LocationQuery>) -> ApiResult<StatusCode> {
+    let path = find_capture(&s, &name, q.location)?;
     tokio::fs::remove_file(path).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -275,6 +310,10 @@ async fn calibration_delete(State(s): State<AppState>, Path(section): Path<Strin
     crate::calibration::save(&p).map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     s.service.reload_calibration();
     Ok(StatusCode::NO_CONTENT)
+}
+
+async fn storage_get(State(s): State<AppState>) -> Json<serde_json::Value> {
+    Json(serde_json::to_value(&*s.storage.status.borrow()).unwrap())
 }
 
 async fn record_get(State(s): State<AppState>) -> Json<serde_json::Value> {
@@ -423,6 +462,7 @@ impl Drop for TargetGuard {
 
 /// Server → client: `{"type":"state",…}` on change, `{"type":"stats",…}` ~5×/s,
 /// `{"type":"update",…}`, `{"type":"calibration",…}`, `{"type":"record",…}`,
+/// `{"type":"storage",…}`,
 /// `{"type":"display","cast":…}`
 /// (see [`display_get`]) and, after the client sends
 /// `{"type":"preview","enabled":true}`, binary JPEG frames. A client that sends
@@ -444,6 +484,8 @@ async fn ws_session(socket: WebSocket, app: AppState) {
     casting.mark_changed();
     let mut record = app.recorder.status.subscribe();
     record.mark_changed();
+    let mut storage = app.storage.status.subscribe();
+    storage.mark_changed();
     let mut target: Option<TargetGuard> = None;
     let mut viewer = None;
     let msg = |kind: &str, v: serde_json::Value| {
@@ -472,6 +514,10 @@ async fn ws_session(socket: WebSocket, app: AppState) {
             r = calib.changed() => {
                 if r.is_err() { break }
                 msg("calibration", serde_json::to_value(&*calib.borrow_and_update()).unwrap())
+            }
+            r = storage.changed() => {
+                if r.is_err() { break }
+                msg("storage", serde_json::to_value(&*storage.borrow_and_update()).unwrap())
             }
             r = record.changed() => {
                 if r.is_err() { break }
