@@ -42,6 +42,14 @@ pub enum SampleFormat {
 }
 
 impl SampleFormat {
+    /// Significant bits per sample.
+    pub fn bits(self) -> u8 {
+        match self {
+            SampleFormat::U8 => 8,
+            SampleFormat::U16 { bits } => bits,
+        }
+    }
+
     pub fn bytes_per_sample(self) -> usize {
         match self {
             SampleFormat::U8 => 1,
