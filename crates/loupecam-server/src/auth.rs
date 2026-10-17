@@ -27,8 +27,6 @@ use std::time::{Duration, Instant, SystemTime};
 
 /// Cookie holding a login session.
 pub const SESSION_COOKIE: &str = "loupecam_session";
-/// Shortest password accepted.
-pub const MIN_PASSWORD: usize = 8;
 
 /// What a caller may do. Ordered: each role includes the ones before it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -698,9 +696,6 @@ fn build(levels: Levels, old: Option<&Stored>) -> Result<Stored, Error> {
             return Ok(None);
         }
         match new.filter(|p| !p.is_empty()) {
-            Some(p) if p.chars().count() < MIN_PASSWORD => {
-                Err(Error::Invalid(format!("the {what} password needs at least {MIN_PASSWORD} characters")))
-            }
             Some(p) => Ok(Some(Pw::New(p))),
             None => old.cloned().map(|h| Some(Pw::Keep(h))).ok_or_else(|| Error::Invalid(format!("set the {what} password"))),
         }
@@ -883,7 +878,7 @@ mod tests {
     fn passworded_access() {
         let a = Auth::new(None, true, None, None);
         assert!(matches!(
-            a.setup(IP, None, levels(Access::Password, ConfigLock::Password, Some("short"), Some("admin-pass"))),
+            a.setup(IP, None, levels(Access::Password, ConfigLock::Password, Some(""), Some("admin-pass"))),
             Err(Error::Invalid(_))
         ));
         assert!(matches!(
@@ -941,6 +936,13 @@ mod tests {
         a.setup(IP, None, levels(Access::Password, ConfigLock::Password, Some("access-pass"), Some("admin-pass"))).unwrap();
         assert_eq!(a.resolve(&k).role, Some(Role::Operate));
         assert_eq!(a.resolve(&Credentials::default()).role, None);
+    }
+
+    #[test]
+    fn any_length_password() {
+        let a = Auth::new(None, true, None, None);
+        a.setup(IP, None, levels(Access::Password, ConfigLock::Open, Some("x"), None)).unwrap();
+        assert_eq!(a.login(IP, "x").unwrap().role, Role::Operate);
     }
 
     #[test]

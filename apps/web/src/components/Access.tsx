@@ -96,13 +96,11 @@ function PasswordPair({ label, value, onChange, optional }: { label: string; val
   )
 }
 
-const MIN_PASSWORD = 8
-
 /** Checks the password fields; returns an error to show, or the levels to send. */
 function levelsFrom(p: Preset, access: [string, string], admin: [string, string], keepExisting: { access: boolean; admin: boolean }): string | Levels {
   const check = (v: [string, string], what: string, keep: boolean): string | null => {
     if (!v[0] && !v[1] && keep) return null
-    if (v[0].length < MIN_PASSWORD) return `The ${what} password needs at least ${MIN_PASSWORD} characters.`
+    if (!v[0]) return `Enter the ${what} password.`
     if (v[0] !== v[1]) return `The two ${what} passwords don't match.`
     return null
   }

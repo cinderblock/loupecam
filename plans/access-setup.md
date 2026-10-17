@@ -36,6 +36,8 @@ From the user (2026-10-16):
   3. **Passworded**: a password is needed for even basic access. The config password
      may either require this password first or bypass it.
   4. **Full auth**: requires HTTPS. Passkeys, and an admin user is set up.
+- **No minimum password length** (user, 2026-10-17). Any non-empty password is
+  accepted.
 - **First-run setup**: by default the first connection runs setup. A CLI option
   `--setup-code` makes setup require a code set at start, random or specified.
 
