@@ -5,6 +5,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+keywords = ["microscope", "camera", "amscope", "touptek", "usb"]
+categories = ["hardware-support", "multimedia::images"]
 rust-version.workspace = true
 
 [dependencies]

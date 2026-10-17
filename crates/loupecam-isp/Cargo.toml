@@ -5,6 +5,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+keywords = ["microscope", "camera", "demosaic", "bayer", "raw"]
+categories = ["multimedia::images"]
 rust-version.workspace = true
 
 [dependencies]
@@ -14,3 +18,6 @@ png.workspace = true
 tiff.workspace = true
 jpeg-encoder.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+loupecam.workspace = true

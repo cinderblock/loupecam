@@ -16,6 +16,11 @@
 //! [`encode`] writes PNG, TIFF and JPEG, and [`resize`] and [`yuv`] prepare frames for
 //! video encoders.
 
+// The README's examples are compiled as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
+
 pub mod auto;
 pub mod correction;
 mod demosaic;

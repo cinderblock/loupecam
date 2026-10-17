@@ -14,6 +14,11 @@
 //! # Ok::<(), loupecam::Error>(())
 //! ```
 
+// The README's examples are compiled as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
+
 pub mod sim;
 mod stream;
 mod usb;

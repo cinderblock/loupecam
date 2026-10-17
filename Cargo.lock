@@ -3065,6 +3065,7 @@ name = "loupecam-isp"
 version = "0.1.2"
 dependencies = [
  "jpeg-encoder",
+ "loupecam",
  "loupecam-protocol",
  "png 0.18.1",
  "rayon",

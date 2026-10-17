@@ -11,7 +11,10 @@ fi
 # The first `version = "…"` in Cargo.toml is [workspace.package]; every crate and the
 # Tauri app inherit it. (perl, not sed: macOS sed has no 0,/re/ address.)
 perl -0pi -e 's/^version = "[^"]*"/version = "'"$v"'"/m' Cargo.toml
+# The published crates' path dependencies carry the version too (crates.io needs it).
+perl -pi -e 's/^(loupecam[-a-z]* = \{ path = "[^"]*", version = ")[^"]*"/${1}'"$v"'"/' Cargo.toml
 grep -m1 '^version = ' Cargo.toml
+grep -E '^loupecam[-a-z]* = .*version' Cargo.toml
 # Keep Cargo.lock consistent so --locked builds still work.
 cargo update --workspace --quiet
 echo "VERSION=$v" >> "${GITHUB_ENV:-/dev/null}"

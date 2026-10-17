@@ -7,12 +7,14 @@ version = "0.1.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/cinderblock/loupecam"
+homepage = "https://github.com/cinderblock/loupecam"
 rust-version = "1.88"
 
 [workspace.dependencies]
-loupecam-protocol = { path = "crates/loupecam-protocol" }
-loupecam = { path = "crates/loupecam" }
-loupecam-isp = { path = "crates/loupecam-isp" }
+# The published library crates need a version too (set-version.sh keeps it in step).
+loupecam-protocol = { path = "crates/loupecam-protocol", version = "0.1.2" }
+loupecam = { path = "crates/loupecam", version = "0.1.2" }
+loupecam-isp = { path = "crates/loupecam-isp", version = "0.1.2" }
 loupecam-server = { path = "crates/loupecam-server" }
 loupecam-update = { path = "crates/loupecam-update" }
 loupecam-kiosk = { path = "crates/loupecam-kiosk" }

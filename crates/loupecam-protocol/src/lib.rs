@@ -8,6 +8,11 @@
 //! Everything here was learned by observing the camera's USB traffic. See
 //! `docs/protocol.md` in the repository for the full write-up.
 
+// The README's examples are compiled as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
+
 pub mod flash;
 pub mod frame;
 pub mod isp;
