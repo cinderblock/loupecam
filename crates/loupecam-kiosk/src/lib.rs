@@ -57,6 +57,9 @@ pub fn run(opts: Options) -> anyhow::Result<()> {
             anyhow::bail!("this build has no window support (the `window` feature)");
         }
     }
+    #[cfg(target_os = "linux")]
+    return platform::kms::run(&opts);
+    #[cfg(not(target_os = "linux"))]
     anyhow::bail!("drawing to the display directly needs Linux; use --window here")
 }
 

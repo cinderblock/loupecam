@@ -125,8 +125,8 @@ work in both the camera view and cast content.
    dev backend, recorder actor, API, timelapse.
 3. ✅ Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
-4. **← current** Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
-5. Chromium override (cage handoff).
+4. ✅ Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
+5. **← current** Chromium override (cage handoff).
 6. V4L2 M2M encoder (needs the Pi 4).
 7. Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
    `chromium`, the user, config.txt notes), README.
@@ -134,6 +134,15 @@ work in both the camera view and cast content.
 
 ## Findings / gotchas
 
+- `serve --simulate-camera` (hidden flag; `loupecam::sim::SimCamera`) streams a
+  synthetic specimen through the real pipeline, so the kiosk, recording and web UI can
+  be developed with no camera attached.
+- On a Pi 4 `/dev/dri/card0` may be V3D (render only): the kiosk scans `card*` for one
+  with a connected connector.
+- The full CLI can't be cross-checked for aarch64-musl on Windows (`ring` in the updater
+  needs `aarch64-linux-musl-gcc`); the kiosk crate alone can. CI builds natively on ARM.
+- Slint was rejected (license); the kiosk draws with tiny-skia + fontdue (DejaVu Sans via
+  the `dejavu` crate), resvg for SVG casts.
 - The embedded test browser (T3 preview) has no PDF viewer: PDF casts show blank
   there. Real Chrome renders them. Chromium on the Pi includes the viewer (verify).
 - Chrome's PDF viewer toolbar runs along the top, so the cast page's back button sits
@@ -169,8 +178,12 @@ work in both the camera view and cast content.
       preset switch, `/cast` live-switching via SSE, PDF in real Chrome, our fMP4 plays and
       seeks in Chromium. Pinch not yet tried on a real touchscreen (no frames without a
       camera, and no multi-touch in the test browser).
-- [ ] Native kiosk: window backend
-- [ ] Native kiosk: DRM + evdev
+- [x] Native kiosk: window backend. Checked on Windows against `serve --simulate-camera`:
+      live view ~30 fps, snap, record/stop with timer, settings sheet, wheel zoom, drag
+      pan, SVG cast with text, PDF cast handed to the browser path. (Test by posting
+      WM_* mouse messages to the window: doesn't move the user's cursor.)
+- [x] Native kiosk: DRM + evdev written; clippy-clean for aarch64-musl and x86_64-gnu.
+      **Not yet run on hardware** (needs the Pi 4 + display).
 - [ ] Chromium override
 - [ ] V4L2 M2M encoder
 - [ ] Packaging + README
