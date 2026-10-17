@@ -69,7 +69,7 @@ Stored as two independent settings, shown in the wizard as the user's four level
 | Configuration protected | `open` | `password` |
 | Configuration locked | `open` | `locked` |
 | Passworded | `password` | `password` or `locked` |
-| Full auth (phase 3) | `accounts` | admin users |
+| ~~Full auth (phase 3, dropped)~~ | `accounts` | admin users |
 
 - `access` decides who can view and operate the camera at all.
 - `config: password` means admin actions need the admin password.
@@ -157,7 +157,7 @@ renders arbitrary cast content.
   largest size). Operator changes are clamped to them, and the UI greys out the
   out-of-range parts.
 
-### Full auth (phase 3)
+### Full auth (phase 3, dropped; kept for the record)
 
 - HTTPS: `--tls-cert/--tls-key` (PEM) via rustls. Possibly ACME later. Behind a
   reverse proxy (e.g. Caddy), trust `X-Forwarded-Proto` from a configured proxy
@@ -188,7 +188,9 @@ Phase 2: settings policy. **Dropped**: the user doesn't think limits make sense 
 microscope ("not much to secure"). "Reset to defaults" would be a convenience feature,
 not security; build it only if asked.
 
-Phase 3: HTTPS and passkeys. **On hold: the user said "wait" (2026-10-17).**
+Phase 3: HTTPS and passkeys. **Dropped**: the user called it excessive for a microscope
+(2026-10-17). The wizard's disabled "Accounts with passkeys" card and the README's
+"planned" line were removed.
 
 ## Findings / gotchas
 
@@ -271,17 +273,19 @@ Phase 3: HTTPS and passkeys. **On hold: the user said "wait" (2026-10-17).**
       fast-forwarded master to `f7255da` (user: "why not"). Deployed to odriver2. Not
       pushed.
 - [x] Phase 2: dropped by the user
-- [ ] Phase 3
+- [x] Phase 3: dropped by the user
 
 ## Open questions for the user
 
-1. Which settings count as "configuration" (admin-only), and what should defaults and
-   limits cover? I'll propose a split in phase 2; nothing is blocked before then.
+1. ~~Settings split for phase 2~~: phase 2 dropped.
 2. ~~Wizard wording~~: the user hasn't noticed any issue (2026-10-17). Closed.
 3. ~~Fast-forward master~~: done.
 4. ~~Phase 2 scope~~: dropped (user, 2026-10-17: "it's a microscope, not much to
    secure").
-5. Push master (22 commits ahead, including the kiosk thread's)?
+5. ~~Push master~~: pushed (`f6d8606`, 2026-10-17).
+6. ~~Phase 3~~: dropped.
+
+None open.
 
 ## Things not to do
 

@@ -129,9 +129,9 @@ setup then asks for the code.
 | Configuration locked | anyone | only `loupecam access` on the server |
 | Passworded | access or admin password | admin password, or locked |
 
-"Configuration" covers access and security, updates, calibration and deleting captures.
-Everything else (exposure, white balance, ROI, captures) is "using the camera". Full
-accounts with passkeys (which need HTTPS) are planned.
+"Configuration" covers access and security, updates, calibration, where files are saved,
+and deleting captures. Everything else (exposure, white balance, ROI, captures,
+recording) is "using the camera".
 
 Browsers log in with a password and get a session cookie. Clients that can't log in
 (Home Assistant, OctoPrint, scripts) use **API keys**, created by an admin under

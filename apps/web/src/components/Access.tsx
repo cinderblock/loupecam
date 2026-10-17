@@ -75,13 +75,6 @@ function LevelCards({ value, onChange }: { value: string; onChange: (p: Preset) 
           </span>
         </label>
       ))}
-      <label className="level disabled" title="Coming in a later version">
-        <input type="radio" name="level" disabled />
-        <span>
-          <strong>Accounts with passkeys</strong>
-          <span className="hint">Users sign in with passkeys, and an admin user manages them. Needs HTTPS; not available yet.</span>
-        </span>
-      </label>
     </div>
   )
 }
