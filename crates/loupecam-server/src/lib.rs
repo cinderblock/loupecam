@@ -58,6 +58,8 @@ pub struct Config {
     pub self_update: bool,
     /// Announce the server over mDNS / DNS-SD (only when listening beyond loopback).
     pub announce: Option<mdns::Announce>,
+    /// Use a simulated camera instead of a USB one (development without hardware).
+    pub simulate_camera: bool,
 }
 
 impl Config {
@@ -130,7 +132,8 @@ impl Server {
     /// Bind and start serving. Must be called inside a tokio runtime.
     pub async fn start(cfg: Config) -> std::io::Result<Server> {
         let settings = load_settings(cfg.settings_file.as_ref());
-        let service = Service::spawn(settings);
+        let source = if cfg.simulate_camera { service::Source::Simulated } else { service::Source::Usb };
+        let service = Service::spawn_with(settings, source);
         let preview = preview::spawn(service.shared.clone());
         let shared = service.shared.clone();
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());

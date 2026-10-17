@@ -50,6 +50,7 @@ fn main() {
         self_update: false,
         // Localhost only; nothing to announce.
         announce: None,
+        simulate_camera: false,
     };
 
     let app = tauri::Builder::default()

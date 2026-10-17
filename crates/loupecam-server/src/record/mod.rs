@@ -476,33 +476,12 @@ mod tests {
         let _ = std::fs::remove_file(&cut);
     }
 
-    /// Feed synthetic raw frames to a service (no camera needed) while the recorder runs.
-    #[cfg(feature = "openh264")]
-    fn feed(service: &Arc<Service>, stop: Arc<std::sync::atomic::AtomicBool>) -> std::thread::JoinHandle<()> {
-        use loupecam::{RawFrame, SampleFormat, Trailer};
-        let shared = service.shared.clone();
-        std::thread::spawn(move || {
-            let (w, h) = (1228u32, 922u32);
-            let mut i = 0u32;
-            while !stop.load(std::sync::atomic::Ordering::Relaxed) {
-                let data = (0..w * h).map(|k| ((k % w + i * 8) % 256) as u8).collect();
-                let raw = RawFrame { width: w, height: h, format: SampleFormat::U8, data, trailer: Trailer { stats: [[0; 3]; 2], sequence: i } };
-                let env = FrameEnvelope { raw: Arc::new(raw), model: &loupecam::protocol::model::MU1803_HS, size_index: 2, origin: (0, 0) };
-                shared.frame.send_replace(Some(env));
-                i += 1;
-                std::thread::sleep(Duration::from_millis(33));
-            }
-        })
-    }
-
     #[cfg(feature = "openh264")]
     #[tokio::test(flavor = "multi_thread")]
     async fn records_video_and_timelapse() {
         use crate::settings::RecordPreset;
         let dir = std::env::temp_dir().join(format!("loupecam-rec-{}", std::process::id()));
-        let service = Service::spawn(Settings::default());
-        let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
-        let feeder = feed(&service, stop.clone());
+        let service = Service::spawn_with(Settings::default(), crate::service::Source::Simulated);
         let rec = Recorder::new(service.clone(), dir.clone());
 
         // Smooth: the 1228×922 stream fits 1280×960, so it's recorded as is.
@@ -511,8 +490,9 @@ mod tests {
         assert!(rec.start().await.is_err(), "a second start must fail");
         tokio::time::sleep(Duration::from_millis(1500)).await;
         let done = rec.stop().await.unwrap();
-        // (Debug builds develop frames slowly.)
-        assert!(done.frames >= 3 && done.bytes > 10_000, "{done:?}");
+        // Debug builds simulate and develop frames slowly.
+        let least = if cfg!(debug_assertions) { 1 } else { 10 };
+        assert!(done.frames >= least && done.bytes > 10_000, "{done:?}");
         assert!(dir.join(done.name.as_ref().unwrap()).is_file());
         assert!(rec.stop().await.is_none());
 
@@ -529,8 +509,6 @@ mod tests {
         assert_eq!(stills as u32, done.stills);
         assert!(rec.status.borrow().error.is_none());
 
-        stop.store(true, std::sync::atomic::Ordering::Relaxed);
-        feeder.join().unwrap();
         let s = service.clone();
         tokio::task::spawn_blocking(move || s.shutdown()).await.unwrap();
         let _ = std::fs::remove_dir_all(&dir);

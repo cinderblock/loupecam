@@ -14,6 +14,7 @@
 //! # Ok::<(), loupecam::Error>(())
 //! ```
 
+pub mod sim;
 mod stream;
 mod usb;
 

@@ -93,6 +93,10 @@ struct ServeArgs {
     /// Name to announce on the network [default: "LoupeCam on <hostname>"].
     #[arg(long)]
     mdns_name: Option<String>,
+    /// Use a simulated camera (a synthetic moving specimen) instead of a USB one, for
+    /// development without hardware.
+    #[arg(long, hide = true)]
+    simulate_camera: bool,
 }
 
 /// How to turn the mosaic into an image (for .png/.jpg/.tif outputs).
@@ -403,6 +407,7 @@ fn serve(a: ServeArgs) -> Result<()> {
         settings_file: if a.no_persist { None } else { Config::default_settings_file() },
         self_update: !a.no_update_check,
         announce: (!a.no_mdns).then_some(loupecam_server::mdns::Announce { name: a.mdns_name }),
+        simulate_camera: a.simulate_camera,
     };
     let rt = tokio::runtime::Runtime::new()?;
     let restart = rt.block_on(async move {
