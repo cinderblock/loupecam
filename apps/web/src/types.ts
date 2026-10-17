@@ -187,3 +187,37 @@ export interface NormRect {
 
 /** Recursive partial, for JSON merge patches. */
 export type Patch<T> = { [K in keyof T]?: T[K] extends object ? (T[K] extends unknown[] ? T[K] : Patch<T[K]> | null) : T[K] }
+
+export type Role = 'view' | 'operate' | 'admin'
+export type AccessLevel = 'open' | 'password'
+export type ConfigLock = 'open' | 'password' | 'locked'
+
+/** `GET /api/access`. */
+export interface AccessInfo {
+  setup: 'required' | 'done' | 'notNeeded'
+  setupCodeRequired: boolean
+  /** `token`: only the server's `--token` grants access. */
+  access: AccessLevel | 'token'
+  config: ConfigLock
+  /** `null`: must log in. */
+  role: Role | null
+  /** Logged in with a session (can log out). */
+  session: boolean
+}
+
+export interface Levels {
+  access: AccessLevel
+  config: ConfigLock
+  /** Left out (or empty) on a change: keep the current one. */
+  accessPassword?: string
+  adminPassword?: string
+}
+
+export interface KeyInfo {
+  id: string
+  name: string
+  role: Role
+  /** Unix seconds. */
+  created: number
+  lastUsed: number | null
+}

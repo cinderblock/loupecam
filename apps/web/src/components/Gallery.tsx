@@ -4,7 +4,7 @@ import type { CaptureEntry } from '../types'
 import { formatBytes } from '../format'
 
 /** Saved captures, newest first. `version` changes trigger a refresh. */
-export function Gallery({ version }: { version: number }) {
+export function Gallery({ version, canDelete }: { version: number; canDelete: boolean }) {
   const [items, setItems] = useState<CaptureEntry[]>([])
   const refresh = useCallback(() => {
     api.captures().then(setItems, () => {})
@@ -22,6 +22,7 @@ export function Gallery({ version }: { version: number }) {
           <a href={api.captureUrl(c.name)} download={c.name} title="Download">
             ⤓
           </a>
+          {canDelete && (
           <button
             className="icon"
             title="Delete"
@@ -34,6 +35,7 @@ export function Gallery({ version }: { version: number }) {
           >
             ✕
           </button>
+          )}
         </li>
       ))}
     </ul>

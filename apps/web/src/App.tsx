@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api, setToken } from './api'
+import { api } from './api'
 import { CaptureSettingsPanel, Controls } from './components/Controls'
 import { Gallery } from './components/Gallery'
 import { Histogram } from './components/Histogram'
@@ -8,6 +8,8 @@ import { formatExposure } from './format'
 import { Viewer, type Overlays, type Tool } from './components/Viewer'
 import { UpdateBanner, UpdatesPanel } from './components/Updates'
 import { CalibrationPanel } from './components/Calibration'
+import { roleLabel, useAccess, type AccessState } from './access'
+import { AccessPanel, AdminGate, Login, SetupWizard } from './components/Access'
 import type { NormRect, ScalePreset } from './types'
 import { useCamera } from './useCamera'
 
@@ -27,6 +29,25 @@ function useStored<T>(key: string, initial: T): [T, (v: T) => void] {
 }
 
 export default function App() {
+  const access = useAccess()
+  const info = access.info
+  if (!info) {
+    return (
+      <div className="auth">
+        <h2>LoupeCam</h2>
+        <p>{access.error ? `Can't reach the server: ${access.error}` : 'Connecting…'}</p>
+        {access.error && <button onClick={access.refresh}>Retry</button>}
+      </div>
+    )
+  }
+  if (info.setup === 'required') return <SetupWizard info={info} onDone={access.setInfo} />
+  if (!info.role) return <Login info={info} onDone={access.setInfo} />
+  // A new role means a new connection (the WebSocket carries the old credentials).
+  return <CameraApp key={info.role} access={access} />
+}
+
+function CameraApp({ access }: { access: AccessState }) {
+  const isAdmin = access.info?.role === 'admin'
   const [tool, setTool] = useState<Tool>('pan')
   const [overlays, setOverlays] = useStored<Overlays>('overlays', { crosshair: false, grid: false, scaleBar: true })
   // Optical magnification between specimen and sensor: objective × camera adapter.
@@ -95,25 +116,12 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [capture])
 
-  if (cam.authNeeded) {
-    return (
-      <div className="auth">
-        <h2>LoupeCam</h2>
-        <p>This camera server requires an access token.</p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            const t = new FormData(e.currentTarget).get('token') as string
-            setToken(t)
-            location.reload()
-          }}
-        >
-          <input name="token" type="password" placeholder="Token" autoFocus />
-          <button type="submit">Connect</button>
-        </form>
-      </div>
-    )
-  }
+  // The session ended (expired, or someone changed the access settings): ask again.
+  const { refresh } = access
+  useEffect(() => {
+    if (cam.authNeeded) refresh()
+  }, [cam.authNeeded, refresh])
+  if (cam.authNeeded) return null
 
   const st = cam.state
   const s = st?.settings
@@ -144,8 +152,10 @@ export default function App() {
           </span>
         )}
         <span className={cam.connected && st?.status.state === 'streaming' ? 'dot ok' : 'dot'} />
+        {access.info?.setup === 'done' && <span className="muted">{roleLabel(access.info.role)}</span>}
+        {access.info?.session && <button onClick={() => api.logout().then(access.setInfo, (e) => flash(e.message))}>Log out</button>}
       </header>
-      {cam.update && <UpdateBanner u={cam.update} onError={flash} />}
+      {cam.update && <UpdateBanner u={cam.update} admin={isAdmin} onError={flash} />}
       <main className="main">
         <div className="stage">
           <div className="toolbar">
@@ -197,6 +207,7 @@ export default function App() {
           </Section>
           {s && (
             <Section title="Calibration" defaultOpen={false}>
+              <AdminGate access={access}>
               <CalibrationPanel
                 s={s}
                 device={dev}
@@ -208,16 +219,20 @@ export default function App() {
                   flash('Drag a box tightly around the colour chart patches')
                 }}
               />
+              </AdminGate>
             </Section>
           )}
           <Section title="Captures">
-            <Gallery version={galleryVersion} />
+            <Gallery version={galleryVersion} canDelete={isAdmin} />
           </Section>
           {s && (
             <Section title="About & updates" defaultOpen={false}>
-              <UpdatesPanel u={cam.update} s={s} patch={cam.patch} />
+              <UpdatesPanel u={cam.update} s={s} patch={cam.patch} admin={isAdmin} />
             </Section>
           )}
+          <Section title="Access & security" defaultOpen={false}>
+            <AccessPanel access={access} flash={flash} />
+          </Section>
           {dev && (
             <Section title="Camera" defaultOpen={false}>
               <dl className="info">

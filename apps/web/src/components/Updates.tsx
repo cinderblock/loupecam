@@ -4,7 +4,7 @@ import type { Patch, Settings, UpdateStatus } from '../types'
 import { Select, Toggle } from './widgets'
 
 /** Banner shown when a newer release exists. */
-export function UpdateBanner({ u, onError }: { u: UpdateStatus; onError: (m: string) => void }) {
+export function UpdateBanner({ u, admin, onError }: { u: UpdateStatus; admin: boolean; onError: (m: string) => void }) {
   const [dismissed, setDismissed] = useState<string | null>(null)
   const rel = u.available
   if (!rel || dismissed === rel.version) return null
@@ -17,7 +17,9 @@ export function UpdateBanner({ u, onError }: { u: UpdateStatus; onError: (m: str
         </a>
       </span>
       <span className="spacer" />
-      {u.enabled && rel.installable ? (
+      {!admin ? (
+        <span className="muted">An admin can install it</span>
+      ) : u.enabled && rel.installable ? (
         <button className="primary" disabled={u.installing} onClick={() => api.installUpdate().catch((e) => onError(e.message))}>
           {u.installing ? 'Installing…' : 'Update and restart'}
         </button>
@@ -31,7 +33,7 @@ export function UpdateBanner({ u, onError }: { u: UpdateStatus; onError: (m: str
   )
 }
 
-export function UpdatesPanel({ u, s, patch }: { u: UpdateStatus | null; s: Settings; patch: (p: Patch<Settings>) => void }) {
+export function UpdatesPanel({ u, s, patch, admin }: { u: UpdateStatus | null; s: Settings; patch: (p: Patch<Settings>) => void; admin: boolean }) {
   const [checking, setChecking] = useState(false)
   if (!u) return null
   return (
@@ -53,8 +55,10 @@ export function UpdatesPanel({ u, s, patch }: { u: UpdateStatus | null; s: Setti
       </div>
       {u.enabled ? (
         <>
-          <Toggle label="Install updates automatically" checked={s.updates.autoInstall} onChange={(v) => patch({ updates: { autoInstall: v } })} title="Off: you are notified and choose when to update" />
+          {!admin && <p className="hint">Update settings need the admin password (Access &amp; security).</p>}
+          <Toggle disabled={!admin} label="Install updates automatically" checked={s.updates.autoInstall} onChange={(v) => patch({ updates: { autoInstall: v } })} title="Off: you are notified and choose when to update" />
           <Select
+            disabled={!admin}
             label="Check every"
             value={s.updates.checkIntervalHours}
             options={[

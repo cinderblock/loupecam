@@ -33,6 +33,9 @@ jiff.workspace = true
 rust-embed = { workspace = true, optional = true }
 mdns-sd.workspace = true
 gethostname.workspace = true
+argon2.workspace = true
+getrandom.workspace = true
+sha2.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows = { workspace = true, features = [

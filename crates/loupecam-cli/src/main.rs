@@ -28,6 +28,17 @@ enum Cmd {
     },
     /// Run the network service: HTTP/WebSocket API, MJPEG stream, optional web UI.
     Serve(ServeArgs),
+    /// Show or change who may use `loupecam serve`. Edits the server's `auth.json`; a
+    /// running server picks changes up within a second.
+    Access {
+        /// The server's config directory [default: LOUPECAM_CONFIG_DIR, or this user's,
+        /// e.g. ~/.config/loupecam]. The Linux service's is
+        /// /var/lib/loupecam/config/loupecam.
+        #[arg(long, env = "LOUPECAM_CONFIG_DIR", global = true)]
+        config_dir: Option<PathBuf>,
+        #[command(subcommand)]
+        cmd: AccessCmd,
+    },
     /// Find LoupeCam servers on the local network (mDNS / DNS-SD).
     Discover {
         /// Seconds to listen for answers.
@@ -65,9 +76,16 @@ struct ServeArgs {
     /// Address to listen on. Use 0.0.0.0:8080 to expose on the network.
     #[arg(long, default_value = "127.0.0.1:8080")]
     listen: std::net::SocketAddr,
-    /// Require this token (Bearer header, ?token=, or cookie) for API and streams.
+    /// A key with full access (Bearer header, ?token=, or cookie). Usually unnecessary:
+    /// a server on the network runs first-run setup in the browser, which chooses how
+    /// it's secured (see `loupecam access`).
     #[arg(long, env = "LOUPECAM_TOKEN")]
     token: Option<String>,
+    /// Make first-run setup ask for a code, so only someone who can see this server's
+    /// output can do it. Give the code, or leave it out for a random one (printed at
+    /// startup). Without this, the first browser to connect runs setup.
+    #[arg(long, env = "LOUPECAM_SETUP_CODE", num_args = 0..=1, default_missing_value = "", value_name = "CODE")]
+    setup_code: Option<String>,
     /// Require this token (or --token) to cast content to the display. Without it,
     /// anyone who can reach the server can cast (it grants nothing else).
     #[arg(long, env = "LOUPECAM_DISPLAY_TOKEN")]
@@ -300,6 +318,7 @@ fn main() -> Result<()> {
             );
         }
         Cmd::Serve(args) => serve(args)?,
+        Cmd::Access { config_dir, cmd } => access(config_dir, cmd)?,
         Cmd::Discover { seconds } => discover(Duration::from_secs_f64(seconds))?,
         Cmd::Update { check, yes } => update(check, yes)?,
         Cmd::Snap { opts, out, count, skip, develop } => {
@@ -373,7 +392,13 @@ fn discover(timeout: Duration) -> Result<()> {
             _ => "no camera connected".into(),
         };
         println!("{}: {camera}", f.name);
-        println!("  version {}, {}", txt("version").unwrap_or("?"), if txt("auth") == Some("token") { "token required" } else { "no token" });
+        println!("  version {}, {}", txt("version").unwrap_or("?"), match txt("auth") {
+                Some("none") => "open",
+                Some("password") => "password required",
+                Some("token") => "token required",
+                Some("setup") => "first-run setup not done",
+                _ => "access unknown",
+            });
         for url in f.urls() {
             println!("  {url}");
         }
@@ -391,12 +416,12 @@ fn serve(a: ServeArgs) -> Result<()> {
         Some("embedded") => bail!("this build has no embedded UI; pass the UI directory instead"),
         Some(dir) => WebUi::Dir(PathBuf::from(dir)),
     };
-    if !a.listen.ip().is_loopback() && a.token.is_none() {
-        eprintln!("warning: listening on {} without --token; anyone on the network can control the camera", a.listen);
-    }
+    let setup_code = a.setup_code.map(|c| if c.trim().is_empty() { loupecam_server::auth::random_setup_code() } else { c });
     let cfg = Config {
         listen: a.listen,
         token: a.token,
+        auth_file: if a.no_persist { None } else { Config::default_auth_file() },
+        setup_code,
         display_token: a.display_token,
         web,
         captures_dir: a.captures.unwrap_or_else(Config::default_captures_dir),
@@ -423,6 +448,163 @@ fn serve(a: ServeArgs) -> Result<()> {
         return Err(loupecam_update::restart().into());
     }
     Ok(())
+}
+
+#[derive(Subcommand)]
+enum AccessCmd {
+    /// Show the access levels and API keys.
+    Show,
+    /// Forget all access settings, logins and API keys. The next browser to connect
+    /// runs first-run setup again (the way back in after a lost password).
+    Reset {
+        /// Don't ask for confirmation.
+        #[arg(short, long)]
+        yes: bool,
+    },
+    /// Set the access levels, even when the configuration is locked. Asks for any
+    /// password the levels need (Enter keeps the current one).
+    Set {
+        /// Who may view and operate the camera.
+        #[arg(long, value_enum)]
+        access: AccessArg,
+        /// Who may change the configuration.
+        #[arg(long, value_enum)]
+        config: ConfigArg,
+    },
+    /// List API keys.
+    Keys,
+    /// Create an API key, for clients that can't log in (Home Assistant, scripts, a kiosk).
+    CreateKey {
+        #[arg(long)]
+        name: String,
+        #[arg(long, value_enum, default_value_t = RoleArg::Operate)]
+        role: RoleArg,
+    },
+    /// Revoke an API key (by id, see `loupecam access keys`).
+    DeleteKey { id: String },
+}
+
+#[derive(Copy, Clone, ValueEnum)]
+enum AccessArg {
+    /// Anyone who can reach the server.
+    Open,
+    /// Only with the access (or admin) password.
+    Password,
+}
+
+#[derive(Copy, Clone, ValueEnum)]
+enum ConfigArg {
+    /// Anyone with access.
+    Open,
+    /// Only with the admin password.
+    Password,
+    /// Not over the network at all; only with `loupecam access` here.
+    Locked,
+}
+
+#[derive(Copy, Clone, ValueEnum)]
+enum RoleArg {
+    View,
+    Operate,
+    Admin,
+}
+
+fn access(config_dir: Option<PathBuf>, cmd: AccessCmd) -> Result<()> {
+    use loupecam_server::auth::{self, Auth};
+    let dir = config_dir.or_else(loupecam_server::config_dir).context("no config directory; pass --config-dir")?;
+    let file = dir.join("auth.json");
+    let a = Auth::new(Some(file.clone()), true, None, None);
+    match cmd {
+        AccessCmd::Show => {
+            let info = a.info(&a.resolve(&Default::default()));
+            println!("{}", file.display());
+            if info.setup == auth::SetupState::Required {
+                println!("not set up: the next browser to connect runs first-run setup");
+                return Ok(());
+            }
+            println!("access: {}", info.access);
+            println!("config: {:?}", info.config);
+            print_keys(&a.keys());
+        }
+        AccessCmd::Reset { yes } => {
+            if !file.exists() {
+                println!("{} doesn't exist: nothing to reset", file.display());
+                return Ok(());
+            }
+            if !yes && !confirm(&format!("Forget all access settings, logins and API keys in {}?", file.display()))? {
+                return Ok(());
+            }
+            std::fs::remove_file(&file).with_context(|| format!("removing {}", file.display()))?;
+            println!("Access reset. The next browser to connect to the server runs first-run setup.");
+        }
+        AccessCmd::Set { access, config } => {
+            let current = a.info(&a.resolve(&Default::default()));
+            let configured = current.setup == auth::SetupState::Done;
+            let mut levels = auth::Levels {
+                access: match access {
+                    AccessArg::Open => auth::Access::Open,
+                    AccessArg::Password => auth::Access::Password,
+                },
+                config: match config {
+                    ConfigArg::Open => auth::ConfigLock::Open,
+                    ConfigArg::Password => auth::ConfigLock::Password,
+                    ConfigArg::Locked => auth::ConfigLock::Locked,
+                },
+                access_password: None,
+                admin_password: None,
+            };
+            if levels.access == auth::Access::Password {
+                levels.access_password = Some(rpassword::prompt_password(prompt("Access password", configured && current.access == "password"))?);
+            }
+            if levels.config == auth::ConfigLock::Password {
+                levels.admin_password = Some(rpassword::prompt_password(prompt("Admin password", configured && current.config == auth::ConfigLock::Password))?);
+            }
+            a.change_local(levels)?;
+            println!("Saved. A running server picks this up within a second; everyone has to log in again.");
+        }
+        AccessCmd::Keys => print_keys(&a.keys()),
+        AccessCmd::CreateKey { name, role } => {
+            let role = match role {
+                RoleArg::View => auth::Role::View,
+                RoleArg::Operate => auth::Role::Operate,
+                RoleArg::Admin => auth::Role::Admin,
+            };
+            let (key, info) = a.create_key(&name, role)?;
+            eprintln!("Created key {} ({:?}) \"{}\". It isn't shown again:", info.id, info.role, info.name);
+            println!("{key}");
+        }
+        AccessCmd::DeleteKey { id } => {
+            a.delete_key(&id)?;
+            println!("Key {id} revoked.");
+        }
+    }
+    Ok(())
+}
+
+fn prompt(what: &str, can_keep: bool) -> String {
+    if can_keep { format!("{what} (Enter keeps the current one): ") } else { format!("{what}: ") }
+}
+
+fn print_keys(keys: &[loupecam_server::auth::KeyInfo]) {
+    if keys.is_empty() {
+        println!("no API keys");
+    }
+    for k in keys {
+        let used = k.last_used.map_or("never used".to_string(), |t| format!("last used {}", timestamp(t)));
+        println!("key {}  {:<8} {}  (created {}, {used})", k.id, format!("{:?}", k.role).to_lowercase(), k.name, timestamp(k.created));
+    }
+}
+
+fn timestamp(unix: i64) -> String {
+    jiff::Timestamp::from_second(unix).map_or_else(|_| unix.to_string(), |t| t.strftime("%Y-%m-%d %H:%M UTC").to_string())
+}
+
+fn confirm(question: &str) -> Result<bool> {
+    eprint!("{question} [y/N] ");
+    std::io::stderr().flush()?;
+    let mut line = String::new();
+    std::io::stdin().read_line(&mut line)?;
+    Ok(matches!(line.trim(), "y" | "Y" | "yes"))
 }
 
 /// The vendor software's default white balance (colour temperature 6503 K, tint 1000).

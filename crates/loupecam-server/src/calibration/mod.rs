@@ -149,7 +149,7 @@ impl Calibration {
 
 /// Where profiles live.
 pub fn dir() -> Option<PathBuf> {
-    dirs::config_dir().map(|d| d.join("loupecam").join("calibration"))
+    crate::config_dir().map(|d| d.join("calibration"))
 }
 
 fn path_for(serial: &str) -> Option<PathBuf> {

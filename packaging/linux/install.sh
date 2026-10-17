@@ -3,11 +3,14 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/cinderblock/loupecam/master/packaging/linux/install.sh | sudo sh
 #   sudo sh install.sh [--version v0.2.0] [--binary ./loupecam] [--listen 0.0.0.0:8080]
+#                      [--setup-code [CODE]]
 #
 # Downloads the release binary for this machine (checked against the release's
 # SHA256SUMS), installs it to /opt/loupecam, adds the camera udev rule, a `loupecam`
-# system user and the loupecam.service unit, and starts it. Re-running upgrades the
-# binary and unit; /etc/loupecam/loupecam.env (listen address, token) is kept.
+# system user and the loupecam.service unit, and starts it. The first browser to
+# connect then runs setup, choosing how the server is secured; with --setup-code,
+# setup asks for a code (random unless given). Re-running upgrades the binary and
+# unit; /etc/loupecam/loupecam.env (listen address and so on) is kept.
 set -eu
 
 REPO=cinderblock/loupecam
@@ -18,14 +21,22 @@ ENV_FILE=/etc/loupecam/loupecam.env
 version=latest
 binary=
 listen=0.0.0.0:80
+setup_code=
 
-usage() { sed -n '2,10s/^# \{0,1\}//p' "$0"; exit "${1:-0}"; }
+usage() { sed -n '2,13s/^# \{0,1\}//p' "$0"; exit "${1:-0}"; }
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 	--version) version=$2; shift 2 ;;
 	--binary) binary=$2; shift 2 ;;
 	--listen) listen=$2; shift 2 ;;
+	--setup-code)
+		# The code is optional: a random one unless the next argument is a value.
+		case "${2:-}" in
+		"" | --*) setup_code=random; shift ;;
+		*) setup_code=$2; shift 2 ;;
+		esac
+		;;
 	-h | --help) usage ;;
 	*) echo "unknown option: $1" >&2; usage 2 >&2 ;;
 	esac
@@ -96,25 +107,40 @@ udevadm trigger --subsystem-match=usb --attr-match=idVendor=0547
 
 install -m 644 "$tmp/loupecam.service" /etc/systemd/system/loupecam.service
 
+if [ "$setup_code" = random ]; then
+	# The server's code alphabet: no 0/O or 1/I.
+	setup_code=$(LC_ALL=C tr -dc 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' </dev/urandom | head -c 8)
+	setup_code="$(echo "$setup_code" | cut -c1-4)-$(echo "$setup_code" | cut -c5-8)"
+fi
+
 if [ ! -f "$ENV_FILE" ]; then
 	install -d -m 755 /etc/loupecam
-	token=$(od -An -tx1 -N16 /dev/urandom | tr -d ' \n')
-	umask 027
-	cat >"$ENV_FILE" <<CONF
+	(
+		umask 027
+		cat >"$ENV_FILE" <<CONF
 # LoupeCam service settings. Apply with: sudo systemctl restart loupecam
 
 # Address and port to serve on.
 LOUPECAM_LISTEN=$listen
 
-# Access token for the API, stream and web UI. Empty means anyone on the network
-# can use the camera.
-LOUPECAM_TOKEN=$token
+# First-run setup (in the browser) chooses how the server is secured. With a setup
+# code, setup asks for it, so only someone who can read this file (or the service
+# log) can do it. Commented out, the first browser to connect runs setup.
+#LOUPECAM_SETUP_CODE=
 
 # Extra arguments to \`loupecam serve\`, e.g. --mdns-name "Bench scope"
 LOUPECAM_ARGS=
 CONF
+	)
 	chgrp loupecam "$ENV_FILE"
 	echo "Created $ENV_FILE"
+fi
+if [ -n "$setup_code" ]; then
+	if grep -q '^#*LOUPECAM_SETUP_CODE=' "$ENV_FILE"; then
+		sed -i "s/^#*LOUPECAM_SETUP_CODE=.*/LOUPECAM_SETUP_CODE=$setup_code/" "$ENV_FILE"
+	else
+		echo "LOUPECAM_SETUP_CODE=$setup_code" >>"$ENV_FILE"
+	fi
 fi
 
 systemctl daemon-reload
@@ -124,7 +150,13 @@ systemctl restart loupecam.service
 . "$ENV_FILE"
 port=${LOUPECAM_LISTEN##*:}
 suffix=$([ "$port" = 80 ] && echo "" || echo ":$port")
+url="http://$(hostname).local$suffix/"
 echo
-echo "LoupeCam is running: http://$(hostname).local$suffix/"
-[ -z "${LOUPECAM_TOKEN:-}" ] || echo "Token: $LOUPECAM_TOKEN   (or open http://$(hostname).local$suffix/?token=$LOUPECAM_TOKEN)"
+echo "LoupeCam is running: $url"
+if [ -n "${LOUPECAM_TOKEN:-}" ]; then
+	echo "Access is set by LOUPECAM_TOKEN in $ENV_FILE."
+elif [ ! -f /var/lib/loupecam/config/loupecam/auth.json ]; then
+	echo "Finish setup: open $url in a browser${LOUPECAM_SETUP_CODE:+ and enter the setup code $LOUPECAM_SETUP_CODE}."
+fi
 echo "Logs: journalctl -u loupecam -f    Settings: $ENV_FILE"
+echo "Access settings: sudo loupecam access show --config-dir /var/lib/loupecam/config/loupecam"

@@ -40,4 +40,8 @@ jiff = "0.2"
 rust-embed = "8"
 mdns-sd = "0.21"
 gethostname = "1"
+argon2 = { version = "0.5", features = ["std"] }
+getrandom = "0.3"
+sha2 = "0.10"
+rpassword = "7"
 windows = "0.61"

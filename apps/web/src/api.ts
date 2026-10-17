@@ -1,7 +1,8 @@
-import type { CalibrationProfile, CalibrationStatus, CaptureEntry, CaptureInfo, NormRect, Patch, Settings, StepRequest, UpdateStatus } from './types'
+import type { AccessInfo, CalibrationProfile, CalibrationStatus, CaptureEntry, CaptureInfo, KeyInfo, Levels, NormRect, Patch, Role, Settings, StepRequest, UpdateStatus } from './types'
 
-// The server may require a token (when exposed on a network). It is kept in
-// localStorage and sent as a Bearer header, or as ?token= where headers are
+// Browsers log in with a password (a session cookie, sent automatically). The server
+// may instead hand out a token (`--token` or an API key, e.g. in a `?token=` link): it
+// is kept in localStorage and sent as a Bearer header, or as ?token= where headers are
 // impossible (<img>, WebSocket).
 const TOKEN_KEY = 'loupecam-token'
 
@@ -31,15 +32,23 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   if (t) headers.Authorization = `Bearer ${t}`
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   const r = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) })
-  if (r.status === 401) throw new AuthError('token required')
   if (!r.ok) {
     const msg = await r.json().then((j) => j.error as string, () => r.statusText)
-    throw new Error(msg)
+    throw r.status === 401 ? new AuthError(msg) : new Error(msg)
   }
   return r.status === 204 ? (undefined as T) : r.json()
 }
 
 export const api = {
+  access: () => request<AccessInfo>('GET', '/api/access'),
+  setup: (levels: Levels, code?: string) => request<AccessInfo>('POST', '/api/setup', { ...levels, code }),
+  login: (password: string) => request<AccessInfo>('POST', '/api/login', { password }),
+  logout: () => request<AccessInfo>('POST', '/api/logout'),
+  changeAccess: (levels: Levels) => request<AccessInfo>('PATCH', '/api/access', levels),
+  logoutAll: () => request<AccessInfo>('POST', '/api/access/logout-all'),
+  keys: () => request<KeyInfo[]>('GET', '/api/keys'),
+  createKey: (name: string, role: Role) => request<{ key: string; info: KeyInfo }>('POST', '/api/keys', { name, role }),
+  deleteKey: (id: string) => request<void>('DELETE', `/api/keys/${encodeURIComponent(id)}`),
   patchSettings: (p: Patch<Settings>) => request<Settings>('PATCH', '/api/settings', p),
   capture: (fullResolution?: boolean) =>
     request<CaptureInfo>('POST', '/api/capture' + (fullResolution === undefined ? '' : `?fullResolution=${fullResolution}`)),

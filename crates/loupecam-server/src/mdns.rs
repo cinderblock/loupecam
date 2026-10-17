@@ -13,10 +13,11 @@
 //! | `version` | LoupeCam version |
 //! | `path` | `/` (where the web UI is, per the `_http._tcp` convention) |
 //! | `ui` | `1` if the web UI is served, else `0` |
-//! | `auth` | `token` if a token is required, else `none` |
+//! | `auth` | what access needs: `none`, `password`, `token` (only `--token`), or `setup` (first-run setup not done yet) |
 //! | `cast` | `token` if casting to the display needs a token, else `open` |
 //! | `model`, `serial` | the connected camera, when there is one |
 
+use crate::auth::Auth;
 use crate::service::{DeviceSummary, Shared};
 use mdns_sd::{DaemonEvent, IfKind, ServiceDaemon, ServiceEvent, ServiceInfo};
 use std::collections::BTreeMap;
@@ -49,7 +50,7 @@ struct Template {
     addr: SocketAddr,
     interfaces: Vec<IfKind>,
     web_ui: bool,
-    token: bool,
+    auth: Arc<Auth>,
     cast_token: bool,
 }
 
@@ -60,7 +61,7 @@ impl Template {
             ("version", env!("CARGO_PKG_VERSION").to_string()),
             ("path", "/".to_string()),
             ("ui", if self.web_ui { "1" } else { "0" }.to_string()),
-            ("auth", if self.token { "token" } else { "none" }.to_string()),
+            ("auth", self.auth.announced().to_string()),
             ("cast", if self.cast_token { "token" } else { "open" }.to_string()),
         ]);
         if let Some(d) = device {
@@ -115,7 +116,7 @@ fn dns_label(host: &str) -> String {
 impl Announcer {
     /// Announce a server bound to `addr`. Returns `None` (after logging why) when
     /// there is nothing to announce or mDNS isn't available.
-    pub fn start(cfg: &Announce, addr: SocketAddr, web_ui: bool, token: bool, cast_token: bool, shared: Arc<Shared>) -> Option<Announcer> {
+    pub fn start(cfg: &Announce, addr: SocketAddr, web_ui: bool, auth: Arc<Auth>, cast_token: bool, shared: Arc<Shared>) -> Option<Announcer> {
         if addr.ip().is_loopback() {
             tracing::debug!("not announcing over mDNS: listening on loopback only");
             return None;
@@ -129,7 +130,7 @@ impl Announcer {
             addr,
             interfaces: interfaces(addr.ip()),
             web_ui,
-            token,
+            auth,
             cast_token,
         };
         let daemon = match ServiceDaemon::new() {
@@ -174,18 +175,25 @@ impl Announcer {
                 .ok();
         }
 
-        // Keep the camera's model and serial in the TXT records current.
+        // Keep the camera's model and serial, and the access level (which first-run
+        // setup changes), current in the TXT records.
         let d = daemon.clone();
         let task = tokio::spawn(async move {
-            let mut last = device;
-            while state.changed().await.is_ok() {
+            let key = |d: &Option<DeviceSummary>, t: &Template| (d.as_ref().map(|d| (d.model.clone(), d.serial.clone())), t.auth.announced());
+            let mut last = key(&device, &template);
+            let mut tick = tokio::time::interval(Duration::from_secs(5));
+            loop {
+                tokio::select! {
+                    r = state.changed() => if r.is_err() { break },
+                    _ = tick.tick() => {}
+                }
                 let device = state.borrow_and_update().device.clone();
-                let key = |d: &Option<DeviceSummary>| d.as_ref().map(|d| (d.model.clone(), d.serial.clone()));
-                if key(&device) == key(&last) {
+                let now = key(&device, &template);
+                if now == last {
                     continue;
                 }
-                last = device;
-                match template.infos(last.as_ref()) {
+                last = now;
+                match template.infos(device.as_ref()) {
                     // Re-registering the same name replaces and re-announces its records.
                     Ok(infos) => {
                         for info in infos {
@@ -329,7 +337,8 @@ mod tests {
             calibration: watch::Sender::new(Default::default()),
         });
         let addr: SocketAddr = "0.0.0.0:48123".parse().unwrap();
-        let announcer = Announcer::start(&Announce { name: Some(name.clone()) }, addr, true, true, false, shared.clone()).unwrap();
+        let announcer = Announcer::start(&Announce { name: Some(name.clone()) }, addr, true, Arc::new(Auth::new(None, true, Some("t".into()), None)), false, shared.clone())
+                .unwrap();
 
         let browser = ServiceDaemon::new().unwrap();
         let rx = browser.browse(SERVICE_TYPE).unwrap();

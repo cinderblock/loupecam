@@ -443,3 +443,107 @@ input.number {
   border-radius: 24px;
   background: rgba(30, 33, 37, 0.85);
 }
+
+.setup {
+  max-width: 560px;
+  margin: 8vh auto;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.levels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.level {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+.level > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.level.selected {
+  border-color: var(--accent);
+  background: #1d2a36;
+}
+.level.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.warn {
+  color: #ffb454;
+  margin: 0;
+}
+.field,
+.password-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.password-pair {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.password-pair > span {
+  min-width: 120px;
+}
+.setup input,
+.section-body input:not([type='range']):not([type='checkbox']):not([type='radio']),
+.section-body select {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+.password-pair input {
+  flex: 1;
+  min-width: 0;
+}
+.section-body h4 {
+  margin: 10px 0 4px;
+}
+.admin-gate form {
+  display: flex;
+  gap: 6px;
+}
+.admin-gate input {
+  flex: 1;
+  min-width: 0;
+}
+.keys {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+}
+.keys li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.keys li > span:first-child {
+  flex: 1;
+}
+.new-key {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.new-key code {
+  user-select: all;
+  word-break: break-all;
+}

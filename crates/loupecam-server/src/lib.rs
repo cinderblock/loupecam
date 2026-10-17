@@ -6,6 +6,7 @@
 //!
 //! See [`http`] for the API surface.
 
+pub mod auth;
 pub mod calibration;
 pub mod captures;
 pub mod cast;
@@ -43,8 +44,15 @@ pub enum WebUi {
 #[derive(Debug, Clone)]
 pub struct Config {
     pub listen: SocketAddr,
-    /// Require this bearer token for the API and streams.
+    /// A key with full access (Bearer header, `?token=` or cookie), set on the command
+    /// line. With nothing else configured, it's the only way in.
     pub token: Option<String>,
+    /// Where access settings are stored (`auth.json`, see [`auth`]). `None` = keep them
+    /// in memory: a loopback-only server is then open, and a network one needs setup at
+    /// every start.
+    pub auth_file: Option<PathBuf>,
+    /// First-run setup asks for this code.
+    pub setup_code: Option<String>,
     /// Require this token (or `token`) to cast to the display. `None` = casting is open
     /// to anyone who can reach the server.
     pub display_token: Option<String>,
@@ -65,7 +73,20 @@ impl Config {
     }
 
     pub fn default_settings_file() -> Option<PathBuf> {
-        dirs::config_dir().map(|d| d.join("loupecam").join("settings.json"))
+        config_dir().map(|d| d.join("settings.json"))
+    }
+
+    pub fn default_auth_file() -> Option<PathBuf> {
+        config_dir().map(|d| d.join("auth.json"))
+    }
+}
+
+/// Where settings, access settings and calibrations live: `LOUPECAM_CONFIG_DIR`, or
+/// `loupecam` in the OS config directory (e.g. `~/.config/loupecam`).
+pub fn config_dir() -> Option<PathBuf> {
+    match std::env::var_os("LOUPECAM_CONFIG_DIR") {
+        Some(d) if !d.is_empty() => Some(d.into()),
+        _ => dirs::config_dir().map(|d| d.join("loupecam")),
     }
 }
 
@@ -76,7 +97,7 @@ pub struct AppState {
     pub preview: Arc<preview::Preview>,
     pub updates: Arc<updates::Updates>,
     pub calibration: Arc<calibration::runner::Runner>,
-    pub token: Option<Arc<str>>,
+    pub auth: Arc<auth::Auth>,
     pub display_token: Option<Arc<str>>,
     pub casting: Arc<cast::Casting>,
     pub web: WebUi,
@@ -133,14 +154,14 @@ impl Server {
         let shared = service.shared.clone();
         let updates = updates::Updates::spawn(cfg.self_update, service.clone());
         let calibration = calibration::runner::Runner::new(service.clone(), Arc::new(calibration::target::TargetHub::default()));
-        let token = cfg.token.is_some();
+        let auth = Arc::new(auth::Auth::new(cfg.auth_file, !cfg.listen.ip().is_loopback(), cfg.token, cfg.setup_code));
         let cast_token = cfg.display_token.is_some();
         let state = AppState {
             calibration,
             service,
             preview,
             updates,
-            token: cfg.token.map(Into::into),
+            auth: auth.clone(),
             display_token: cfg.display_token.map(Into::into),
             casting: Arc::default(),
             web: cfg.web,
@@ -154,15 +175,21 @@ impl Server {
         let addr = listener.local_addr()?;
         let (shutdown, rx) = tokio::sync::oneshot::channel::<()>();
         let task = tokio::spawn(async move {
-            axum::serve(listener, app)
+            axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>())
                 .with_graceful_shutdown(async move {
                     let _ = rx.await;
                 })
                 .await
         });
         tracing::info!("listening on http://{addr}");
+        if auth.info(&auth.resolve(&Default::default())).setup == auth::SetupState::Required {
+            match auth.setup_code() {
+                Some(code) => tracing::warn!("first-run setup required: open http://{addr}/ and enter setup code {code}"),
+                None => tracing::warn!("first-run setup required: the first browser to open http://{addr}/ sets up access"),
+            }
+        }
         let web_ui = !matches!(state.web, WebUi::Disabled);
-        let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, token, cast_token, shared));
+        let announcer = cfg.announce.and_then(|a| mdns::Announcer::start(&a, addr, web_ui, auth, cast_token, shared));
         if !addr.ip().is_loopback() {
             let mdns = announcer.is_some();
             tokio::task::spawn_blocking(move || {
@@ -187,6 +214,7 @@ impl Server {
         }
         let _ = self.shutdown.send(());
         let r = self.task.await.map_err(std::io::Error::other)?;
+        self.state.auth.flush();
         let service = self.state.service.clone();
         tokio::task::spawn_blocking(move || service.shutdown()).await.map_err(std::io::Error::other)?;
         r

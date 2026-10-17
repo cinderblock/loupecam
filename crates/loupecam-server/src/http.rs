@@ -1,5 +1,6 @@
 //! HTTP / WebSocket API.
 
+use crate::auth::{self, Role};
 use crate::captures;
 use crate::cast;
 use crate::geometry::{NormRect, display_to_frame};
@@ -7,7 +8,8 @@ use crate::{AppState, WebUi};
 use axum::body::Body;
 use axum::extract::DefaultBodyLimit;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
-use axum::extract::{Path, Query, Request, State};
+use axum::Extension;
+use axum::extract::{ConnectInfo, Path, Query, Request, State};
 use axum::http::{HeaderMap, HeaderValue, StatusCode, header};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
@@ -17,6 +19,7 @@ use bytes::Bytes;
 use futures_util::{SinkExt, StreamExt};
 use serde::Deserialize;
 use serde_json::json;
+use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -61,6 +64,13 @@ pub fn router(state: AppState) -> Router {
         )
         .route("/display/content", get(display_content))
         .route("/display/events", get(display_events))
+        .route("/access", get(access_get).patch(access_patch))
+        .route("/access/logout-all", post(logout_all))
+        .route("/setup", post(setup))
+        .route("/login", post(login))
+        .route("/logout", post(logout))
+        .route("/keys", get(keys_list).post(key_create))
+        .route("/keys/{id}", axum::routing::delete(key_delete))
         .route("/ws", get(ws));
     Router::new()
         .nest("/api", api)
@@ -71,43 +81,234 @@ pub fn router(state: AppState) -> Router {
         .with_state(state)
 }
 
-/// Bearer-token check when a token is configured. Browsers can't set headers on
-/// `<img>`/WebSocket requests, so `?token=` and a cookie are accepted too.
-///
-/// Casting (`/api/display…`) has its own rule: open to anyone unless a display token is
-/// set, in which case it or the camera token is required.
-async fn auth(State(s): State<AppState>, req: Request, next: Next) -> Response {
-    let path = req.uri().path();
-    let is_cast = path == "/api/display" || path.starts_with("/api/display/");
-    let accepted: Vec<&str> = if is_cast {
-        match s.display_token.as_deref() {
-            None => return next.run(req).await,
-            Some(d) => [Some(d), s.token.as_deref()].into_iter().flatten().collect(),
-        }
-    } else {
-        match s.token.as_deref() {
-            None => return next.run(req).await,
-            Some(t) => vec![t],
-        }
+/// The caller's access, worked out by [`auth`] and available to handlers as an
+/// extension. Handlers that need more than viewing take [`Operator`] or [`Admin`].
+#[derive(Debug, Clone, Copy)]
+pub struct Caller(pub auth::Resolved);
+
+/// Rejects callers below `role`.
+fn require(parts: &axum::http::request::Parts, role: Role) -> Result<(), ApiError> {
+    let caller = parts.extensions.get::<Caller>().and_then(|c| c.0.role);
+    if caller >= Some(role) {
+        return Ok(());
+    }
+    let msg = match role {
+        Role::Admin => "admin password required",
+        _ => "login required",
     };
-    // The UI shell itself is public so it can ask for the token.
-    let is_ui = !(path.starts_with("/api") || path.ends_with(".mjpg") || path.ends_with(".jpg"));
-    let h = req.headers();
-    let bearer = h.get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()).and_then(|v| v.strip_prefix("Bearer "));
-    let cookie = h
-        .get(header::COOKIE)
-        .and_then(|v| v.to_str().ok())
-        .and_then(|c| c.split(';').find_map(|kv| kv.trim().strip_prefix("loupecam_token=")));
-    let query = req.uri().query().and_then(|q| q.split('&').find_map(|kv| kv.strip_prefix("token=")));
-    let ok = [bearer, cookie, query]
-        .into_iter()
-        .flatten()
-        .any(|t| accepted.iter().any(|a| constant_time_eq(t.as_bytes(), a.as_bytes())));
-    if ok || is_ui { next.run(req).await } else { ApiError(StatusCode::UNAUTHORIZED, "token required".into()).into_response() }
+    Err(ApiError(if caller.is_some() { StatusCode::FORBIDDEN } else { StatusCode::UNAUTHORIZED }, msg.into()))
 }
 
-fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
-    a.len() == b.len() && a.iter().zip(b).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
+/// Extractor: the caller may operate the camera.
+pub struct Operator;
+/// Extractor: the caller is an admin.
+pub struct Admin;
+
+impl<S: Send + Sync> axum::extract::FromRequestParts<S> for Operator {
+    type Rejection = ApiError;
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, _: &S) -> Result<Self, ApiError> {
+        require(parts, Role::Operate).map(|()| Operator)
+    }
+}
+
+impl<S: Send + Sync> axum::extract::FromRequestParts<S> for Admin {
+    type Rejection = ApiError;
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, _: &S) -> Result<Self, ApiError> {
+        require(parts, Role::Admin).map(|()| Admin)
+    }
+}
+
+fn cookie<'a>(h: &'a HeaderMap, name: &str) -> Option<&'a str> {
+    h.get_all(header::COOKIE)
+        .iter()
+        .filter_map(|v| v.to_str().ok())
+        .flat_map(|c| c.split(';'))
+        .find_map(|kv| kv.trim().strip_prefix(name)?.strip_prefix('='))
+}
+
+/// Works out who's calling (see [`crate::auth`]) and enforces the baseline: `view` for
+/// the API and streams, and setup first on an unconfigured server. Browsers can't set
+/// headers on `<img>`/WebSocket requests, so keys are also accepted as `?token=` and
+/// as the `loupecam_token` cookie.
+///
+/// Casting (`/api/display…`) has its own rule: open to anyone unless a display token is
+/// set, in which case it, or an operator's credentials, are required.
+async fn auth(State(s): State<AppState>, mut req: Request, next: Next) -> Response {
+    let path = req.uri().path();
+    let h = req.headers();
+    let bearer = h.get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()).and_then(|v| v.strip_prefix("Bearer "));
+    let query = req.uri().query().and_then(|q| q.split('&').find_map(|kv| kv.strip_prefix("token=")));
+    let creds = auth::Credentials { tokens: [bearer, query, cookie(h, "loupecam_token")], session: cookie(h, auth::SESSION_COOKIE) };
+    let caller = s.auth.resolve(&creds);
+    let is_cast = path == "/api/display" || path.starts_with("/api/display/");
+    // The UI shell is public so it can run setup or ask for a login; so is the access API.
+    let is_ui = !(path.starts_with("/api") || path.ends_with(".mjpg") || path.ends_with(".jpg"));
+    let is_access = matches!(path, "/api/access" | "/api/setup" | "/api/login" | "/api/logout");
+    if is_cast {
+        if let Some(d) = s.display_token.as_deref() {
+            let display = [bearer, query].into_iter().flatten().any(|t| auth::eq(t, d));
+            if !display && caller.role < Some(Role::Operate) {
+                return ApiError(StatusCode::UNAUTHORIZED, "display token required".into()).into_response();
+            }
+        }
+    } else if !(is_ui || is_access) {
+        if caller.setup_required {
+            return ApiError(StatusCode::CONFLICT, "setup required".into()).into_response();
+        }
+        if caller.role.is_none() {
+            return ApiError(StatusCode::UNAUTHORIZED, "login required".into()).into_response();
+        }
+    }
+    // A session cookie rides along on any request the browser makes to this host, even
+    // from another site's page (and SameSite doesn't tell ports apart). So changes made
+    // with one must come from this server's own pages.
+    if caller.via_session && !req.method().is_safe() && !same_origin(h) {
+        return ApiError(StatusCode::FORBIDDEN, "cross-origin request refused".into()).into_response();
+    }
+    req.extensions_mut().insert(Caller(caller));
+    next.run(req).await
+}
+
+/// The request comes from a page served by this server.
+fn same_origin(h: &HeaderMap) -> bool {
+    if let Some(site) = h.get("sec-fetch-site").and_then(|v| v.to_str().ok()) {
+        return site == "same-origin";
+    }
+    let origin = h.get(header::ORIGIN).and_then(|v| v.to_str().ok());
+    let host = h.get(header::HOST).and_then(|v| v.to_str().ok());
+    match (origin, host) {
+        (Some(o), Some(host)) => o.split_once("://").is_some_and(|(_, authority)| authority.eq_ignore_ascii_case(host)),
+        _ => false,
+    }
+}
+
+fn auth_error(e: auth::Error) -> ApiError {
+    use auth::Error as E;
+    let status = match &e {
+        E::AlreadySetUp | E::SetupNotNeeded => StatusCode::CONFLICT,
+        E::WrongCode | E::WrongPassword => StatusCode::UNAUTHORIZED,
+        E::TooManyAttempts(_) => StatusCode::TOO_MANY_REQUESTS,
+        E::Invalid(_) => StatusCode::BAD_REQUEST,
+        E::Locked => StatusCode::FORBIDDEN,
+        E::NoSuchKey => StatusCode::NOT_FOUND,
+        E::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    };
+    ApiError(status, e.to_string())
+}
+
+/// Run a slow (Argon2) access operation off the async threads.
+async fn blocking<T: Send + 'static>(f: impl FnOnce() -> Result<T, auth::Error> + Send + 'static) -> ApiResult<T> {
+    tokio::task::spawn_blocking(f).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?.map_err(auth_error)
+}
+
+/// The session lives on the server (which ends it after idling, see [`auth`]); the
+/// cookie just outlasts it.
+fn session_cookie(value: &str, max_age: u64) -> HeaderValue {
+    HeaderValue::from_str(&format!("{}={value}; Path=/; HttpOnly; SameSite=Strict; Max-Age={max_age}", auth::SESSION_COOKIE)).unwrap()
+}
+
+/// The access info as `caller` sees it, setting (or, with `clear`, removing) the
+/// session cookie.
+fn access_response(s: &AppState, caller: auth::Resolved, session: Option<auth::NewSession>, clear: bool) -> Response {
+    let (cookie, caller) = match &session {
+        Some(n) => (Some(session_cookie(&n.cookie, 400 * 24 * 3600)), auth::Resolved { role: Some(n.role), via_session: true, setup_required: false }),
+        None if clear => (Some(session_cookie("", 0)), s.auth.resolve(&Default::default())),
+        None => (None, caller),
+    };
+    let mut r = Json(s.auth.info(&caller)).into_response();
+    if let Some(c) = cookie {
+        r.headers_mut().insert(header::SET_COOKIE, c);
+    }
+    r
+}
+
+/// `GET /api/access`: whether setup is needed, the levels, and the caller's role.
+async fn access_get(State(s): State<AppState>, Extension(c): Extension<Caller>) -> Json<auth::Info> {
+    Json(s.auth.info(&c.0))
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SetupBody {
+    #[serde(default)]
+    code: Option<String>,
+    #[serde(flatten)]
+    levels: auth::Levels,
+}
+
+/// `POST /api/setup`: first-run setup. Logs the caller in when the levels need it.
+async fn setup(
+    State(s): State<AppState>,
+    Extension(c): Extension<Caller>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
+    Json(b): Json<SetupBody>,
+) -> ApiResult<Response> {
+    let a = s.auth.clone();
+    let session = blocking(move || a.setup(peer.ip(), b.code.as_deref(), b.levels)).await?;
+    // Re-resolve: with open levels the caller's role comes from the new levels.
+    let caller = if session.is_none() { s.auth.resolve(&Default::default()) } else { c.0 };
+    Ok(access_response(&s, caller, session, false))
+}
+
+#[derive(Deserialize)]
+struct LoginBody {
+    password: String,
+}
+
+/// `POST /api/login {password}`: the admin password gives `admin`, the access password
+/// `operate`.
+async fn login(
+    State(s): State<AppState>,
+    Extension(c): Extension<Caller>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
+    Json(b): Json<LoginBody>,
+) -> ApiResult<Response> {
+    let a = s.auth.clone();
+    let session = blocking(move || a.login(peer.ip(), &b.password)).await?;
+    Ok(access_response(&s, c.0, Some(session), false))
+}
+
+async fn logout(State(s): State<AppState>, Extension(c): Extension<Caller>, headers: HeaderMap) -> ApiResult<Response> {
+    if let Some(cookie) = cookie(&headers, auth::SESSION_COOKIE) {
+        s.auth.logout(cookie).map_err(auth_error)?;
+    }
+    Ok(access_response(&s, c.0, None, true))
+}
+
+/// `PATCH /api/access`: change the levels or passwords. Ends every session; the caller
+/// gets a new one when the new levels need it.
+async fn access_patch(_: Admin, Extension(c): Extension<Caller>, State(s): State<AppState>, Json(levels): Json<auth::Levels>) -> ApiResult<Response> {
+    let a = s.auth.clone();
+    let session = blocking(move || a.change(levels)).await?;
+    let clear = session.is_none() && c.0.via_session;
+    Ok(access_response(&s, s.auth.resolve(&Default::default()), session, clear))
+}
+
+/// `POST /api/access/logout-all`: end every login session, the caller's included.
+async fn logout_all(_: Admin, Extension(c): Extension<Caller>, State(s): State<AppState>) -> ApiResult<Response> {
+    s.auth.logout_all().map_err(auth_error)?;
+    Ok(access_response(&s, c.0, None, true))
+}
+
+async fn keys_list(_: Admin, State(s): State<AppState>) -> Json<Vec<auth::KeyInfo>> {
+    Json(s.auth.keys())
+}
+
+#[derive(Deserialize)]
+struct NewKey {
+    name: String,
+    role: Role,
+}
+
+/// `POST /api/keys {name, role}`: the response holds the key, which isn't shown again.
+async fn key_create(_: Admin, State(s): State<AppState>, Json(b): Json<NewKey>) -> ApiResult<Json<serde_json::Value>> {
+    let (key, info) = s.auth.create_key(&b.name, b.role).map_err(auth_error)?;
+    Ok(Json(json!({ "key": key, "info": info })))
+}
+
+async fn key_delete(_: Admin, State(s): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
+    s.auth.delete_key(&id).map_err(auth_error)?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn get_state(State(s): State<AppState>) -> Json<serde_json::Value> {
@@ -122,7 +323,16 @@ async fn get_settings(State(s): State<AppState>) -> Json<serde_json::Value> {
     Json(serde_json::to_value(&s.service.shared.state.borrow().settings).unwrap())
 }
 
-async fn patch_settings(State(s): State<AppState>, Json(patch): Json<serde_json::Value>) -> ApiResult<Json<serde_json::Value>> {
+async fn patch_settings(
+    _: Operator,
+    Extension(c): Extension<Caller>,
+    State(s): State<AppState>,
+    Json(patch): Json<serde_json::Value>,
+) -> ApiResult<Json<serde_json::Value>> {
+    // Updates and calibration are configuration: admins only.
+    if c.0.role < Some(Role::Admin) && ["updates", "calibration"].iter().any(|k| patch.get(k).is_some()) {
+        return Err(ApiError(StatusCode::FORBIDDEN, "admin password required".into()));
+    }
     let settings = s.service.patch(patch).await.map_err(bad)?;
     s.persist(&settings);
     Ok(Json(serde_json::to_value(settings).unwrap()))
@@ -134,7 +344,7 @@ struct CaptureQuery {
     full_resolution: Option<bool>,
 }
 
-async fn capture(State(s): State<AppState>, Query(q): Query<CaptureQuery>) -> ApiResult<Json<captures::CaptureInfo>> {
+async fn capture(_: Operator, State(s): State<AppState>, Query(q): Query<CaptureQuery>) -> ApiResult<Json<captures::CaptureInfo>> {
     let full = q.full_resolution.unwrap_or_else(|| s.service.shared.state.borrow().settings.capture.full_resolution);
     let c = s.service.capture(full).await.map_err(unavailable)?;
     let dir = s.captures_dir.clone();
@@ -161,7 +371,7 @@ async fn get_capture(State(s): State<AppState>, Path(name): Path<String>) -> Api
     Ok(([(header::CONTENT_TYPE, mime.as_ref().to_string())], bytes).into_response())
 }
 
-async fn delete_capture(State(s): State<AppState>, Path(name): Path<String>) -> ApiResult<StatusCode> {
+async fn delete_capture(_: Admin, State(s): State<AppState>, Path(name): Path<String>) -> ApiResult<StatusCode> {
     let path = captures::resolve(&s.captures_dir, &name).ok_or(ApiError(StatusCode::NOT_FOUND, "no such capture".into()))?;
     tokio::fs::remove_file(path).await.map_err(|e| ApiError(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     Ok(StatusCode::NO_CONTENT)
@@ -182,7 +392,7 @@ fn display_mapping(s: &AppState) -> Option<(loupecam_isp::Orientation, u32, u32)
     Some((o, env.raw.width, env.raw.height))
 }
 
-async fn white_balance(State(s): State<AppState>, Json(b): Json<RegionBody>) -> ApiResult<Json<serde_json::Value>> {
+async fn white_balance(_: Operator, State(s): State<AppState>, Json(b): Json<RegionBody>) -> ApiResult<Json<serde_json::Value>> {
     let region = match b.region {
         Some(r) => {
             let (o, w, h) = display_mapping(&s).ok_or_else(|| unavailable("no frame yet"))?;
@@ -197,7 +407,7 @@ async fn white_balance(State(s): State<AppState>, Json(b): Json<RegionBody>) -> 
 
 /// Set the sensor ROI from a region drawn on the displayed image (relative to the
 /// current view, so ROIs can be refined), or clear it.
-async fn set_roi(State(s): State<AppState>, Json(b): Json<RegionBody>) -> ApiResult<Json<serde_json::Value>> {
+async fn set_roi(_: Operator, State(s): State<AppState>, Json(b): Json<RegionBody>) -> ApiResult<Json<serde_json::Value>> {
     let patch = match b.region {
         None => json!({ "roi": null }),
         Some(r) => {
@@ -217,12 +427,12 @@ async fn update_status(State(s): State<AppState>) -> Json<serde_json::Value> {
     Json(serde_json::to_value(&*s.updates.status.borrow()).unwrap())
 }
 
-async fn update_check(State(s): State<AppState>) -> Json<serde_json::Value> {
+async fn update_check(_: Operator, State(s): State<AppState>) -> Json<serde_json::Value> {
     Json(serde_json::to_value(s.updates.check().await).unwrap())
 }
 
 /// Install the available update; the server restarts shortly after responding.
-async fn update_install(State(s): State<AppState>) -> ApiResult<Json<serde_json::Value>> {
+async fn update_install(_: Admin, State(s): State<AppState>) -> ApiResult<Json<serde_json::Value>> {
     let version = s.updates.install().await.map_err(bad)?;
     Ok(Json(json!({ "installed": version, "restarting": true })))
 }
@@ -237,6 +447,7 @@ async fn calibration_get(State(s): State<AppState>) -> Json<serde_json::Value> {
 }
 
 async fn calibration_run(
+    _: Admin,
     State(s): State<AppState>,
     Json(req): Json<crate::calibration::runner::StepRequest>,
 ) -> ApiResult<StatusCode> {
@@ -244,14 +455,14 @@ async fn calibration_run(
     Ok(StatusCode::ACCEPTED)
 }
 
-async fn calibration_cancel(State(s): State<AppState>) -> StatusCode {
+async fn calibration_cancel(_: Admin, State(s): State<AppState>) -> StatusCode {
     s.calibration.cancel();
     StatusCode::NO_CONTENT
 }
 
 /// Forget a calibration section: `dark`, `gain`, `color`, `flatField-<size>`, or
 /// `scale-<name>`.
-async fn calibration_delete(State(s): State<AppState>, Path(section): Path<String>) -> ApiResult<StatusCode> {
+async fn calibration_delete(_: Admin, State(s): State<AppState>, Path(section): Path<String>) -> ApiResult<StatusCode> {
     let serial = s.service.shared.state.borrow().device.as_ref().map(|d| d.serial.clone()).ok_or_else(|| unavailable("no camera connected"))?;
     let mut p = crate::calibration::load(&serial);
     match section.as_str() {
