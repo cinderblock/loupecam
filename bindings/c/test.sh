@@ -6,13 +6,16 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# Both library kinds, and the system libraries a static link needs.
-libs=$(cargo rustc --release -p loupecam-capi --crate-type cdylib,staticlib -- --print native-static-libs 2>&1 |
-  tee /dev/stderr | sed -n 's/.*native-static-libs: //p' | head -1)
 target=$(cargo metadata --format-version 1 --no-deps | grep -o '"target_directory":"[^"]*"' | cut -d'"' -f4 | sed 's#\\\\#/#g')
 lib="$target/release"
 out="$target/capi-test"
 mkdir -p "$out"
+
+# Both library kinds, and the system libraries a static link needs. No colour, since
+# the native-static-libs line is parsed (CI sets CARGO_TERM_COLOR=always).
+cargo rustc --color never --release -p loupecam-capi --crate-type cdylib,staticlib -- --print native-static-libs 2>&1 |
+  tee "$out/build.log"
+libs=$(sed -n 's/.*native-static-libs: //p' "$out/build.log" | head -1)
 flags=(-std=c99 -Wall -Wextra -Werror -Iinclude)
 
 case "$(uname -s)" in

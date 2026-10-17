@@ -13,8 +13,10 @@ fn header_is_current() {
         std::fs::write(&path, &generated).unwrap();
         return;
     }
-    // Compare ignoring line endings (the checkout may have CRLF).
-    let committed = std::fs::read_to_string(&path).unwrap_or_default().replace("\r\n", "\n");
+    // Compare ignoring line endings. A CRLF checkout puts CRLF in the header, and in the
+    // source's doc comments, which cbindgen copies into the header.
+    let generated = generated.replace('\r', "");
+    let committed = std::fs::read_to_string(&path).unwrap_or_default().replace('\r', "");
     assert!(
         committed == generated,
         "include/loupecam.h is out of date: run `LOUPECAM_BLESS=1 cargo test -p loupecam-capi --test header`"
