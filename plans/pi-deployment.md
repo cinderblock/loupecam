@@ -68,6 +68,13 @@ everything goes in the repo (`packaging/linux/`) and is tested first on a stand-
   appended to `/boot/firmware/config.txt` (backup `config.txt.bak-loupecam`), rebooted.
   Device tree then showed `usb_max_current_enable` = 1. Zero over-current events after
   that, both with `motion` stopped and with it running alongside (90 s).
+- **But the supply can't carry full CPU load on top of that.** A 4-core `cargo build`
+  on odriver2 (camera streaming, `motion` running) browned it out about 40 s in. The
+  journal for that boot ends at 2026-10-16 23:13:49 with no shutdown, and the Pi
+  rebooted by itself. For the final Pi, use the official 27 W supply rather than
+  `usb_max_current_enable=1` on an unknown one. Build LoupeCam elsewhere: it
+  cross-compiles from Windows (recipe in `plans/access-setup.md` on branch
+  `access-setup`).
 - `/var/lib/loupecam` is empty until the first settings change; a PATCH then wrote
   `/var/lib/loupecam/config/loupecam/settings.json` (owned by `loupecam`).
 - Verified after the fix: starts at boot; `/snapshot.jpg`, `/stream.mjpg` (~1.1 MB/s);
