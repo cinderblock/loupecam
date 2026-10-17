@@ -435,11 +435,54 @@ input.number {
   font-size: 20px;
 }
 .cast-back {
+  /* Bottom corner: PDF viewers put their toolbar along the top. */
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   right: 10px;
   padding: 10px 16px;
   font-size: 16px;
   border-radius: 24px;
   background: rgba(30, 33, 37, 0.85);
+}
+
+.hint.warn {
+  color: #f0b44c;
+}
+.row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.row .grow {
+  flex: 1;
+  min-width: 0;
+}
+input[type='url'] {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+button.record {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.record-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e5484d;
+}
+button.record.active {
+  background: #4a1d20;
+  border-color: #e5484d;
+}
+button.record.active .record-dot {
+  animation: record-blink 1s steps(2, start) infinite;
+}
+@keyframes record-blink {
+  to {
+    visibility: hidden;
+  }
 }

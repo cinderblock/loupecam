@@ -4,7 +4,7 @@ import type { CaptureEntry } from '../types'
 import { formatBytes } from '../format'
 
 /** Saved captures, newest first. `version` changes trigger a refresh. */
-export function Gallery({ version }: { version: number }) {
+export function Gallery({ version }: { version: number | string }) {
   const [items, setItems] = useState<CaptureEntry[]>([])
   const refresh = useCallback(() => {
     api.captures().then(setItems, () => {})
@@ -15,7 +15,8 @@ export function Gallery({ version }: { version: number }) {
     <ul className="gallery">
       {items.slice(0, 50).map((c) => (
         <li key={c.name}>
-          <a href={api.captureUrl(c.name)} target="_blank" rel="noreferrer" title="Open">
+          <a href={api.captureUrl(c.name)} target="_blank" rel="noreferrer" title={c.name.endsWith('.mp4') ? 'Play' : 'Open'}>
+            {c.name.endsWith('.mp4') ? '▶ ' : ''}
             {c.name}
           </a>
           <span className="muted">{formatBytes(c.bytes)}</span>

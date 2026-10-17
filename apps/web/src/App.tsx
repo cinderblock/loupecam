@@ -8,6 +8,8 @@ import { formatExposure } from './format'
 import { Viewer, type Overlays, type Tool } from './components/Viewer'
 import { UpdateBanner, UpdatesPanel } from './components/Updates'
 import { CalibrationPanel } from './components/Calibration'
+import { RecordButton, RecordPanel } from './components/Record'
+import { CastPanel } from './components/Cast'
 import type { NormRect, ScalePreset } from './types'
 import { useCamera } from './useCamera'
 
@@ -41,6 +43,8 @@ export default function App() {
     window.setTimeout(() => setToast((t) => (t === m ? null : t)), 4000)
   }, [])
   const cam = useCamera(flash)
+  // The gallery also refreshes when a recording finishes.
+  const lastRecording = cam.record?.last?.started ?? ''
   // Calibrated scale presets (refreshed when a calibration step finishes).
   const [scalePresets, setScalePresets] = useState<ScalePreset[]>([])
   const calibAt = cam.calibration?.last?.at
@@ -166,6 +170,7 @@ export default function App() {
                 {k === 'scaleBar' ? 'Scale bar' : k[0].toUpperCase() + k.slice(1)}
               </button>
             ))}
+            <RecordButton status={cam.record} disabled={!dev} onError={flash} />
             <button className="primary" disabled={busy || !dev} onClick={capture} title="Capture (Space)">
               {busy ? 'Capturing…' : 'Capture'}
             </button>
@@ -184,6 +189,14 @@ export default function App() {
               <CaptureSettingsPanel s={s} patch={cam.patch} />
             </Section>
           )}
+          {s && (
+            <Section title="Recording" defaultOpen={false}>
+              <RecordPanel s={s} device={dev} status={cam.record} patch={cam.patch} />
+            </Section>
+          )}
+          <Section title="Cast to display" defaultOpen={false}>
+            <CastPanel cast={cam.cast} onError={flash} />
+          </Section>
           <Section title="Scale" defaultOpen={false}>
             {s?.calibration.scalePreset ? (
               <p className="hint">Using the calibrated preset “{s.calibration.scalePreset}” (change it under Calibration).</p>
@@ -211,7 +224,7 @@ export default function App() {
             </Section>
           )}
           <Section title="Captures">
-            <Gallery version={galleryVersion} />
+            <Gallery version={`${galleryVersion}:${lastRecording}`} />
           </Section>
           {s && (
             <Section title="About & updates" defaultOpen={false}>

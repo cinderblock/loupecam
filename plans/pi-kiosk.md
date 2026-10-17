@@ -123,9 +123,9 @@ work in both the camera view and cast content.
 1. ✅ Casting API + display token (server) and the `/cast` page (web).
 2. ✅ Recording core: fMP4 muxer (tests check it with ffprobe), encoder trait, openh264
    dev backend, recorder actor, API, timelapse.
-3. **← current** Web UI: record button and mode picker, Gallery video playback, touch gestures in
+3. ✅ Web UI: record button and mode picker, Gallery video playback, touch gestures in
    Viewer.
-4. Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
+4. **← current** Native kiosk crate: the window backend first (develop on Windows), then DRM + evdev.
 5. Chromium override (cage handoff).
 6. V4L2 M2M encoder (needs the Pi 4).
 7. Packaging: `loupecam-kiosk.service`, `install.sh --kiosk` (installs `cage`,
@@ -134,6 +134,10 @@ work in both the camera view and cast content.
 
 ## Findings / gotchas
 
+- The embedded test browser (T3 preview) has no PDF viewer: PDF casts show blank
+  there. Real Chrome renders them. Chromium on the Pi includes the viewer (verify).
+- Chrome's PDF viewer toolbar runs along the top, so the cast page's back button sits
+  bottom-right.
 - The recorder develops frames itself, independently of the preview, so recording and
   watching both develop each frame. Fine on a desktop; on the Pi 4 measure it, and if
   it's CPU-bound, share the preview's developed image when the sizes match.
@@ -160,7 +164,11 @@ work in both the camera view and cast content.
       openh264 → fMP4 round trip checked by ffprobe/ffmpeg (including a file truncated
       mid-way), and the full recorder fed synthetic raw frames (video, timelapse with
       stills).
-- [ ] Web UI: record, gallery video, touch viewer
+- [x] Web UI: record button + Recording panel (presets and knobs), Cast panel, ▶ videos
+      in Gallery, pinch/two-finger pan/double-tap in Viewer. Checked in a browser: panels,
+      preset switch, `/cast` live-switching via SSE, PDF in real Chrome, our fMP4 plays and
+      seeks in Chromium. Pinch not yet tried on a real touchscreen (no frames without a
+      camera, and no multi-touch in the test browser).
 - [ ] Native kiosk: window backend
 - [ ] Native kiosk: DRM + evdev
 - [ ] Chromium override
