@@ -10,8 +10,8 @@ is replaced by a choice of security levels, set in the UI and changeable later.
 
 ## Environment / context
 
-- Work happens in the worktree `../loupecam-access` (branch `access-setup`, from master
-  `3dbf232`). The main tree is shared with the kiosk thread
+- Work happened in the worktree `../loupecam-access` (branch `access-setup`, from master
+  `3dbf232`); it was merged to master and both were removed afterwards. The main tree is shared with the kiosk thread
   ([pi-kiosk.md](pi-kiosk.md)), which has uncommitted recording work in `http.rs`,
   `lib.rs` and `settings.rs`, the same files this touches. Expect merge conflicts there.
 - Build in this worktree with `CARGO_BUILD_BUILD_DIR="$PWD/target/build-dir"` (see
